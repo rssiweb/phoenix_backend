@@ -32,7 +32,7 @@ CSRF_SESSION_KEY = os.getenv('CSRF_SESSION_KEY', 'abra-kadabra')
 # Secret key for signing cookies
 SECRET_KEY = os.getenv('SECRET_KEY', 'abra-kadabra')
 
-BCRYPT_LOG_ROUNDS = os.getenv('BCRYPT_LOG_ROUNDS', 10)
+BCRYPT_LOG_ROUNDS = int(os.getenv('BCRYPT_LOG_ROUNDS', 10))
 
 # default token life to 2 hours
-TOKEN_LIFESPAN_SEC = os.getenv('TOKEN_LIFESPAN_SEC', 7200)
+TOKEN_LIFESPAN_SEC = int(os.getenv('TOKEN_LIFESPAN_SEC', 7200))
