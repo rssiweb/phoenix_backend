@@ -1,3 +1,6 @@
 flask
 gunicorn
 flask_sqlalchemy
+pyjwt
+flask_bcrypt
+flask_migrate
