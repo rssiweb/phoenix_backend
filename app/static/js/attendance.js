@@ -1,127 +1,4 @@
-{% extends 'base.html' %}
-
-{% block body %}
-{% raw %}
-<div id="app" class="ui container">
-    
-    <button id="signout" v-on:click="logout" class="ui right floated orange button">Signout</button>
-    
-    <h2 class="ui header">{{ heading }}</h2>
-    <div class="sub header">
-        <button class="ui compact mini icon button" v-on:click="previousDay">
-            <i class="chevron left icon" ></i>
-        </button>
-        {{ displayDateString }}
-        <button class="ui compact mini icon button" v-on:click="nextDay" v-bind:class="{ disabled: isToday }">
-            <i class="chevron right icon"></i>
-        </button>
-    </div>
-    
-    <div class="ui container">
-
-        <div class="ui container" v-if="error">
-            <div class="ui negative message">
-                <i class="close icon"></i>
-                <div class="header">
-                    {{ error }}
-                </div>
-            </div>
-        </div>
-
-        <div class="ui container" v-if="message">
-            <div class="ui info message">
-                <i class="close icon"></i>
-                <div class="header">
-                    {{ message }}
-                </div>
-            </div>
-        </div>
-
-        <div class="ui segment" v-if="loading">
-            <div class="ui active inverted dimmer">
-                <div class="ui text loader">{{ loading }}</div>
-            </div>
-            <p><br/><br/><br/><br/><br/></p>
-        </div>
-
-        <div class="ui very relaxed large items" v-if="!loading && students.length > 0">
-          <div v-for="student in students"  class="item">
-            <a class="ui small image">
-              <img src="http://via.placeholder.com/50x50">
-            </a>
-
-            <div class="content">
-                <div class="header">{{ student.name }}</div>
-                <div class="description">
-                    <p>{{ student.student_id }} | {{ student.category }}</p>
-                    <p v-if="student.in" >Punched in at <b>{{ getPresentableTime(student.in) }}</b></p>
-                    <p v-else>No punch in record</p>
-                    <p v-if="student.out" >Punched out at <b>{{ getPresentableTime(student.out) }}</b></p>
-                    <p v-else>No punch out record</p>
-                    <div class="ui input" v-if="student.out && !viewOnly">
-                        <input type="text" placeholder="Comment (Optional).." v-model="student.comment">
-                    </div>
-                    <p v-if="viewOnly && student.comment"><b>Comment:</b> {{ student.comment }}</p>
-                </div>
-                <div class="extra" v-if="!viewOnly">
-                    <div class="ui buttons">
-                        <button class="ui left attached button" v-on:click="punchIn(student)" v-bind:class="[ student.in ? 'olive' : '' ]">Punch in</button>
-                        <button class="right attached ui button" v-on:click="punchOut(student)" v-bind:class="[ student.out ? 'purple' : '', student.in ? '' : 'disabled' ]">Punch out</button>
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-    </div>
-    <br/>
-    <div class="ui container">
-        <div class="ui blue button" v-on:click="showAddStudentModel">Add Student</div>
-        <div class="ui right floated positive button" v-on:click="saveAttendance" v-bind:class="{disabled: loading}" v-if="!viewOnly">Save</div>
-    </div>
-
-<!-- Model add student -->
-<div class="ui modal">
-  <i class="close icon"></i>
-  <div class="header">
-   Add Student
-  </div>
-  <div class="content">
-    <form id='addStudentForm' class="ui form">
-        <div class="field">
-            <label>Student ID</label>
-            <input type="text" name="id" placeholder="Student ID">
-        </div>
-        <div class="field">
-            <label>Category</label>
-            <input type="text" name="category" placeholder="Category">
-        </div>
-        <div class="field">
-            <label>Name</label>
-            <input type="text" name="name" placeholder="First Name">
-        </div>
-        <div class="field">
-            <label>Date of Birth</label>
-            <input type="date" name="dob" placeholder="Date of Birth">
-        </div>
-    </form>
-  </div>
-  <div class="actions">
-    <div class="ui black deny button">Cancel</div>
-    <div class="ui positive right button" v-on:click="addStudent">Add</div>
-  </div>
-</div>
-</div>
-{% endraw %}
-{% endblock %}
-
-{% block script %}
-{% raw %}
-<script type="text/javascript">
-    $('#example2').calendar({
-      type: 'date'
-    });
-
-    var app = new Vue({
+var app = new Vue({
         el: '#app',
         data: {
             heading:'Attendance',
@@ -171,18 +48,6 @@
                         this.loading = '';
                     });
             },
-            addStudent: function(){
-                data = this.getJsonFromForm($('#addStudentForm input'))
-                console.log(data);
-                this.$http.post('/api/student/add',data,{
-                    headers: { Authorization: 'Basic ' +  this.token}
-                }).then( response => {
-                    console.log(response);
-                    this.loadStudents();
-                }, error => {
-                    console.log(error);
-                });
-            },
             getAttendance: function(){
                 this.loading = 'Loading attendance...'
                 var token = this.token
@@ -222,7 +87,7 @@
                             comment: student.comment
                         });
                 });
-                this.$http.post('/api/attendance/set/' + moment().format('DDMMYYYY'), updatedStudents, {
+                this.$http.post('/api/attendance/set/' + moment(this.attendanceDate).format('DDMMYYYY'), updatedStudents, {
                     headers: { Authorization: 'Basic ' +  this.token}
                 }).then( response => {
                     console.log(response);
@@ -231,9 +96,6 @@
                     console.log(error);
                     this.loading = '';    
                 });
-            },
-            showAddStudentModel: function(){
-                $('.ui.modal').modal('show');
             },
             punchIn: function(student){
                 var updatedStd = student;
@@ -245,7 +107,14 @@
                     updatedStd.out = undefined;
                 }
                 this.$set(this.students, this.students.indexOf(student), updatedStd);
-                console.log(this.students);
+                //ajax request to punch in the student
+                this.$http.post('/api/attendance/punchin/'+moment(this.attendanceDate).format('DDMMYYYY')+'/'+student.id,{in: moment(student.in).format('HH:mm:ss')},{
+                    headers: { Authorization: 'Basic ' +  this.token}
+                }).then(response => {
+                    console.log(response);
+                }, error => {
+                    console.log(error);
+                });
             },
             punchOut: function(student){
                 var updatedStd = student;
@@ -255,14 +124,6 @@
                     updatedStd.out = undefined;
                 this.$set(this.students, this.students.indexOf(student), updatedStd);
                 console.log(this.students);
-            },
-            getJsonFromForm: function(formInputArr){
-                data = {}
-                $(formInputArr).each(function(index, input){
-                    data[input.name] = input.value;
-                    input.value = '';
-                });
-                return data;
             },
             getPresentableTime: function(datetime){
                 return moment(datetime).format('hh mm:ss A');
@@ -287,14 +148,10 @@
                     window.location = '/';
             },
             attendanceDate: function(){
-                console.log(this.attendanceDate)
                 this.isToday = moment(this.attendanceDate.format('YYYY-MM-DD')).isAfter(moment())
             }
         },
         computed:{
             
         }
-    })
-</script>
-{% endraw %}
-{% endblock %}
+    });

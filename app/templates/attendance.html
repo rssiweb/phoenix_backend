@@ -1,0 +1,99 @@
+{% extends 'lbase.html' %}
+
+{% block bodywh %}
+{% raw %}
+    
+    <h2 class="ui header">{{ heading }}</h2>
+
+    <div class="ui container">
+        <div class="sub header">
+            <button class="ui compact mini icon button" v-on:click="previousDay">
+                <i class="chevron left icon" ></i>
+            </button>
+            {{ displayDateString }}
+            <button class="ui compact mini icon button" v-on:click="nextDay" v-bind:class="{ disabled: isToday }">
+                <i class="chevron right icon"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="ui container">
+
+        <div class="ui container" v-if="error">
+            <div class="ui negative message">
+                <i class="close icon"></i>
+                <div class="header">
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <div class="ui container" v-if="message">
+            <div class="ui info message">
+                <i class="close icon"></i>
+                <div class="header">
+                    {{ message }}
+                </div>
+            </div>
+        </div>
+
+        <div class="ui segment" v-if="loading">
+            <div class="ui active inverted dimmer">
+                <div class="ui text loader">{{ loading }}</div>
+            </div>
+            <p><br/><br/><br/><br/><br/></p>
+        </div>
+
+        <div class="ui container">
+
+        <table class="ui celled striped table" v-if="!loading && students.length > 0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Student ID</th>
+                    <th>Category</th>
+                    <th>Punch In</th>
+                    <th>Punch Out</th>
+                    <th>Comment (Optional)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="student in students">
+                    <td><h4 class="ui center aligned header">{{student.name}}</h4></td>
+                    <td>{{student.student_id}}</td>
+                    <td>{{student.category}}</td>
+                    <td>
+                        <p v-if="student.in" >{{ getPresentableTime(student.in) }}</p>
+                        <p v-else>No punch in record</p>
+                    </td>
+                    <td>
+                        <p v-if="student.out" >{{ getPresentableTime(student.out) }}</p>
+                        <p v-else>No punch out record</p>
+                    </td>
+                    <td>
+                        <div class="ui input" v-if="student.out && !viewOnly">
+                            <input type="text" placeholder="Comments.." v-model="student.comment">
+                        </div>
+                        <p v-if="viewOnly && student.comment"><b>Comment:</b> {{ student.comment }}</p>
+                    </td>
+                    <td>
+                        <div class="extra" v-if="!viewOnly">
+                            <div class="ui buttons">
+                                <button class="ui left attached button" v-on:click="punchIn(student)" v-bind:class="[ student.in ? 'disabled' : '' ]">Punch in</button>
+                                <button class="right attached ui button" v-on:click="punchOut(student)" v-bind:class="[ student.out ? 'disabled' : '', student.in ? '' : 'disabled' ]">Punch out</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/attendance.js') }}"></script>
+{% endblock %}

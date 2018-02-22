@@ -252,3 +252,22 @@ def set_attendance(date):
     res['addedIds'] = std_added
     res_code = 200
     return make_response(jsonify(res)), res_code
+
+
+@mod_api.route('/attendance/punchin/<string:date>/<int:studentid>', methods=['POST'])
+@login_required
+def punch_in(date, studentid):
+    print date, studentid
+    res = dict(status='fail')
+    data = request.json or request.data or request.form
+    try:
+        date = datetime.strptime(date, '%d%m%Y')
+        print date
+        date  = datetime.strptime(data['in'], '%H:%M:%S')
+        print date
+    except Exception as e:
+        print e
+        res['message'] = 'Invalid date {}'.format(date)
+        print res
+    print 'data', data
+    return jsonify([date, studentid])

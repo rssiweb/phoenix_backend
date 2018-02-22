@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div id="app" class="ui container">
+    <div class="ui secondary pointing menu">
+        <a class="item {%if page == 1%}active{%endif%}" href="/attendance">Attendance</a>
+        <a class="item {%if page == 2%}active{%endif%}" href="/students">Students</a>
+        <a class="item {%if page == 3%}active{%endif%}" href="/faculties">Faculties</a>
+        <div class="right menu">
+            <div class="ui item" >
+                <button v-on:click="logout" class="ui orange button">Logout</button> 
+            </div>
+        </div>
+    </div>
+    {% block bodywh %}{% endblock %}
+</div>
+{% endblock%}
