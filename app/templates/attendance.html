@@ -57,7 +57,7 @@
                     <th>Punch In</th>
                     <th>Punch Out</th>
                     <th>Comment (Optional)</th>
-                    <th>Action</th>
+                    <th v-if="!viewOnly">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -81,8 +81,8 @@
                         </div>
                         <p v-if="viewOnly && student.comment">{{ student.comment }}</p>
                     </td>
-                    <td>
-                        <div class="extra" v-if="!viewOnly">
+                    <td v-if="!viewOnly">
+                        <div class="extra">
                             <div class="compact mini ui buttons">
                                 <button class="ui left attached button" v-on:click="saveAttendaceData(student,'in')" v-bind:class="[ student.in ? 'disabled' : '' ]">Punch in</button>
                                 <button class="ui right attached button" v-on:click="saveAttendaceData(student,'out')" v-bind:class="[ student.out ? 'disabled' : '', student.in ? '' : 'disabled' ]">Punch out</button>
