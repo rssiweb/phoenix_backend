@@ -10,8 +10,8 @@ var app = new Vue({
             timeFormat: '',
             attendanceDate: moment(),
             displayDateString: moment().format('dddd, Do MMMM'),
-            isToday: true,
             viewOnly: false,
+            nextIsFuture: true,
         },
         created: function(){
             console.log('stating');
@@ -26,9 +26,8 @@ var app = new Vue({
                 this.loading = 'Loading students...'
                 var token = this.token;
                 console.log('token', token);
-                this.$http.get('/api/student',{
-                        headers: { Authorization: 'Basic ' +  token}
-                    }).then(data => {
+                this.$http.get('/api/student',this.getHeaders())
+                .then(data => {
                         console.log(data);
                         this.students = data.body.students
                         if(this.students.length == 0){
@@ -48,23 +47,28 @@ var app = new Vue({
                         this.loading = '';
                     });
             },
+            getHeaders: function(){
+                return {headers: { Authorization: 'Basic ' +  this.token}};
+            },
             getAttendance: function(){
                 this.loading = 'Loading attendance...'
                 var token = this.token
                 var vm = this
-                this.$http.get('/api/attendance/'+this.attendanceDate.format('DDMMYYYY'),{
-                        headers: { Authorization: 'Basic ' +  token}
-                    }).then(data => {
-                        var students = vm.students;
-                        data.body.attendance.forEach(function(item, index){
-                            //TODO: updated attendance of students
-                            students.forEach(function(student, stdi){
+                var url = '/api/attendance/'+this.attendanceDate.format('DDMMYYYY')
+                this.$http.get(url, vm.getHeaders())
+                .then(data => {
+                        console.log(data);
+                        vm.students.forEach(function(student, stdi){
+                            student.in = undefined;
+                            student.out = undefined;
+                            student.comment = undefined;
+                            data.body.attendance.forEach(function(item, index){
                                 if(student.id == item.student.id){
                                     console.log(student,item,'matched');
                                     student.in = item.punchIn;
                                     student.out = item.punchOut;
                                     student.comment = item.comments;
-                                    vm.$set(vm.students, index, student);
+                                    vm.$set(vm.students, stdi, student);
                                 }
                             })
                         });
@@ -75,71 +79,80 @@ var app = new Vue({
                         this.message = error.data.message;
                     });
             },
-            saveAttendance:function(){
-                this.loading = 'Saving attendance..';
-                var updatedStudents = [];
-                $(this.students).each(function(index, student){
-                    if(student.in && student.out)
-                        updatedStudents.push({
-                            student_id: student.id,
-                            in: student.in,
-                            out: student.out,
-                            comment: student.comment
-                        });
-                });
-                this.$http.post('/api/attendance/set/' + moment(this.attendanceDate).format('DDMMYYYY'), updatedStudents, {
-                    headers: { Authorization: 'Basic ' +  this.token}
-                }).then( response => {
-                    console.log(response);
-                    this.loading = '';
-                }, error => {
-                    console.log(error);
-                    this.loading = '';    
-                });
-            },
-            punchIn: function(student){
+            saveAttendaceData: function(student, what){
+                if(what != 'in' && what != 'out' && what != 'comment') return;
+                
                 var updatedStd = student;
-                if(!student.in){
-                    updatedStd.in = new Date();
+                var postData = {};
+
+                if(what == 'in'){
+                    updatedStd.in = moment().format('HH:mm:ss');
+                    postData.in = updatedStd.in;
                 }
-                else{
-                    updatedStd.in = undefined;
-                    updatedStd.out = undefined;
+                else if(what == 'out'){
+                    updatedStd.out = moment().format('HH:mm:ss');
+                    postData.out = updatedStd.out;
                 }
-                this.$set(this.students, this.students.indexOf(student), updatedStd);
+                else if(what == 'comment'){
+                    postData.comment = updatedStd.comment;
+                }
+
+                var url = '/api/attendance/'+moment(this.attendanceDate).format('DDMMYYYY')+'/'+student.id+'/'+what
+                console.log('url',url);
+                console.log('postData',postData);
+                var vm = this;
+                vm.$set(vm.students, vm.students.indexOf(student), updatedStd);
                 //ajax request to punch in the student
-                this.$http.post('/api/attendance/punchin/'+moment(this.attendanceDate).format('DDMMYYYY')+'/'+student.id,{in: moment(student.in).format('HH:mm:ss')},{
-                    headers: { Authorization: 'Basic ' +  this.token}
-                }).then(response => {
-                    console.log(response);
+                vm.$http.post(url, postData, vm.getHeaders())
+                .then(response => {
+                    if(response.body.status == 'success'){
+                        console.log('saved')
+                    }else{
+                        // undo the changes in ui
+                       var redoUpdatedStd = updatedStd;
+                        if(what == 'in'){
+                            redoUpdatedStd.in = undefined;
+                        }
+                        else if(what == 'out'){
+                            redoUpdatedStd.out = undefined;
+                        }
+                        else if(what == 'comment'){
+                            redoUpdatedStd.comment = undefined;
+                        }
+                        vm.$set(vm.students, vm.students.indexOf(updatedStd), redoUpdatedStd);
+                    }
                 }, error => {
                     console.log(error);
+                    var redoUpdatedStd = updatedStd;
+                    redoUpdatedStd.in = undefined;
+                    this.$set(this.students, this.students.indexOf(updatedStd), redoUpdatedStd);
                 });
             },
             punchOut: function(student){
                 var updatedStd = student;
                 if(!student.out)
-                    updatedStd.out = new Date();
+                    updatedStd.out = moment().format('HH:mm:ss');
                 else
                     updatedStd.out = undefined;
                 this.$set(this.students, this.students.indexOf(student), updatedStd);
                 console.log(this.students);
             },
-            getPresentableTime: function(datetime){
-                return moment(datetime).format('hh mm:ss A');
+            getTimeString: function(datetime){
+                return moment(datetime,['HH:mm:ss']).format('hh:mm:ss A');
             },
             nextDay: function(){
                 console.log('nextDay');
-                this.attendanceDate.add(1, 'day');
-                this.displayDateString = this.attendanceDate.format('dddd, Do MMMM');
+                this.attendanceDate = moment(this.attendanceDate).add(1, 'day');
+                var today = moment()
+                if(today.diff(this.attendanceDate,'days')==0)
+                    this.viewOnly = false;    
+                this.getAttendance();
             },
             previousDay: function(){
                 console.log('preDay');
-                this.attendanceDate.subtract(1, 'day');
-                this.displayDateString = this.attendanceDate.format('dddd, Do MMMM');
+                this.attendanceDate = moment(this.attendanceDate).subtract(1, 'day');
                 this.viewOnly = true;
                 this.getAttendance();
-                
             }
         },
         watch:{
@@ -148,10 +161,16 @@ var app = new Vue({
                     window.location = '/';
             },
             attendanceDate: function(){
-                this.isToday = moment(this.attendanceDate.format('YYYY-MM-DD')).isAfter(moment())
+                var currAttendance = moment(this.attendanceDate)
+                currAttendance.add(1,'day')
+                var today = moment()
+                this.nextIsFuture = currAttendance.isAfter(today)
+                console.log(this.nextIsFuture);
             }
         },
         computed:{
-            
+            currentAttendanceDate:function(){
+                return this.attendanceDate.format('dddd, Do MMMM');;
+            }
         }
     });

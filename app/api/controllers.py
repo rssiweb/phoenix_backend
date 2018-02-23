@@ -63,7 +63,7 @@ def list_faculties():
 def add_faculty():
     required_fileds = ['email', 'password', 'name']
     res = dict(status='fail')
-    res_code = 401
+    res_code = 200
 
     data = request.json or request.data or request.form
     if not data:
@@ -106,9 +106,11 @@ def add_faculty():
 
 @mod_api.route('/student')
 @login_required
+@addLag
 def list_students():
     students = [s.serialize() for s in Student.query.all()]
     data = dict(status='Success', students=students)
+    print data
     return make_response(jsonify(data)), 200
 
 
@@ -117,7 +119,7 @@ def list_students():
 def add_student():
     required_fields = ['dob', 'name', 'category', 'id']
     res = dict(status='fail')
-    res_code = 401
+    res_code = 200
 
     data = request.json or request.data or request.form
     if not data:
@@ -173,6 +175,7 @@ def index():
 
 
 @mod_api.route('/get_token', methods=['POST'])
+@addLag
 def get_token():
     # get the post data
     data = request.json or request.data or request.form
@@ -204,15 +207,17 @@ def get_token():
     return make_response(jsonify(res)), 401
 
 
-@mod_api.route('/attendance/<int:date>', methods=['GET'])
+@mod_api.route('/attendance/<string:date>', methods=['GET'])
 @login_required
+@addLag
 def get_attendance(date):
-    date = datetime.strptime(str(date), '%d%m%Y').date()
+    date = datetime.strptime(date, '%d%m%Y').date()
     print date
     attendance = Attendance.query.filter_by(date=date).all()
     attendance = [att.serialize() for att in attendance]
     data = dict(result=True, date=date, attendance=attendance)
-    return make_response(jsonify(data))
+    print data
+    return make_response(jsonify(data)), 200
 
 
 @mod_api.route('/attendance/set/<int:date>', methods=['POST'])
@@ -221,7 +226,7 @@ def set_attendance(date):
     data = request.json or request.data or request.form
     date = datetime.strptime(str(date), '%d%m%Y')
     res = dict(status='fail')
-    res_code = 400
+    res_code = 200
     if not isinstance(data, list):
         res['message'] = 'expect a list got {0}.'.format(data)
         return make_response(jsonify(res)), res_code
@@ -250,24 +255,75 @@ def set_attendance(date):
     res['meassage'] = 'Attendance saved successfully'
     res['updatedIds'] = std_updated
     res['addedIds'] = std_added
+    return make_response(jsonify(res)), res_code # Created
+
+
+@mod_api.route('/attendance/<string:date>/<int:studentid>/<string:what>', methods=['POST'])
+@login_required
+def punch_in(date, studentid, what):
+    res = dict(status='fail')
     res_code = 200
+    if what not in ['in', 'out', 'comment']:
+        res['message'] = 'Invalid url'
+        return make_response(jsonify(res)), res_code
+
+    print date, studentid
+    data = request.json or request.data or request.form
+    print 'data', data
+    punch_in_time = None
+    res_code = 200
+    try:
+        date = datetime.strptime(date, '%d%m%Y').date()
+        print date
+        dataToSave = data.get(what)
+        # if its a time then should be parsellable to the specific format
+        if what in ['in', 'out']:
+            datetime.strptime(dataToSave, '%H:%M:%S')
+    except Exception as e:
+        print e
+        res['message'] = 'Invalid date or punch in time [{},{}]'.format(date, data['in'])
+        return make_response(jsonify(res)), res_code
+    student = Student.query.get(studentid)
+    faculty = Faculty.query.get(request.user.id)
+    msg = check_student_faculty(student, faculty, date)
+    if msg:
+        res['message'] = msg
+        return make_response(jsonify(res)), res_code
+
+    attendance = Attendance.query.filter_by(date=date, student_id=student.id).first()
+    if attendance:
+        if faculty.admin:
+            if what == 'in':
+                attendance.punchIn = dataToSave
+            elif what == 'out':
+                attendance.punchOut = dataToSave
+            else:
+                attendance.comments = dataToSave
+            res['message'] = 'Updated existing record'
+            db.session.commit()
+            print attendance
+            res['status'] = 'success'
+            res_code = 200
+        else:
+            res['message'] = 'Record already exists, Request admin to update the record.'
+    else:
+        # If the record does not exist that means the dataToSave is intime
+        attendance = Attendance(date=date,
+                                student_id=studentid,
+                                punchIn=dataToSave)
+        db.session.add(attendance)
+        db.session.commit()
+        print attendance.serialize()
+        res['message'] = 'Record created.'
+        res['status'] = 'success'
+        res_code = 200
     return make_response(jsonify(res)), res_code
 
 
-@mod_api.route('/attendance/punchin/<string:date>/<int:studentid>', methods=['POST'])
-@login_required
-def punch_in(date, studentid):
-    print date, studentid
-    res = dict(status='fail')
-    data = request.json or request.data or request.form
-    try:
-        date = datetime.strptime(date, '%d%m%Y')
-        print date
-        date  = datetime.strptime(data['in'], '%H:%M:%S')
-        print date
-    except Exception as e:
-        print e
-        res['message'] = 'Invalid date {}'.format(date)
-        print res
-    print 'data', data
-    return jsonify([date, studentid])
+def check_student_faculty(student, faculty, date):
+    if not faculty:
+        return 'You are not a Faculty'
+    if not any([faculty.admin, date != datetime.today()]):
+        return 'Invalid date {}'.format(date)
+    if not student:
+        return 'No such student'

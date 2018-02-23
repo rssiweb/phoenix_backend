@@ -10,8 +10,8 @@
             <button class="ui compact mini icon button" v-on:click="previousDay">
                 <i class="chevron left icon" ></i>
             </button>
-            {{ displayDateString }}
-            <button class="ui compact mini icon button" v-on:click="nextDay" v-bind:class="{ disabled: isToday }">
+            {{ currentAttendanceDate }}
+            <button class="ui compact mini icon button" v-on:click="nextDay" v-bind:class="{ disabled: nextIsFuture }">
                 <i class="chevron right icon"></i>
             </button>
         </div>
@@ -46,12 +46,14 @@
 
         <div class="ui container">
 
-        <table class="ui celled striped table" v-if="!loading && students.length > 0">
+        <table class="ui compact striped table" v-if="!loading && students.length > 0">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Student ID</th>
                     <th>Category</th>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Contact</th>
                     <th>Punch In</th>
                     <th>Punch Out</th>
                     <th>Comment (Optional)</th>
@@ -60,28 +62,30 @@
             </thead>
             <tbody>
                 <tr v-for="student in students">
-                    <td><h4 class="ui center aligned header">{{student.name}}</h4></td>
-                    <td>{{student.student_id}}</td>
                     <td>{{student.category}}</td>
+                    <td>{{student.student_id}}</td>
+                    <td>{{student.name}}</td>
+                    <td>{{moment(student.dob).fromNow(true)}}</td>
+                    <td>{{student.contact || 'No Contact Info'}}</td>
                     <td>
-                        <p v-if="student.in" >{{ getPresentableTime(student.in) }}</p>
+                        <p v-if="student.in" >{{ getTimeString(student.in) }}</p>
                         <p v-else>No punch in record</p>
                     </td>
                     <td>
-                        <p v-if="student.out" >{{ getPresentableTime(student.out) }}</p>
+                        <p v-if="student.out" >{{ getTimeString(student.out) }}</p>
                         <p v-else>No punch out record</p>
                     </td>
                     <td>
-                        <div class="ui input" v-if="student.out && !viewOnly">
-                            <input type="text" placeholder="Comments.." v-model="student.comment">
+                        <div class="ui input" v-if="!viewOnly" v-bind:class="{ disabled: !student.in || student.out}">
+                            <input type="text" placeholder="Comments.." v-model="student.comment" v-on:change="saveAttendaceData(student,'comment')">
                         </div>
-                        <p v-if="viewOnly && student.comment"><b>Comment:</b> {{ student.comment }}</p>
+                        <p v-if="viewOnly && student.comment">{{ student.comment }}</p>
                     </td>
                     <td>
                         <div class="extra" v-if="!viewOnly">
-                            <div class="ui buttons">
-                                <button class="ui left attached button" v-on:click="punchIn(student)" v-bind:class="[ student.in ? 'disabled' : '' ]">Punch in</button>
-                                <button class="right attached ui button" v-on:click="punchOut(student)" v-bind:class="[ student.out ? 'disabled' : '', student.in ? '' : 'disabled' ]">Punch out</button>
+                            <div class="compact mini ui buttons">
+                                <button class="ui left attached button" v-on:click="saveAttendaceData(student,'in')" v-bind:class="[ student.in ? 'disabled' : '' ]">Punch in</button>
+                                <button class="ui right attached button" v-on:click="saveAttendaceData(student,'out')" v-bind:class="[ student.out ? 'disabled' : '', student.in ? '' : 'disabled' ]">Punch out</button>
                             </div>
                         </div>
                     </td>

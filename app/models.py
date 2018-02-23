@@ -52,7 +52,6 @@ class Faculty(User):
                     admin=self.admin,
                     )
 
-
     @staticmethod
     def encode_auth_token(email):
         """
@@ -88,8 +87,10 @@ class Student(User):
     dob = db.Column(db.Date(), nullable=False)
     student_id = db.Column(db.String(50), nullable=False)
     category = db.Column(db.String(50), nullable=False)
+    contact = db.Column(db.String(50), nullable=False)
+    branch = db.Column(db.String(50), nullable=False)
 
-    def __init__(self, name, dob, student_id, category):
+    def __init__(self, name, dob, student_id, category, contact, branch):
         super(Student, self).__init__(name)
         self.student_id = student_id
         self.category = category
@@ -97,6 +98,8 @@ class Student(User):
             self.dob = datetime.strptime(dob, '%Y-%m-%d').date()
         else:
             self.dob = dob
+        self.contact = contact
+        self.branch = branch
 
     def __repr__(self):
         return '<Student %r>' % self.name
@@ -107,6 +110,8 @@ class Student(User):
                     dob=self.dob,
                     category=self.category,
                     student_id=self.student_id,
+                    contact=self.contact,
+                    branch=self.branch,
                     )
 
 
@@ -114,28 +119,26 @@ class Attendance(Base):
     __tablename__ = 'attendance'
 
     date = db.Column(db.Date, nullable=False, default=db.func.current_date())
-    punchIn = db.Column(db.DateTime(), nullable=False, default=db.func.current_timestamp())
-    punchOut = db.Column(db.DateTime(), nullable=False, default=db.func.current_timestamp())
-    comments = db.Column(db.String(100), nullable=True)
+    punchIn = db.Column(db.String(50), nullable=False)
+    punchOut = db.Column(db.String(50))
+    comments = db.Column(db.String(100))
+    location = db.Column(db.String(100))
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
     student = relationship('Student')
 
-    def __init__(self, date, punchIn, punchOut, comments, student_id):
-        if not isinstance(date, datetime):
-            self.date = datetime.strptime(date, '%Y-%m-%d').date()
-        else:
-            self.date = date
-        if not isinstance(punchIn, datetime):
-            # 2018-02-19T18:50:40.067Z
-            self.punchIn = datetime.strptime(punchIn, '%Y-%m-%dT%H:%M:%S.%fZ')
-        else:
-            self.punchIn = punchIn
-        if not isinstance(punchOut, datetime):
-            self.punchOut = datetime.strptime(punchOut, '%Y-%m-%dT%H:%M:%S.%fZ')
-        else:
-            self.punchOut = punchOut
-        self.comments = comments
+    def __init__(self, date, student_id, punchIn, punchOut=None, comments=None, location=None):
+        self.date = date
         self.student_id = student_id
+
+        if punchIn:
+            datetime.strptime(punchIn, '%H:%M:%S')
+        self.punchIn = punchIn
+
+        if punchOut:
+            datetime.strptime(punchOut, '%H:%M:%S')
+        self.punchOut = punchOut
+        self.comments = comments
+        self.location = location
 
     def serialize(self):
         return dict(id=self.id,
