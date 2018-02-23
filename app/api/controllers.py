@@ -106,7 +106,6 @@ def add_faculty():
 
 @mod_api.route('/student')
 @login_required
-@addLag
 def list_students():
     students = [s.serialize() for s in Student.query.all()]
     data = dict(status='Success', students=students)
@@ -175,7 +174,6 @@ def index():
 
 
 @mod_api.route('/get_token', methods=['POST'])
-@addLag
 def get_token():
     # get the post data
     data = request.json or request.data or request.form
@@ -209,7 +207,6 @@ def get_token():
 
 @mod_api.route('/attendance/<string:date>', methods=['GET'])
 @login_required
-@addLag
 def get_attendance(date):
     date = datetime.strptime(date, '%d%m%Y').date()
     print date
