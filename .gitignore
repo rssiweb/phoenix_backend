@@ -1,5 +1,6 @@
-venv/
+venv/*
 *.pyc
-.idea/
+*.pyo
+.idea/*
 .env
 app.db
