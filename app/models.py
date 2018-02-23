@@ -87,8 +87,8 @@ class Student(User):
     dob = db.Column(db.Date(), nullable=False)
     student_id = db.Column(db.String(50), nullable=False)
     category = db.Column(db.String(50), nullable=False)
-    contact = db.Column(db.String(50), nullable=False)
-    branch = db.Column(db.String(50), nullable=False)
+    contact = db.Column(db.String(50), nullable=True)
+    branch = db.Column(db.String(50), nullable=True)
 
     def __init__(self, name, dob, student_id, category, contact, branch):
         super(Student, self).__init__(name)
