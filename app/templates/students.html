@@ -7,6 +7,11 @@
 <h2 class="ui header">{{ heading }}</h2>
 
 <div class="ui container">
+    <div class="ui sub header"></div>    
+    <button v-on:click="showImportModel" class="ui mini primary right floated button">Import Students</button>
+</div>
+
+<div class="ui container">
     <div class="ui container" v-if="error">
         <div class="ui negative message">
             <i class="close icon"></i>
@@ -47,21 +52,18 @@
             <!-- clicking on a student will add its details to the below form and the add button will become update button -->
             <td>{{student.student_id}}</td>
             <td>{{student.category}}</td>
-            <td><a href="#" v-on:click="updateStudent(student.id)">{{student.name}}</a></td>
+            <td><a href="#" v-on:click="updateStudent(student.id, $event)">{{student.name}}</a></td>
             <td>{{moment(student.dob).fromNow(true)}}</td>
             <td>{{student.contact || 'No contact info'}}</td>
         </tr>
     </table>
 <br/>
     <div class="ui form container">
-        <div class="ui two column grid">
-            <div class="eight wide column">
-                <h3>Add Student</h3>
-            </div>
-            <div class="eight wide column">
-                <button v-on:click="showImportModel" class="ui right floated compact button">Import Students</button>
-            </div>
+        
+        <div class="ui sub header">
+            <h3>Add Student</h3>
         </div>
+        
         <br/>
         <div id="addStudentForm" class="fields">
             <input type="hidden" v-model="studentToUpdate.id"/>
@@ -108,6 +110,9 @@
                 <div class="field">
                     <button class="ui primary button" v-on:click="importStudents" v-bind:class="{disabled:!importFile}">Load</button>
                 </div>
+                <div class="field">
+                    <p>{{importSummary}}</p>
+                </div>
             </div>
         </div>
         
@@ -119,7 +124,7 @@
         </div>
         
         <div v-if="imported">
-            <table class="ui compact striped table" v-if="loadedStudents">
+            <table class="ui compact striped table" v-if="loadedStudents.length > 0">
                 <thead>
                     <tr>
                         <th>Student ID</th>
@@ -145,8 +150,7 @@
         </div>
     </div>
     <div class="actions">
-        <div class="ui button">Cancel</div>
-        <div class="ui positive button" v-bind:class="{disabled:loadedStudents}">Save</div>
+        <div class="ui button" v-on:click="hideImportModel">Close</div>
     </div>
 </div>
 </div>

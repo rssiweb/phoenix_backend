@@ -171,7 +171,7 @@ var app = new Vue({
         },
         computed:{
             currentAttendanceDate:function(){
-                return this.attendanceDate.format('dddd, Do MMMM');;
+                return this.attendanceDate.format('dddd, Do MMMM YYYY');;
             }
         }
     });

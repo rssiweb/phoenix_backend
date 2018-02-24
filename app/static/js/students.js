@@ -16,6 +16,7 @@ var app = new Vue({
             importing: '',
             importFile: undefined,
             imported: false,
+            importSummary: '',
         },
         created: function(){
             this.loadStudents();
@@ -49,8 +50,10 @@ var app = new Vue({
                             std.added=true;
                             vm.loadedStudents.push(std);
                         });
-                        $('#importModal').modal('hide');
-                        setTimeout(vm.showImportModel,1000)
+                        vm.importSummary = response.body.added.length+' students Added, '+response.body.updated.length+' updated'
+                        setTimeout(function(){
+                            $('#importModal').modal('refresh');
+                        },200);
                     }
                     this.importing = false;
                     this.imported = true;
@@ -59,6 +62,7 @@ var app = new Vue({
                     console.log(error);
                     this.importing = false;
                     this.imported = true;
+                    this.importSummary = error.body.message
                 });
             },
             loadStudents: function(){
@@ -162,7 +166,8 @@ var app = new Vue({
                     this.loading = ''
                 })
             },
-            updateStudent: function(id){
+            updateStudent: function(id, event){
+                if (event) event.preventDefault();
                 console.log(id);
                 var stdToUpdate = null;
                 this.students.forEach(function(student, index){
@@ -191,6 +196,9 @@ var app = new Vue({
             },
             showImportModel: function(){
                 $('#importModal').modal('show');
+            },
+            hideImportModel: function(){
+                $('#importModal').modal('hide');
             }
         },
         computed:{
@@ -205,6 +213,8 @@ var app = new Vue({
                     return moment(this.studentToUpdate.dob).format('YYYY-MM-DD');
                 else
                     return ''
-            }
+            },
+        },
+        watch:{
         }
     });

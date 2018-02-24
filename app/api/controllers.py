@@ -1,8 +1,7 @@
 from flask import request, Blueprint, make_response
 from app import db, jsonify, bcrypt
 from app.models import Faculty, Student, Attendance
-from datetime import datetime, timedelta
-
+from datetime import datetime
 from functools import wraps
 from operator import itemgetter
 import jwt
@@ -87,7 +86,8 @@ def add_faculty():
 
     keys = [str(key) for key in data.keys()]
     if required_fileds != keys:
-        res['message'] = 'expected atleast {0} got only {1}'.format(required_fileds, keys)
+        res['message'] = 'expected atleast {0} got only {1}'\
+                         .format(required_fileds, keys)
         return make_response(jsonify(res)), res_code
 
     email = data.get('email')
@@ -108,7 +108,8 @@ def add_faculty():
             db.session.add(faculty)
             db.session.commit()
             res['status'] = 'success'
-            res['message'] = '{0} successfully registered.'.format(faculty.name)
+            res['message'] = '{0} successfully registered.'\
+                             .format(faculty.name)
             res_code = 201
         except Exception as e:
             print e
@@ -124,7 +125,6 @@ def add_faculty():
 def list_students():
     students = [s.serialize() for s in Student.query.all()]
     data = dict(status='Success', students=students)
-    print data
     return make_response(jsonify(data)), 200
 
 
@@ -147,7 +147,8 @@ def add_update_student(action):
 
     keys = [str(key) for key in data.keys()]
     if not set(required_fields).issubset(set(keys)):
-        res['message'] = 'expected atleast {0} got only {1}'.format(required_fields, keys)
+        res['message'] = 'expected atleast {0} got only {1}'\
+                         .format(required_fields, keys)
         return jsonify(res), res_code
 
     dob = data.get('dob').strip()
@@ -173,7 +174,8 @@ def add_update_student(action):
                 category=category)
             # insert the user
             db.session.add(student)
-            res['message'] = '{0} Successfully registered.'.format(student.name)
+            res['message'] = '{0} Successfully registered.'\
+                             .format(student.name)
             res_code = 201
         except Exception as e:
             print e
@@ -191,6 +193,7 @@ def add_update_student(action):
         res['student'] = student.serialize()
     return jsonify(res), res_code
 
+
 @mod_api.route('/student/delete/<int:studentid>', methods=['GET'])
 @login_required
 @only_admins
@@ -207,6 +210,7 @@ def delete_student(studentid):
     else:
         res['message'] = 'No such student'
     return make_response(jsonify(res)), res_code
+
 
 @mod_api.route('/')
 @login_required
@@ -277,7 +281,8 @@ def set_attendance(date):
         punchIn = student.get('in')
         punchOut = student.get('out')
         comments = student.get('comment')
-        attendance = Attendance.query.filter_by(date=date, student_id=student_id).first()
+        attendance = Attendance.query.filter_by(date=date,
+                                                student_id=student_id).first()
         if not attendance:
             attendance = Attendance(date=date,
                                     comments=comments,
@@ -295,10 +300,11 @@ def set_attendance(date):
     res['meassage'] = 'Attendance saved successfully'
     res['updatedIds'] = std_updated
     res['addedIds'] = std_added
-    return make_response(jsonify(res)), res_code # Created
+    return make_response(jsonify(res)), res_code
 
 
-@mod_api.route('/attendance/<string:date>/<int:studentid>/<string:what>', methods=['POST'])
+@mod_api.route('/attendance/<string:date>/<int:studentid>/<string:what>',
+               methods=['POST'])
 @login_required
 def punch_in(date, studentid, what):
     res = dict(status='fail')
@@ -306,22 +312,18 @@ def punch_in(date, studentid, what):
     if what not in ['in', 'out', 'comment']:
         res['message'] = 'Invalid url'
         return make_response(jsonify(res)), res_code
-
-    print date, studentid
     data = request.json or request.data or request.form
-    print 'data', data
-    punch_in_time = None
     res_code = 200
     try:
         date = datetime.strptime(date, '%d%m%Y').date()
-        print date
         dataToSave = data.get(what)
         # if its a time then should be parsellable to the specific format
         if what in ['in', 'out']:
             datetime.strptime(dataToSave, '%H:%M:%S')
     except Exception as e:
         print e
-        res['message'] = 'Invalid date or punch in time [{},{}]'.format(date, data['in'])
+        res['message'] = 'Invalid date or punch in time [{},{}]'\
+                         .format(date, data['in'])
         return make_response(jsonify(res)), res_code
     student = Student.query.get(studentid)
     faculty = Faculty.query.get(request.user.id)
@@ -330,7 +332,8 @@ def punch_in(date, studentid, what):
         res['message'] = msg
         return make_response(jsonify(res)), res_code
 
-    attendance = Attendance.query.filter_by(date=date, student_id=student.id).first()
+    attendance = Attendance.query.filter_by(date=date,
+                                            student_id=student.id).first()
     if attendance:
         if faculty.admin:
             if what == 'in':
@@ -345,7 +348,8 @@ def punch_in(date, studentid, what):
             res['status'] = 'success'
             res_code = 200
         else:
-            res['message'] = 'Record already exists, Request admin to update the record.'
+            res['message'] = 'Record already exists, Request admin \
+            to update the record.'
     else:
         # If the record does not exist that means the dataToSave is intime
         attendance = Attendance(date=date,
@@ -388,12 +392,18 @@ def import_students():
         name, contact = getName(row), getContact(row)
         branch = getBranch(row)
         if student:
-            student.category = category
-            student.dob = dob
-            student.name = name
-            student.contact = contact
-            student.branch = branch
-            updated.append(student)
+            unchanged = all([student.category == category,
+                             student.dob == dob,
+                             student.name == name,
+                             student.contact == contact,
+                             student.branch == branch])
+            if not unchanged:
+                student.category = category
+                student.dob = dob
+                student.name = name
+                student.contact = contact
+                student.branch = branch
+                updated.append(student)
         else:
             student = Student(student_id=student_id,
                               category=category,
@@ -401,13 +411,14 @@ def import_students():
                               name=name,
                               contact=contact,
                               branch=branch)
-            #db.session.add(student)
+            db.session.add(student)
             added.append(student)
-    #db.session.commit()
+    db.session.commit()
     res['status'] = 'success'
     res['added'] = [std.serialize() for std in added]
     res['updated'] = [std.serialize() for std in updated]
-    res['message'] = 'Added {0} student(s), Udpated {1} student(s)'.format(len(added),len(updated))
+    res['message'] = 'Added {0} student(s), Udpated {1} student(s)'\
+                     .format(len(added), len(updated))
     return jsonify(res), 200
 
 
