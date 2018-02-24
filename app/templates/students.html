@@ -52,20 +52,28 @@
             <td>{{student.contact || 'No contact info'}}</td>
         </tr>
     </table>
-  
+<br/>
     <div class="ui form container">
-        <h3 class="ui header">Add Student</h3>
+        <div class="ui two column grid">
+            <div class="eight wide column">
+                <h3>Add Student</h3>
+            </div>
+            <div class="eight wide column">
+                <button v-on:click="showImportModel" class="ui right floated compact button">Import Students</button>
+            </div>
+        </div>
+        <br/>
         <div id="addStudentForm" class="fields">
             <input type="hidden" v-model="studentToUpdate.id"/>
-            <div class="field" v-bind:class="{disabled:isUpdate}">
+            <div class="required field" v-bind:class="{disabled:isUpdate}">
                 <label>Student ID</label>
                 <input type="text" name="id" placeholder="Student ID" v-model="studentToUpdate.student_id">
             </div>
-            <div class="field">
+            <div class="required field">
                 <label>Category</label>
                 <input type="text" name="category" placeholder="Category" v-model="studentToUpdate.category">
             </div>
-            <div class="field">
+            <div class="required field">
                 <label>Name</label>
                 <input type="text" name="name" placeholder="Name" v-model="studentToUpdate.name">
             </div>
@@ -75,7 +83,7 @@
             </div>
             <div class="field">
                 <label>Contact</label>
-                <input type="text" name="contact" placeholder="Contact Number" v-model="studentToUpdate.contact">
+                <input type="text" name="contact" placeholder="Contact Number" v-model="studentToUpdate.contact" maxlength="10">
             </div>
         </div>
 
@@ -83,12 +91,64 @@
         <button class="ui negative right floated button" v-on:click="deleteStudent(studentToUpdate)" v-if="isUpdate" v-bind:class="{disabled:loading}">Delete</button>
         <button class="ui deny button" v-on:click="resetStudent" v-bind:class="{disabled:loading}">Clear</button>
 
+
 </div>
 
-<div class="ui container">
-    
+<div id="importModal" class="ui large modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Import Students
+    </div>
+    <div class="scrolling content">
+        <div class="ui center align form">
+            <div class="inline fields">
+                <div class="field">
+                    <input type="file" accept=".xlsx, .xls, .csv" class="ui input" @change="importFile = event.target.files[0]"/>
+                </div>
+                <div class="field">
+                    <button class="ui primary button" v-on:click="importStudents" v-bind:class="{disabled:!importFile}">Load</button>
+                </div>
+            </div>
+        </div>
+        
+        <div v-if="importing">
+            <div class="ui active inverted dimmer">
+                <div class="ui text loader">Reading file...</div>
+            </div>
+            <p><br/><br/><br/></p>
+        </div>
+        
+        <div v-if="imported">
+            <table class="ui compact striped table" v-if="loadedStudents">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Category</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Contact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for=" student in loadedStudents" v-bind:class="[student.added?'positive':'warning']">
+                        <td >{{student.student_id}}</td>
+                        <td>{{student.category}}</td>
+                        <td>{{student.name}}</td>
+                        <td>{{moment(student.dob).fromNow(true)}}</td>
+                        <td>{{student.contact || 'No contact info'}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="ui message" v-else>
+                <p>No Students loaded</p>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui button">Cancel</div>
+        <div class="ui positive button" v-bind:class="{disabled:loadedStudents}">Save</div>
+    </div>
 </div>
-
 </div>
 {%endraw%}
 {% endblock %}

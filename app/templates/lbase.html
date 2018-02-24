@@ -7,9 +7,7 @@
         <a class="item {%if page == 2%}active{%endif%}" href="/students" v-if="is_admin">Students</a>
         <a class="item {%if page == 3%}active{%endif%}" href="/faculties" v-if="is_admin">Faculties</a>
         <div class="right menu">
-            <div class="ui item" >
-                <button v-on:click="logout" class="ui orange button">Logout</button> 
-            </div>
+            <a v-on:click="logout" class="item">Logout</a>
         </div>
     </div>
     {% block bodywh %}{% endblock %}

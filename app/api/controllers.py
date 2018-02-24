@@ -1,11 +1,13 @@
 from flask import request, Blueprint, make_response
 from app import db, jsonify, bcrypt
 from app.models import Faculty, Student, Attendance
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from functools import wraps
+from operator import itemgetter
 import jwt
 import time
+import csv
 
 mod_api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -166,6 +168,7 @@ def add_update_student(action):
     if not student and action == 'add':
         try:
             student = Student(
+                name=name,
                 student_id=student_id,
                 category=category)
             # insert the user
@@ -355,6 +358,57 @@ def punch_in(date, studentid, what):
         res['status'] = 'success'
         res_code = 200
     return make_response(jsonify(res)), res_code
+
+
+@mod_api.route('/student/import', methods=['POST'])
+@login_required
+@only_admins
+def import_students():
+    res = dict(status='fail')
+    file = request.files.get('studentsListFile')
+    csvreader = csv.reader(file, delimiter=',', quotechar='"')
+    # TODO: check type of file
+    heading = [title.strip().lower() for title in csvreader.next()]
+    getName = itemgetter(heading.index('name of the student'))
+    getCategory = itemgetter(heading.index('category'))
+    getStudentId = itemgetter(heading.index('student id'))
+    getAge = itemgetter(heading.index('age'))
+    getContact = itemgetter(heading.index('telephone no.'))
+    getBranch = itemgetter(heading.index('preferred branch'))
+
+    added = []
+    updated = []
+    for row in csvreader:
+        student = Student.query.filter_by(student_id=getStudentId(row)).first()
+        today = datetime.today()
+        dob = datetime(year=today.year - int(getAge(row)),
+                       month=today.month,
+                       day=today.day).date()
+        category, student_id = getCategory(row), getStudentId(row)
+        name, contact = getName(row), getContact(row)
+        branch = getBranch(row)
+        if student:
+            student.category = category
+            student.dob = dob
+            student.name = name
+            student.contact = contact
+            student.branch = branch
+            updated.append(student)
+        else:
+            student = Student(student_id=student_id,
+                              category=category,
+                              dob=dob,
+                              name=name,
+                              contact=contact,
+                              branch=branch)
+            #db.session.add(student)
+            added.append(student)
+    #db.session.commit()
+    res['status'] = 'success'
+    res['added'] = [std.serialize() for std in added]
+    res['updated'] = [std.serialize() for std in updated]
+    res['message'] = 'Added {0} student(s), Udpated {1} student(s)'.format(len(added),len(updated))
+    return jsonify(res), 200
 
 
 def check_student_faculty(student, faculty, date):

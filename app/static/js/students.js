@@ -7,9 +7,15 @@ var app = new Vue({
             students: [],
             error: '',
             message: '',
+            
             loading: '',
             studentToUpdate: {},
             isUpdate: false,
+
+            loadedStudents: [],
+            importing: '',
+            importFile: undefined,
+            imported: false,
         },
         created: function(){
             this.loadStudents();
@@ -21,6 +27,39 @@ var app = new Vue({
             },
             getHeaders: function(){
                 return {headers: { Authorization: 'Basic ' +  this.token}}
+            },
+            importStudents: function(){
+                this.importing = true;
+                console.log('importing students from', this.importFile);
+                //send the file to server and get list new students 
+                //and list of updating students
+                var vm = this;
+                var url = '/api/student/import'
+                var postData = new FormData()
+                postData.append('studentsListFile',this.importFile)
+                vm.$http.post(url, postData, this.getHeaders())
+                .then(response => {
+                    console.log(response);
+                    if(response.body.status=='success'){
+                        response.body.updated.forEach((std, index)=>{
+                            std.updated=true;
+                            vm.loadedStudents.push(std);
+                        });
+                        response.body.added.forEach((std, index)=>{
+                            std.added=true;
+                            vm.loadedStudents.push(std);
+                        });
+                        $('#importModal').modal('hide');
+                        setTimeout(vm.showImportModel,1000)
+                    }
+                    this.importing = false;
+                    this.imported = true;
+                },
+                error => {
+                    console.log(error);
+                    this.importing = false;
+                    this.imported = true;
+                });
             },
             loadStudents: function(){
                 this.loading = 'Loading students...'
@@ -150,6 +189,9 @@ var app = new Vue({
                 });
                 return data;
             },
+            showImportModel: function(){
+                $('#importModal').modal('show');
+            }
         },
         computed:{
             buttonText: function(){

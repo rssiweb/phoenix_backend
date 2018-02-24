@@ -90,7 +90,7 @@ class Student(User):
     contact = db.Column(db.String(50), nullable=True)
     branch = db.Column(db.String(50), nullable=True)
 
-    def __init__(self, student_id, category, name=None,
+    def __init__(self, student_id, category, name,
                  dob=None, contact=None, branch=None):
         super(Student, self).__init__(name)
         self.student_id = student_id
