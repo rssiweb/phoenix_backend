@@ -119,7 +119,6 @@ def add_faculty():
 
 @mod_api.route('/student')
 @login_required
-@addLag
 def list_students():
     students = [s.serialize() for s in Student.query.all()]
     data = dict(status='Success', students=students)
@@ -130,7 +129,6 @@ def list_students():
 @mod_api.route('/student/<string:action>', methods=['POST'])
 @login_required
 @only_admins
-@addLag
 def add_update_student(action):
     res = dict(status='fail')
     res_code = 200
@@ -193,7 +191,6 @@ def add_update_student(action):
 @mod_api.route('/student/delete/<int:studentid>', methods=['GET'])
 @login_required
 @only_admins
-@addLag
 def delete_student(studentid):
     res = dict(status='fail')
     res_code = 200
