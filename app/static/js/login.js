@@ -7,8 +7,10 @@ var hideLoading = function(){
     $('#error-message').removeClass('hidden');
 };
 var saveToken = function(result){
+        console.log(result);
         var values = {expires: 1}
         Cookies.set('auth_token',result.auth_token, values);
+        Cookies.set('is_admin',result.is_admin, values);
         window.location = "/attendance";
 };
 var errorgettingToken = function(result){

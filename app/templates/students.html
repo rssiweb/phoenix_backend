@@ -4,23 +4,52 @@
 {% block bodywh %}
 {%raw%}
 <!-- Model add student -->
-<div class="ui container">
+<h2 class="ui header">{{ heading }}</h2>
 
-    <table class="ui celled stripped table">
+<div class="ui container">
+    <div class="ui container" v-if="error">
+        <div class="ui negative message">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ error }}
+            </div>
+        </div>
+    </div>
+
+    <div class="ui container" v-if="message">
+        <div class="ui info message">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ message }}
+            </div>
+        </div>
+    </div>
+
+    <div class="ui segment" v-if="loading">
+        <div class="ui active inverted dimmer">
+            <div class="ui text loader">{{ loading }}</div>
+        </div>
+        <p><br/><br/><br/><br/></p>
+    </div>
+
+    <table class="ui compact striped table" v-if="!loading">
         <thead>
             <tr>
-                <th>Name</th>
+                
                 <th>Student ID</th>
                 <th>Category</th>
-                <th>Date of Birth</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Contact</th>
             </tr>
         </thead>
         <tr v-for="student in students">
             <!-- clicking on a student will add its details to the below form and the add button will become update button -->
-            <td><a href="#" v-on:click="updateStudent(student.id)">{{student.name}}</a></td>
             <td>{{student.student_id}}</td>
             <td>{{student.category}}</td>
-            <td>{{moment(student.dob).format('Do MMMM YYYY')}}</td>
+            <td><a href="#" v-on:click="updateStudent(student.id)">{{student.name}}</a></td>
+            <td>{{moment(student.dob).fromNow(true)}}</td>
+            <td>{{student.contact || 'No contact info'}}</td>
         </tr>
     </table>
   
@@ -28,11 +57,7 @@
         <h3 class="ui header">Add Student</h3>
         <div id="addStudentForm" class="fields">
             <input type="hidden" v-model="studentToUpdate.id"/>
-            <div class="field">
-                <label>Name</label>
-                <input type="text" name="name" placeholder="Name" v-model="studentToUpdate.name">
-            </div>
-            <div class="field">
+            <div class="field" v-bind:class="{disabled:isUpdate}">
                 <label>Student ID</label>
                 <input type="text" name="id" placeholder="Student ID" v-model="studentToUpdate.student_id">
             </div>
@@ -41,13 +66,22 @@
                 <input type="text" name="category" placeholder="Category" v-model="studentToUpdate.category">
             </div>
             <div class="field">
+                <label>Name</label>
+                <input type="text" name="name" placeholder="Name" v-model="studentToUpdate.name">
+            </div>
+            <div class="field">
                 <label>Date of Birth</label>
-                <input type="date" name="dob" placeholder="Date of Birth" v-model="formDate">
+                <input type="date" name="dob" placeholder="Date of Birth" v-model="studentToUpdateFormattedDate">
+            </div>
+            <div class="field">
+                <label>Contact</label>
+                <input type="text" name="contact" placeholder="Contact Number" v-model="studentToUpdate.contact">
             </div>
         </div>
 
-        <button class="ui positive button" v-on:click="addStudent">{{buttonText}}</button>
-        <button class="ui deny button" v-on:click="resetStudent">Reset</button>
+        <button class="ui positive button" v-on:click="addOrUpdateStudent" v-bind:class="{disabled:loading}">{{buttonText}}</button>
+        <button class="ui negative right floated button" v-on:click="deleteStudent(studentToUpdate)" v-if="isUpdate" v-bind:class="{disabled:loading}">Delete</button>
+        <button class="ui deny button" v-on:click="resetStudent" v-bind:class="{disabled:loading}">Clear</button>
 
 </div>
 

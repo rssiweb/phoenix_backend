@@ -1,7 +1,9 @@
 var app = new Vue({
         el: '#app',
         data: {
+            heading: 'Students',
             token: Cookies.get('auth_token'),
+            is_admin: (Cookies.get('is_admin')=='true'),
             students: [],
             error: '',
             message: '',
@@ -16,6 +18,9 @@ var app = new Vue({
             logout: function(){
                 Cookies.remove('auth_token');
                 window.location = '/';
+            },
+            getHeaders: function(){
+                return {headers: { Authorization: 'Basic ' +  this.token}}
             },
             loadStudents: function(){
                 this.loading = 'Loading students...'
@@ -42,18 +47,81 @@ var app = new Vue({
                         this.loading = '';
                     });
             },
-            addStudent: function(){
-                this.loading = 'Adding Student...'
-                data = this.getJsonFromForm($('#addStudentForm input'))
-                console.log(data);
-                this.$http.post('/api/student/add',data,{
-                    headers: { Authorization: 'Basic ' +  this.token}
-                }).then( response => {
+            addOrUpdateStudent: function(){
+                this.error = ''
+                var url = '';
+                if(this.studentToUpdate){
+                    this.loading = 'Updating '+this.studentToUpdate.name+'...'
+                    url = '/api/student/update';
+                }
+                else{
+                    this.loading = 'Adding '+$('#addStudentForm input[name="name"]').val()+'...'
+                    url = '/api/student/add';
+                }
+
+                postData = this.getJsonFromForm($('#addStudentForm input'))
+                console.log(postData);
+                var vm = this
+                
+                this.$http.post(url, postData, vm.getHeaders())
+                .then( response => {
                     console.log(response);
+                    vm.loading = '';
+                    if(response.body.status=='fail'){
+                        vm.error = response.body.message;
+                        return;
+                    }
+                    // reset only if its success
+                    vm.resetStudent()
+                    var updatedStudent = response.body.student;
+                    console.log(updatedStudent);
+                    if(!updatedStudent) return;
+
+                    var indexToreplace = -1;
+                    vm.students.forEach((tmpstd, index) => {
+                        if(tmpstd.id == updatedStudent.id){
+                            indexToreplace = index;
+                            console.log(index);
+                        }
+                    });
+                    if(indexToreplace != -1){
+                        vm.$set(vm.students, indexToreplace, updatedStudent)
+                        console.log('setted');
+                    }else{
+                        vm.students.push(updatedStudent);
+                    }
                     //get the new data from response and add him to the students list
                 }, error => {
                     console.log(error);
+                    vm.loading = '';
                 });
+            },
+            deleteStudent:function(student){
+                console.log('delete', student);
+                this.loading = 'Deleting '+student.name+'...'
+                var vm = this;
+                var url = '/api/student/delete/'+student.id
+                this.$http.get(url,this.getHeaders())
+                .then(response => {
+                    console.log(response);    
+                    this.loading = ''
+                    if(response.body.status=='success'){
+                        //remove the student from list
+                        vm.resetStudent();
+                        var removedStudentIndex = -1;
+                        vm.students.forEach((tmpStd, index) => {
+                            if(tmpStd.id == response.body.studentid){
+                                removedStudentIndex = index;
+                            }
+                        });
+                        if(removedStudentIndex!=-1)
+                            vm.students.splice(removedStudentIndex, 1);
+                    }
+                },
+                error => {
+                    console.log(error);
+                    this.loading = ''
+                })
             },
             updateStudent: function(id){
                 console.log(id);
@@ -86,11 +154,11 @@ var app = new Vue({
         computed:{
             buttonText: function(){
                 if(this.isUpdate)
-                    return "Update Student"       
+                    return "Update"       
                 else
-                    return "Add Student"
+                    return "Add"
             },
-            formDate:function(){
+            studentToUpdateFormattedDate:function(){
                 if(this.studentToUpdate.dob)
                     return moment(this.studentToUpdate.dob).format('YYYY-MM-DD');
                 else

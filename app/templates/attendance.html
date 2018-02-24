@@ -14,6 +14,7 @@
             <button class="ui compact mini icon button" v-on:click="nextDay" v-bind:class="{ disabled: nextIsFuture }">
                 <i class="chevron right icon"></i>
             </button>
+            <button class="ui mini primary right floated button" v-if="is_admin">Edit Mode</button>
         </div>
     </div>
     
@@ -41,11 +42,10 @@
             <div class="ui active inverted dimmer">
                 <div class="ui text loader">{{ loading }}</div>
             </div>
-            <p><br/><br/><br/><br/><br/></p>
+            <p><br/><br/><br/><br/></p>
         </div>
 
         <div class="ui container">
-
         <table class="ui compact striped table" v-if="!loading && students.length > 0">
             <thead>
                 <tr>
@@ -66,7 +66,7 @@
                     <td>{{student.student_id}}</td>
                     <td>{{student.name}}</td>
                     <td>{{moment(student.dob).fromNow(true)}}</td>
-                    <td>{{student.contact || 'No Contact Info'}}</td>
+                    <td>{{student.contact || 'No contact info'}}</td>
                     <td>
                         <p v-if="student.in" >{{ getTimeString(student.in) }}</p>
                         <p v-else>No punch in record</p>

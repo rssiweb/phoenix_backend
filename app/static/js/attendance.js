@@ -3,6 +3,7 @@ var app = new Vue({
         data: {
             heading:'Attendance',
             token: Cookies.get('auth_token'),
+            is_admin: (Cookies.get('is_admin')=='true'),
             students: [],
             error: '',
             message: '',

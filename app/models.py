@@ -1,7 +1,7 @@
 import jwt
 from app import db, app, bcrypt
 from datetime import datetime, timedelta
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 
 class Base(db.Model):
@@ -84,17 +84,18 @@ class Faculty(User):
 class Student(User):
     __tablename__ = 'student'
 
-    dob = db.Column(db.Date(), nullable=False)
     student_id = db.Column(db.String(50), nullable=False)
     category = db.Column(db.String(50), nullable=False)
+    dob = db.Column(db.Date(), nullable=True)
     contact = db.Column(db.String(50), nullable=True)
     branch = db.Column(db.String(50), nullable=True)
 
-    def __init__(self, name, dob, student_id, category, contact, branch):
+    def __init__(self, student_id, category, name=None,
+                 dob=None, contact=None, branch=None):
         super(Student, self).__init__(name)
         self.student_id = student_id
         self.category = category
-        if not isinstance(dob, datetime):
+        if isinstance(dob, basestring):
             self.dob = datetime.strptime(dob, '%Y-%m-%d').date()
         else:
             self.dob = dob
@@ -124,7 +125,7 @@ class Attendance(Base):
     comments = db.Column(db.String(100))
     location = db.Column(db.String(100))
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    student = relationship('Student')
+    student = relationship('Student', backref=backref("person", cascade="all, delete-orphan"))
 
     def __init__(self, date, student_id, punchIn, punchOut=None, comments=None, location=None):
         self.date = date

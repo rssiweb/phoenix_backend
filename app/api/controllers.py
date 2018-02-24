@@ -18,6 +18,18 @@ def addLag(func):
     return decorated
 
 
+def only_admins(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        res = dict(status='fail')
+        faculty = Faculty.query.get(request.user.id)
+        if all([faculty, faculty.admin]):
+            return func(*args, **kwargs)
+        res['message'] = 'You are not authorized to access this page.'
+        return make_response(jsonify(res)), 401
+    return decorated
+
+
 def login_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
@@ -60,6 +72,7 @@ def list_faculties():
 
 @mod_api.route('/faculty/add', methods=['POST'])
 @login_required
+@only_admins
 def add_faculty():
     required_fileds = ['email', 'password', 'name']
     res = dict(status='fail')
@@ -106,6 +119,7 @@ def add_faculty():
 
 @mod_api.route('/student')
 @login_required
+@addLag
 def list_students():
     students = [s.serialize() for s in Student.query.all()]
     data = dict(status='Success', students=students)
@@ -113,12 +127,18 @@ def list_students():
     return make_response(jsonify(data)), 200
 
 
-@mod_api.route('/student/add', methods=['POST'])
+@mod_api.route('/student/<string:action>', methods=['POST'])
 @login_required
-def add_student():
-    required_fields = ['dob', 'name', 'category', 'id']
+@only_admins
+@addLag
+def add_update_student(action):
     res = dict(status='fail')
     res_code = 200
+    if action not in ['add', 'update']:
+        res['message'] = 'Invalid url'
+        return jsonify(res), 401
+
+    required_fields = ['dob', 'name', 'category', 'id']
 
     data = request.json or request.data or request.form
     if not data:
@@ -126,46 +146,67 @@ def add_student():
         return make_response(jsonify(res)), res_code
 
     keys = [str(key) for key in data.keys()]
-    if set(required_fields) != set(keys):
+    if not set(required_fields).issubset(set(keys)):
         res['message'] = 'expected atleast {0} got only {1}'.format(required_fields, keys)
-        return make_response(jsonify(res)), res_code
+        return jsonify(res), res_code
 
     dob = data.get('dob').strip()
     name = data.get('name').strip()
     category = data.get('category').strip()
+    contact = data.get('contact').strip()
     student_id = data.get('id').strip()
     if not all([dob, name, category, student_id]):
-        res['message'] = 'missing required data.'
-        return make_response(jsonify(res)), res_code
-
-    parsed_dob = datetime.strptime(dob, '%Y-%m-%d')
-    if not parsed_dob:
-        res['message'] = 'Invalid date {0}.'.format(dob)
-        return make_response(jsonify(res)), res_code
-    dob = parsed_dob
+        res['message'] = 'required fields are missing or blank'
+        return jsonify(res), res_code
+    try:
+        dob = datetime.strptime(dob, '%Y-%m-%d')
+    except Exception:
+        res['message'] = 'Invalid date: {0}'.format(dob)
+        return jsonify(res), res_code
 
     student = Student.query.filter_by(student_id=student_id).first()
-    if not student:
+    if not student and action == 'add':
         try:
             student = Student(
                 student_id=student_id,
-                category=category,
-                name=name,
-                dob=dob)
+                category=category)
             # insert the user
             db.session.add(student)
-            db.session.commit()
-            res['status'] = 'success'
             res['message'] = '{0} Successfully registered.'.format(student.name)
             res_code = 201
         except Exception as e:
             print e
             res['message'] = 'Some error occurred. Please try again.'
+    elif action == 'add':
+        res['message'] = 'Student ID {} alreay exists'.format(student_id)
+        res_code = 201
     else:
-        res['meassage'] = 'Student already exists.'
-        res_code = 202
-    return make_response(jsonify(res)), res_code
+        student.name = name
+        student.dob = dob
+        student.category = category
+        student.contact = contact
+        db.session.commit()
+        res['status'] = 'success'
+        res['student'] = student.serialize()
+    return jsonify(res), res_code
 
+@mod_api.route('/student/delete/<int:studentid>', methods=['GET'])
+@login_required
+@only_admins
+@addLag
+def delete_student(studentid):
+    res = dict(status='fail')
+    res_code = 200
+    student = Student.query.get(studentid)
+    if student:
+        db.session.delete(student)
+        db.session.commit()
+        res['message'] = 'Student deleted'
+        res['studentid'] = studentid
+        res['status'] = 'success'
+    else:
+        res['message'] = 'No such student'
+    return make_response(jsonify(res)), res_code
 
 @mod_api.route('/')
 @login_required
@@ -187,8 +228,10 @@ def get_token():
                 res = {
                     'status': 'success',
                     'message': 'log in successful.',
-                    'auth_token': faculty.encode_auth_token(email).decode()
+                    'auth_token': faculty.encode_auth_token(email).decode(),
+                    'is_admin': faculty.admin
                 }
+                print res
                 return make_response(jsonify(res)), 202
         except Exception as e:
             print str(e)
