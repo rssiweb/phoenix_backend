@@ -50,6 +50,25 @@
         </div>
 
         <div class="ui container">
+        <div class="ui form">
+            
+            <div class="fields">
+                <div class="field">
+                    <label>Category</label>
+                     <select multiple="" class="ui dropdown" v-model="categoryFilter">
+                        <option value="">All</option>
+                          <option v-for="cat in categories" v-bind:value="cat">{{cat}}</option>
+                     </select>
+                </div>
+                <div class="field">
+                    <label>Branch</label>
+                    <select multiple="" class="ui dropdown" v-model="branchFilter">
+                        <option value="">All</option>
+                          <option v-for="branch in branches" v-bind:value="branch">{{branch}}</option>
+                     </select>
+                </div>
+            </div>
+        </div>
         <table class="ui compact striped table" v-if="!loading && students.length > 0">
             <thead>
                 <tr>
@@ -65,7 +84,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="student in students">
+                <tr v-for="student in filteredStudents">
                     <td>{{student.category}}</td>
                     <td>{{student.student_id}}</td>
                     <td>{{student.name}}</td>

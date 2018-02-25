@@ -13,10 +13,15 @@ var app = new Vue({
             displayDateString: moment().format('dddd, Do MMMM'),
             viewOnly: false,
             nextIsFuture: true,
+            categoryFilter: [],
+            branchFilter: [],
         },
         created: function(){
             console.log('stating');
             this.loadStudents();
+        },
+        beforeUpdate(){
+            $('select').dropdown();
         },
         methods: {
             logout: function(){
@@ -47,6 +52,7 @@ var app = new Vue({
                         console.log(error);
                         this.loading = '';
                     });
+
             },
             getHeaders: function(){
                 return {headers: { Authorization: 'Basic ' +  this.token}};
@@ -180,6 +186,29 @@ var app = new Vue({
         computed:{
             currentAttendanceDate:function(){
                 return this.attendanceDate.format('dddd, Do MMMM YYYY');;
-            }
+            },
+            filteredStudents(){
+                return this.students.filter(student => {
+                    var inSearchedCat = this.categoryFilter.length==0 || this.categoryFilter.indexOf(student.category) != -1;
+                    var inSearchedBranch = this.branchFilter.length==0 || this.branchFilter.indexOf(student.branch) != -1;
+                    return inSearchedCat && inSearchedBranch
+                })
+            },
+            categories(){
+                var categories=[]
+                this.students.forEach((std,index)=>{
+                    if(categories.indexOf(std.category)==-1)
+                        categories.push(std.category);
+                })
+                return categories;
+            },
+            branches(){
+                var branches=[]
+                this.students.forEach((std,index)=>{
+                    if(branches.indexOf(std.branch)==-1)
+                        branches.push(std.branch);
+                })
+                return branches;
+            },
         }
     });
