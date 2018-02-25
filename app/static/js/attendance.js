@@ -15,13 +15,15 @@ var app = new Vue({
             nextIsFuture: true,
             categoryFilter: [],
             branchFilter: [],
+            editMode: false,
         },
         created: function(){
             console.log('stating');
             this.loadStudents();
         },
-        beforeUpdate(){
+        updated: function(){
             $('select').dropdown();
+            $(this.$el.getElementsByTagName('table')[0]).tablesort()
         },
         methods: {
             logout: function(){

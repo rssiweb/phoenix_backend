@@ -18,7 +18,7 @@
             <button class="ui compact mini icon button" v-on:click="nextDay" v-bind:class="{ disabled: nextIsFuture }">
                 <i class="chevron right icon"></i>
             </button>
-            <button class="ui mini primary right floated button" v-if="is_admin">Edit Mode</button>
+            <button class="ui mini primary right floated button" v-if="is_admin" @click="editable=!editable">Edit Mode</button>
         </div>
     </div>
     
@@ -69,7 +69,7 @@
                 </div>
             </div>
         </div>
-        <table class="ui compact striped table" v-if="!loading && students.length > 0">
+        <table class="ui compact sortable striped table" v-if="!loading && students.length > 0">
             <thead>
                 <tr>
                     <th>Category</th>

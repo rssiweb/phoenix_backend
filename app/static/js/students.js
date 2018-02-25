@@ -21,6 +21,10 @@ var app = new Vue({
         created: function(){
             this.loadStudents();
         },
+        updated: function(){
+            $(this.$el.getElementsByTagName('table')[0]).tablesort()
+            console.log('sorted');
+        },
         methods: {
             logout: function(){
                 Cookies.remove('auth_token');
@@ -54,6 +58,8 @@ var app = new Vue({
                         setTimeout(function(){
                             $('#importModal').modal('refresh');
                         },200);
+                        if(response.body.added.length > 0 || response.body.updated.length > 0)
+                            vm.loadStudents();
                     }
                     this.importing = false;
                     this.imported = true;
@@ -75,12 +81,13 @@ var app = new Vue({
                         console.log(data);
                         this.students = data.body.students
                         if(this.students.length == 0){
-                        if(data.body.message)
-                                this.message = data.body.message;
-                            else
-                                this.message = 'No students';
+                            if(data.body.message)
+                                    this.message = data.body.message;
+                                else
+                                    this.message = 'No students';
                         }else{
                             this.message = '';
+                            console.log('loaded');
                         }
                         console.log(this.message);
                         this.loading = '';
@@ -194,12 +201,19 @@ var app = new Vue({
                 });
                 return data;
             },
-            showImportModel: function(){
+            showImportModel(){
                 $('#importModal').modal('show');
             },
-            hideImportModel: function(){
+            hideImportModel(){
                 $('#importModal').modal('hide');
-            }
+                this.clearImportState();
+            },
+            clearImportState(){
+                this.loadedStudents = [];
+                this.importing = '';
+                this.imported = false;
+                this.importSummary = '';
+            },
         },
         computed:{
             buttonText: function(){
@@ -216,5 +230,8 @@ var app = new Vue({
             },
         },
         watch:{
+            students: function(){
+                
+            }
         }
     });
