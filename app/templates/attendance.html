@@ -1,5 +1,9 @@
 {% extends 'lbase.html' %}
 
+{% block style %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/attendance.css')}}">
+{% endblock %}
+
 {% block bodywh %}
 {% raw %}
     
@@ -66,14 +70,18 @@
                     <td>{{student.student_id}}</td>
                     <td>{{student.name}}</td>
                     <td>{{moment(student.dob).fromNow(true)}}</td>
-                    <td>{{student.contact || 'No contact info'}}</td>
+                    <td>{{student.contact}}</td>
                     <td>
-                        <p v-if="student.in" >{{ getTimeString(student.in) }}</p>
-                        <p v-else>No punch in record</p>
+                        <div v-if="student.in">
+                            <p>{{ getTimeString(student.in) }}</p>
+                            <p class="small faded text" v-if="student.inby">By {{ student.inby.name }}</p>
+                        </div>
                     </td>
                     <td>
-                        <p v-if="student.out" >{{ getTimeString(student.out) }}</p>
-                        <p v-else>No punch out record</p>
+                        <div v-if="student.out" >
+                            <p>{{ getTimeString(student.out) }}</p>
+                            <p class="small faded text" v-if="student.outby">By {{ student.outby.name }}</p>
+                        </div>
                     </td>
                     <td>
                         <div class="ui input" v-if="!viewOnly" v-bind:class="{ disabled: !student.in || student.out}">
@@ -82,11 +90,9 @@
                         <p v-if="viewOnly && student.comment">{{ student.comment }}</p>
                     </td>
                     <td v-if="!viewOnly">
-                        <div class="extra">
-                            <div class="compact mini ui buttons">
-                                <button class="ui left attached button" v-on:click="saveAttendaceData(student,'in')" v-bind:class="[ student.in ? 'disabled' : '' ]">Punch in</button>
-                                <button class="ui right attached button" v-on:click="saveAttendaceData(student,'out')" v-bind:class="[ student.out ? 'disabled' : '', student.in ? '' : 'disabled' ]">Punch out</button>
-                            </div>
+                        <div class="compact mini ui buttons">
+                            <button class="ui left attached button" v-on:click="saveAttendaceData(student,'in')" v-bind:class="[ student.in ? 'disabled' : '' ]">Punch in</button>
+                            <button class="ui right attached button" v-on:click="saveAttendaceData(student,'out')" v-bind:class="[ student.out ? 'disabled' : '', student.in ? '' : 'disabled' ]">Punch out</button>
                         </div>
                     </td>
                 </tr>

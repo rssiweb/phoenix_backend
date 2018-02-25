@@ -256,57 +256,16 @@ def get_token():
 @login_required
 def get_attendance(date):
     date = datetime.strptime(date, '%d%m%Y').date()
-    print date
     attendance = Attendance.query.filter_by(date=date).all()
     attendance = [att.serialize() for att in attendance]
     data = dict(result=True, date=date, attendance=attendance)
-    print data
     return make_response(jsonify(data)), 200
-
-
-@mod_api.route('/attendance/set/<int:date>', methods=['POST'])
-@login_required
-def set_attendance(date):
-    data = request.json or request.data or request.form
-    date = datetime.strptime(str(date), '%d%m%Y')
-    res = dict(status='fail')
-    res_code = 200
-    if not isinstance(data, list):
-        res['message'] = 'expect a list got {0}.'.format(data)
-        return make_response(jsonify(res)), res_code
-    std_updated = []
-    std_added = []
-    for student in data:
-        student_id = student.get('student_id')
-        punchIn = student.get('in')
-        punchOut = student.get('out')
-        comments = student.get('comment')
-        attendance = Attendance.query.filter_by(date=date,
-                                                student_id=student_id).first()
-        if not attendance:
-            attendance = Attendance(date=date,
-                                    comments=comments,
-                                    punchOut=punchOut,
-                                    punchIn=punchIn,
-                                    student_id=student_id)
-            db.session.add(attendance)
-            std_added.append(student_id)
-        else:
-            attendance.punchIn = punchIn
-            attendance.punchOut = punchOut
-            std_updated.append(student_id)
-    db.session.commit()
-    res['status'] = 'Success'
-    res['meassage'] = 'Attendance saved successfully'
-    res['updatedIds'] = std_updated
-    res['addedIds'] = std_added
-    return make_response(jsonify(res)), res_code
 
 
 @mod_api.route('/attendance/<string:date>/<int:studentid>/<string:what>',
                methods=['POST'])
 @login_required
-def punch_in(date, studentid, what):
+def set_attendance(date, studentid, what):
     res = dict(status='fail')
     res_code = 200
     if what not in ['in', 'out', 'comment']:
@@ -337,14 +296,16 @@ def punch_in(date, studentid, what):
     if attendance:
         if faculty.admin:
             if what == 'in':
-                attendance.punchIn = dataToSave
+                attendance.punch_in = dataToSave
+                attendance.punch_in_by_id = request.user.id
             elif what == 'out':
-                attendance.punchOut = dataToSave
+                attendance.punch_out = dataToSave
+                attendance.punch_out_by_id = request.user.id
             else:
                 attendance.comments = dataToSave
             res['message'] = 'Updated existing record'
             db.session.commit()
-            print attendance
+            res['attendance'] = attendance.serialize()
             res['status'] = 'success'
             res_code = 200
         else:
@@ -354,10 +315,11 @@ def punch_in(date, studentid, what):
         # If the record does not exist that means the dataToSave is intime
         attendance = Attendance(date=date,
                                 student_id=studentid,
-                                punchIn=dataToSave)
+                                punch_in=dataToSave,
+                                punch_in_by_id=request.user.id)
         db.session.add(attendance)
         db.session.commit()
-        print attendance.serialize()
+        res['attendance'] = attendance.serialize()
         res['message'] = 'Record created.'
         res['status'] = 'success'
         res_code = 200

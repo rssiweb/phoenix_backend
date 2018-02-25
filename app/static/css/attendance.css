@@ -1,0 +1,7 @@
+p.small{
+    margin-top:-14px;
+    font-size: 0.9em;
+}
+p.faded{
+    color:rgba(0,0,0,.60);
+}

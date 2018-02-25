@@ -67,7 +67,9 @@ var app = new Vue({
                                 if(student.id == item.student.id){
                                     console.log(student,item,'matched');
                                     student.in = item.punchIn;
+                                    student.inby = item.punchInBy;
                                     student.out = item.punchOut;
+                                    student.outby = item.punchOutBy;
                                     student.comment = item.comments;
                                     vm.$set(vm.students, stdi, student);
                                 }
@@ -108,6 +110,12 @@ var app = new Vue({
                 .then(response => {
                     if(response.body.status == 'success'){
                         console.log('saved')
+                        if(response.body.attendance){
+                            var newupdatedStd = updatedStd
+                            newupdatedStd.inby = response.body.attendance.punchInBy
+                            newupdatedStd.outby = response.body.attendance.punchOutBy
+                            vm.$set(vm.students, vm.students.indexOf(updatedStd), newupdatedStd);
+                        }
                     }else{
                         // undo the changes in ui
                        var redoUpdatedStd = updatedStd;
@@ -139,7 +147,7 @@ var app = new Vue({
                 console.log(this.students);
             },
             getTimeString: function(datetime){
-                return moment(datetime,['HH:mm:ss']).format('hh:mm:ss A');
+                return moment(datetime,['HH:mm:ss']).format('hh:mm A');
             },
             nextDay: function(){
                 console.log('nextDay');

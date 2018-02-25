@@ -120,24 +120,34 @@ class Attendance(Base):
     __tablename__ = 'attendance'
 
     date = db.Column(db.Date, nullable=False, default=db.func.current_date())
-    punchIn = db.Column(db.String(50), nullable=False)
-    punchOut = db.Column(db.String(50))
+    punch_in = db.Column(db.String(50), nullable=False)
+    punch_in_by_id = db.Column(db.Integer, db.ForeignKey('faculty.id'))
+    punch_in_by = relationship('Faculty', foreign_keys=[punch_in_by_id])
+    punch_out = db.Column(db.String(50))
+    punch_out_by_id = db.Column(db.Integer, db.ForeignKey('faculty.id'))
+    punch_out_by = relationship('Faculty', foreign_keys=[punch_out_by_id])
     comments = db.Column(db.String(100))
     location = db.Column(db.String(100))
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    student = relationship('Student', backref=backref("person", cascade="all, delete-orphan"))
+    student = relationship('Student',
+                           backref=backref("person",
+                                           cascade="all, delete-orphan"))
 
-    def __init__(self, date, student_id, punchIn, punchOut=None, comments=None, location=None):
+    def __init__(self, date, student_id, punch_in, punch_in_by_id,
+                 punch_out=None, punch_out_by_id=None, comments=None,
+                 location=None):
         self.date = date
         self.student_id = student_id
 
-        if punchIn:
-            datetime.strptime(punchIn, '%H:%M:%S')
-        self.punchIn = punchIn
+        if punch_in:
+            datetime.strptime(punch_in, '%H:%M:%S')
+        self.punch_in = punch_in
+        self.punch_in_by_id = punch_in_by_id
 
-        if punchOut:
-            datetime.strptime(punchOut, '%H:%M:%S')
-        self.punchOut = punchOut
+        if punch_out:
+            datetime.strptime(punch_out, '%H:%M:%S')
+        self.punch_out = punch_out
+        self.punch_out_by_id = punch_out_by_id
         self.comments = comments
         self.location = location
 
@@ -145,5 +155,7 @@ class Attendance(Base):
         return dict(id=self.id,
                     student=self.student.serialize(),
                     comments=self.comments,
-                    punchIn=self.punchIn,
-                    punchOut=self.punchOut)
+                    punchIn=self.punch_in,
+                    punchInBy=self.punch_in_by.serialize() if self.punch_in_by else {},
+                    punchOut=self.punch_out,
+                    punchOutBy=self.punch_out_by.serialize() if self.punch_out_by else {})
