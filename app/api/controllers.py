@@ -67,7 +67,7 @@ def login_required(func):
 @login_required
 def list_faculties():
     faculties = [f.serialize() for f in Faculty.query.all()]
-    data = dict(status='Success', faculties=faculties)
+    data = dict(status='success', faculties=faculties)
     return make_response(jsonify(data)), 200
 
 
@@ -338,7 +338,7 @@ def import_students():
     getName = itemgetter(heading.index('name of the student'))
     getCategory = itemgetter(heading.index('category'))
     getStudentId = itemgetter(heading.index('student id'))
-    getAge = itemgetter(heading.index('age'))
+    getDob = itemgetter(heading.index('date of birth'))
     getContact = itemgetter(heading.index('telephone no.'))
     getBranch = itemgetter(heading.index('preferred branch'))
 
@@ -346,10 +346,7 @@ def import_students():
     updated = []
     for row in csvreader:
         student = Student.query.filter_by(student_id=getStudentId(row)).first()
-        today = datetime.today()
-        dob = datetime(year=today.year - int(getAge(row)),
-                       month=today.month,
-                       day=today.day).date()
+        dob = datetime.strptime('%d/%m/%Y', getDob(row))
         category, student_id = getCategory(row), getStudentId(row)
         name, contact = getName(row), getContact(row)
         branch = getBranch(row)
