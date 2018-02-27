@@ -40,7 +40,6 @@ var app = new Vue({
             data = {}
             $(formInputArr).each(function(index, input){
                 data[input.name] = input.value;
-                input.value = '';
             });
             return data;
         },
