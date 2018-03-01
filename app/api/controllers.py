@@ -75,35 +75,43 @@ def list_faculties():
 @login_required
 @only_admins
 def add_faculty():
-    required_fileds = ['email', 'password', 'name']
+    required_fields = ('facultyId', 'email', 'password', 'name', 'gender')
     res = dict(status='fail')
     res_code = 200
 
     data = request.json or request.data or request.form
     if not data:
         res['message'] = 'No data received.'
-        return make_response(jsonify(res)), res_code
+        return jsonify(res), res_code
 
-    keys = [str(key) for key in data.keys()]
-    if required_fileds != keys:
-        res['message'] = 'expected atleast {0} got only {1}'\
-                         .format(required_fileds, keys)
-        return make_response(jsonify(res)), res_code
+    keys = data.keys()
+    missing_required_fields = set(required_fields) - set(keys)
+    if missing_required_fields:
+        res['message'] = 'expected fields {0} not found'\
+                         .format(missing_required_fields)
+        return jsonify(res), res_code
 
     email = data.get('email')
     name = data.get('name')
     password = data.get('password')
-    if not all([email, name, password]):
-        res['message'] = 'missing required data.'
-        return make_response(jsonify(res)), res_code
+    gender = data.get('gender')
+    facultyId = data.get('facultyId')
+    blank_values = [key for key in required_fields
+                    if not data.get(key, '').strip()]
+    if blank_values:
+        res['message'] = 'values for field(s) {0} is required'\
+                         .format(blank_values)
+        return jsonify(res), res_code
 
-    faculty = Faculty.query.filter_by(email=email).first()
+    faculty = Faculty.query.filter_by(facultyId=facultyId).first()
     if not faculty:
         try:
             faculty = Faculty(
+                facultyId=facultyId,
                 name=name,
                 email=email,
-                password=password)
+                password=password,
+                gender=gender)
             # insert the user
             db.session.add(faculty)
             db.session.commit()
@@ -117,7 +125,7 @@ def add_faculty():
     else:
         res['meassage'] = 'Faculty already exists.'
         res_code = 202
-    return make_response(jsonify(res)), res_code
+    return jsonify(res), res_code
 
 
 @mod_api.route('/student')

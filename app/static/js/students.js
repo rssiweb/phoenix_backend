@@ -68,7 +68,7 @@ var app = new Vue({
                     console.log(error);
                     this.importing = false;
                     this.imported = true;
-                    this.importSummary = error.body.message
+                    this.importSummary = error.body.message || error.statusText
                 });
             },
             loadStudents: function(){
@@ -92,8 +92,8 @@ var app = new Vue({
                         console.log(this.message);
                         this.loading = '';
                     },error => {
-                        this.error = error.body.message;
                         console.log(error);
+                        this.error = error.body.message || error.statusText;
                         this.loading = '';
                     });
             },

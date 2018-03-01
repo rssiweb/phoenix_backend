@@ -31,25 +31,38 @@ class User(Base):
 class Faculty(User):
     __tablename__ = 'faculty'
 
+    facultyId = db.Column(db.String(255), nullable=False, unique=True,
+                          nullable=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
     admin = db.Column(db.Boolean(), default=False)
+    gender = db.Column(db.Enum('male', 'female', 'others', name='gender'),
+                       nullable=True)
 
-    def __init__(self, name, email, password):
+    def __init__(self, facultyId, name, email, password, gender):
         super(Faculty, self).__init__(name)
+        self.facultyId = facultyId
         self.email = email
         self.password = bcrypt.generate_password_hash(
             password, app.config.get('BCRYPT_LOG_ROUNDS')
         ).decode()
+
+        gender = gender.lower()
+        if gender in ['male', 'female', 'others']:
+            self.gender = gender
+        else:
+            raise ValueError('Invalid gender value "%s"' % gender)
 
     def __repr__(self):
         return '<Faculty %r>' % self.name
 
     def serialize(self):
         return dict(id=self.id,
+                    facultyId=self.facultyId,
                     name=self.name,
                     email=self.email,
                     admin=self.admin,
+                    gender=self.gender,
                     )
 
     @staticmethod
