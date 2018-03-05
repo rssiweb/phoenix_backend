@@ -17,12 +17,11 @@ class User(Base):
     __abstract__ = True
 
     name = db.Column(db.String(128))
+    isActive = db.Column(db.Boolean, default=True)
 
-    def __init__(self, name):
+    def __init__(self, name, isActive=True):
         self.name = name
-
-    def __repr__(self):
-        return '<User %r>' % self.name
+        self.isActive = isActive
 
     def serialize(self):
         return dict(name=self.name)
@@ -31,8 +30,7 @@ class User(Base):
 class Faculty(User):
     __tablename__ = 'faculty'
 
-    facultyId = db.Column(db.String(255), nullable=False, unique=True,
-                          nullable=True)
+    facultyId = db.Column(db.String(255), nullable=False, unique=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
     admin = db.Column(db.Boolean(), default=False)
@@ -53,9 +51,6 @@ class Faculty(User):
         else:
             raise ValueError('Invalid gender value "%s"' % gender)
 
-    def __repr__(self):
-        return '<Faculty %r>' % self.name
-
     def serialize(self):
         return dict(id=self.id,
                     facultyId=self.facultyId,
@@ -64,6 +59,12 @@ class Faculty(User):
                     admin=self.admin,
                     gender=self.gender,
                     )
+
+    def __repr__(self):
+        class_name = type(self).__class__
+        return '%s(%s, %s, %s, %s, %s)' % (class_name, self.facultyId,
+                                           self.name, self.admin,
+                                           self.email, self.gender)
 
     @staticmethod
     def encode_auth_token(email):
@@ -116,7 +117,8 @@ class Student(User):
         self.branch = branch
 
     def __repr__(self):
-        return '<Student %r>' % self.name
+        class_type = type(self)
+        return '%s(%s)' % (class_type, self.name)
 
     def serialize(self):
         return dict(id=self.id,
@@ -132,16 +134,20 @@ class Student(User):
 class Attendance(Base):
     __tablename__ = 'attendance'
 
-    date = db.Column(db.Date, nullable=False, default=db.func.current_date())
-    punch_in = db.Column(db.String(50), nullable=False)
-    punch_in_by_id = db.Column(db.Integer, db.ForeignKey('faculty.id'))
+    date = db.Column(db.Date(), nullable=False, default=db.func.current_date())
+
+    punch_in = db.Column(db.String(50), nullable=True)
+    punch_in_by_id = db.Column(db.Integer(), db.ForeignKey('faculty.id'))
     punch_in_by = relationship('Faculty', foreign_keys=[punch_in_by_id])
-    punch_out = db.Column(db.String(50))
-    punch_out_by_id = db.Column(db.Integer, db.ForeignKey('faculty.id'))
+
+    punch_out = db.Column(db.String(50), nullable=True)
+    punch_out_by_id = db.Column(db.Integer(), db.ForeignKey('faculty.id'))
     punch_out_by = relationship('Faculty', foreign_keys=[punch_out_by_id])
-    comments = db.Column(db.String(100))
-    location = db.Column(db.String(100))
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
+
+    comments = db.Column(db.String(100), nullable=True)
+    location = db.Column(db.String(100), nullable=True)
+
+    student_id = db.Column(db.Integer(), db.ForeignKey('student.id'))
     student = relationship('Student',
                            backref=backref("person",
                                            cascade="all, delete-orphan"))
@@ -163,6 +169,13 @@ class Attendance(Base):
         self.punch_out_by_id = punch_out_by_id
         self.comments = comments
         self.location = location
+
+    def __repr__(self):
+        class_type = type(self)
+        return '%s(student=%s, date=%s, punch_in=%s,\
+        punch_in_by=%s, punch_out=%s, punch_out_by=%s)' % \
+            (class_type, self.student.name, self.date, self.punch_in,
+                self.punch_in_by, self.punch_out, self.punch_out_by)
 
     def serialize(self):
         return dict(id=self.id,

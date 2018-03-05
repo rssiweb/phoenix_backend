@@ -39,7 +39,7 @@ var app = new Vue({
                 //send the file to server and get list new students 
                 //and list of updating students
                 var vm = this;
-                var url = '/api/student/import'
+                var url = '/api/admin/student/import'
                 var postData = new FormData()
                 postData.append('studentsListFile',this.importFile)
                 vm.$http.post(url, postData, this.getHeaders())
@@ -102,11 +102,11 @@ var app = new Vue({
                 var url = '';
                 if(this.studentToUpdate){
                     this.loading = 'Updating '+this.studentToUpdate.name+'...'
-                    url = '/api/student/update';
+                    url = '/api/admin/student/update';
                 }
                 else{
                     this.loading = 'Adding '+$('#addStudentForm input[name="name"]').val()+'...'
-                    url = '/api/student/add';
+                    url = '/api/admin/student/add';
                 }
 
                 postData = this.getJsonFromForm($('#addStudentForm input'))
@@ -150,7 +150,7 @@ var app = new Vue({
                 console.log('delete', student);
                 this.loading = 'Deleting '+student.name+'...'
                 var vm = this;
-                var url = '/api/student/delete/'+student.id
+                var url = '/api/admin/student/delete/'+student.id
                 this.$http.get(url,this.getHeaders())
                 .then(response => {
                     console.log(response);    

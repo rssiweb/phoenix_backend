@@ -16,15 +16,19 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+
 # Sample HTTP error handling
 @app.errorhandler(404)
 def not_found(error):
     return jsonify(dict(error=str(error))), 404
 
-from app.api.controllers import mod_api as api_module
-from app.ui.controllers import mod_ui as ui_module
 
-app.register_blueprint(api_module)
-app.register_blueprint(ui_module)
+from app.api.controllers import api
+from app.api.admin.controllers import adminapi
+from app.ui.controllers import ui
+
+app.register_blueprint(api)
+app.register_blueprint(adminapi)
+app.register_blueprint(ui)
 
 db.create_all()

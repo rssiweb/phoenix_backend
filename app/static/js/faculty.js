@@ -32,7 +32,7 @@ var app = new Vue({
             return {headers: { Authorization: 'Basic ' +  this.token}}
         },
         loadFaculties(){
-            var url = '/api/faculty';
+            var url = '/api/admin/faculty';
             var vm = this;
             this.$http.get(url,this.getHeaders())
             .then((response) => {
@@ -59,7 +59,7 @@ var app = new Vue({
             var loading = 'Adding '+$('addFacultyForm input[name="name"]').val()+'...'
             var postData = this.facultyToUpdate
             console.log('updating', postData);
-            var url = '/api/faculty/add';
+            var url = '/api/admin/faculty/add';
             var vm = this;
             vm.$http.post(url,postData, vm.getHeaders())
             .then((response) => {

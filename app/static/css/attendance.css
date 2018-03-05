@@ -5,3 +5,7 @@ p.small{
 p.faded{
     color:rgba(0,0,0,.60);
 }
+.smallerror{
+	font-size: 0.7em;
+	color: red;
+}
