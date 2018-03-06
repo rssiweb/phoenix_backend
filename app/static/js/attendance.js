@@ -93,42 +93,46 @@ var app = new Vue({
         savePunchIn(student){
             var updatedStd = student;
             var indexOfStd = this.students.indexOf(student);
+
             if(updatedStd.in == undefined){
+                //when faculty clicks punchIn button
                 updatedStd.in = moment().format('HH:mm:ss');
             }
             else{
+                //when admin modifies the punchOut
                 if (updatedStd.in == ''){
-                    //clearing recorded time
+                    //admin clears the puchIn field
                     if(updatedStd.out){
-                        updatedStd.inerror = 'should be before '+updatedStd.out
-                        this.$set(this.students, indexOfStd, updatedStd);
-                        return;
+                        updatedStd.inerror = 'clear punch out before punch in'
                     }
                     else if(updatedStd.comment){
-                        updatedStd.inerror = 'clear punchout and comment first.'
-                        this.$set(this.students, indexOfStd, updatedStd);
+                        updatedStd.inerror = 'cannot clear punch in when comment is present'
                     }
                     else{
                         updatedStd.inerror = ''
                     }
                 }else{
-                    //update
+                    //admin changes the time in puchIn field
                     var newTime = moment(updatedStd.in,['HH:mm:ss','HH:mm'])
-                    var tmpOut = student.out==undefined? student.out : moment(student.out,['HH:mm:ss','HH:mm'])
-                    if(newTime.isValid() && (tmpOut==undefined || newTime.isBefore(tmpOut))){
-                        //validData: is before punchOut time if punch out time is defined
+                    
+                    if(!newTime.isValid()){
+                        updatedStd.inerror = 'Invalid Time';
+                    }
+
+                    if(student.out){
+                        var tmpOut = moment(student.out,['HH:mm:ss','HH:mm'])
+                        if(!newTime.isBefore(tmpOut)){
+                            updatedStd.inerror = 'should be before punch out';
+                        }
+                    }else{
                         updatedStd.in = newTime.format('HH:mm:ss');
                         updatedStd.inerror = '';
-                    }else{
-                        //Invalid update value
-                        updatedStd.inerror = 'Invalid Time ' + updatedStd.in
-                        if(tmpOut!=undefined && !newTime.isBefore(tmpOut))
-                            updatedStd.inerror = 'PunchIn time should be before ' + updatedStd.out
-                        //updatedStd.in = '00:00:00'
-                        this.$set(this.students, indexOfStd, updatedStd);
-                        return;
                     }
                 }
+            }
+            if(updatedStd.inerror){
+                this.$set(this.students, indexOfStd, updatedStd);
+                return;
             }
             this.saveAttendaceData(updatedStd,indexOfStd, 'in');
         },
@@ -138,13 +142,17 @@ var app = new Vue({
             var indexOfStd = this.students.indexOf(student);
 
             if(updatedStd.out == undefined){
+                //when faculty clicks punchOut button
                 updatedStd.out = moment().format('HH:mm:ss');
             }
             else{
+                //when admin modifies the punchOut
                 if (updatedStd.out == ''){
-                    //clearing recorded time
+                    //when admin clears the punchOut field
+                    //it is a valid case, when admin wants a student to be punched in only
+                    updatedStd.outerror = ''
                 }else{
-                    //update
+                    //when admin changes the time in punchOut field
                     var newTime = moment(updatedStd.out,['HH:mm:ss','HH:mm'])
                     var tmpIn = moment(updatedStd.in,['HH:mm:ss','HH:mm'])
                     if(newTime.isValid() && newTime.isAfter(tmpIn)){
@@ -154,11 +162,12 @@ var app = new Vue({
                         updatedStd.outerror = 'Invalid Time ' + updatedStd.out
                         if(!newTime.isAfter(tmpIn))
                             updatedStd.outerror = 'Punch out time should be after ' + updatedStd.in
-                        //updatedStd.out = '00:00:00'
-                        this.$set(this.students, this.students.indexOf(student), updatedStd);
-                        return;
                     }
                 }
+            }
+            if(updatedStd.outerror){
+                this.$set(this.students, indexOfStd, updatedStd);
+                return;
             }
             this.saveAttendaceData(updatedStd,indexOfStd, 'out');  
         },
