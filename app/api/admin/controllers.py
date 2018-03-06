@@ -243,15 +243,12 @@ def set_punch_out(attendance, date, outTime):
         return jsonify(dict(status='fail',
                             message='Cannot puch out before puch in'
                             )), 200
-    if attendance.punch_out is not None:
-        return jsonify(dict(status='fail',
-                            message='student already punched out'
-                            )), 200
-    isValid, dateOrError = parseDate(outTime, '%H:%M:%S')
-    if not isValid:
-        return jsonify(dict(status='fail',
-                            message='time is not valid {}'.format(outTime)
-                            )), 200
+    if outTime != '':
+        isValid, dateOrError = parseDate(outTime, '%H:%M:%S')
+        if not isValid:
+            return jsonify(dict(status='fail',
+                                message='{} is not valid time'.format(outTime)
+                                )), 200
 
     attendance.punch_out = outTime
     attendance.punch_out_by_id = request.user.id
@@ -268,14 +265,14 @@ def set_comment(attendance, date, comment):
         return jsonify(dict(status='fail',
                             message='Cannot add comment now'
                             )), 200
-    if attendance and not attendance.punch_out:
-        attendance.comments = comment
-        db.session.add(attendance)
-        db.session.commit()
-        return jsonify(dict(status='success',
-                            message='comment saved successfuly',
-                            attendance=attendance.serialize()
-                            )), 200
+
+    attendance.comments = comment
+    db.session.add(attendance)
+    db.session.commit()
+    return jsonify(dict(status='success',
+                        message='comment saved successfuly',
+                        attendance=attendance.serialize()
+                        )), 200
 
 
 @adminapi.route('/attendance/<string:date>/<int:studentid>/<string:what>',
@@ -307,7 +304,7 @@ def set_attendance(date, studentid, what):
         res['message'] = 'Invalid student id'
         return jsonify(res), res_code
 
-    attendance = Attendance.query.filter_by(date=datetime.today().date(),
+    attendance = Attendance.query.filter_by(date=date,
                                             student_id=student.id).first()
     print attendance
     if what == 'in':
