@@ -14,7 +14,10 @@ var app = new Vue({
         facultyToReset: {},
 
         facultyToUpdate: {},
+        isFacultyUpdate: false,
         confirmPassword: '',
+
+        searchTxt: '',
     },
     created: function(){
         this.loadFaculties();
@@ -50,17 +53,26 @@ var app = new Vue({
                 vm.error = error.body.message || error.statusText;
             });
         },
-        resetPassword(faculty){
-            console.log(faculty);
+        showResetDialog(faculty){
             this.facultyToReset = faculty;
             $('#resetModal').modal('show');
         },
         addFaculty(){
-            var loading = 'Adding '+$('addFacultyForm input[name="name"]').val()+'...'
-            var postData = this.facultyToUpdate
-            console.log('updating', postData);
-            var url = '/api/admin/faculty/add';
+            if(!this.validEmail(this.facultyToUpdate.email)){
+                this.facultyToUpdate.emailError = 'Invalid Email address'
+
+                return
+            }
+            this.facultyToUpdate.emailError = ''
+            
             var vm = this;
+            var loading = 'Adding ' + this.facultyToUpdate.name + '...'
+            
+            var postData = this.facultyToUpdate
+            console.log('adding', postData);
+
+            var url = '/api/admin/faculty/add';
+            
             vm.$http.post(url,postData, vm.getHeaders())
             .then((response) => {
                 console.log(response);
@@ -77,6 +89,26 @@ var app = new Vue({
                 vm.loading = '';
             });
         },
+        updateFaculty(){
+            if(!this.isFacultyUpdate){
+                return this.addFaculty();
+            }
+            console.log('update', this.facultyToUpdate)
+        },
+        markFacultyToUpdate(faculty){
+            console.log('update', faculty);
+            this.isFacultyUpdate = true;
+            this.facultyToUpdate = Object.assign({}, faculty);
+            $('#addFacultyForm select').dropdown('set selected', this.facultyToUpdate.gender)
+        },
+        resetPassword(){
+            console.log('reset password', this.facultyToReset);
+        },
+        resetFacultyForm(){
+            this.isFacultyUpdate = false;
+            this.facultyToUpdate = {};
+            $('#addFacultyForm select').dropdown('clear'    )
+        },
         getJsonFromForm(formInputArr){
             data = {}
             $(formInputArr).each(function(index, input){
@@ -85,12 +117,56 @@ var app = new Vue({
                 input.value = '';
             });
             return data;
-        },
+        }
     },
     computed:{
         matchPassword(){
             return !this.facultyToUpdate.password ||
             this.facultyToUpdate.password == this.confirmPassword;
+        },
+        facultyBtnTxt(){
+            return this.isFacultyUpdate ?  "Update" : "Add";
+        },
+        enableFacultyBtn(){
+            if(this.loading) return false;
+            if(this.isFacultyUpdate &&
+               this.facultyToUpdate.name &&
+               this.facultyToUpdate.facultyId &&
+               this.facultyToUpdate.email &&
+               this.validEmail &&
+               this.facultyToUpdate.gender)
+                return true;
+            if(!this.isFacultyUpdate &&
+               this.facultyToUpdate.name &&
+               this.facultyToUpdate.facultyId &&
+               this.facultyToUpdate.email &&
+               this.validEmail &&
+               this.facultyToUpdate.gender &&
+               this.facultyToUpdate.password == this.confirmPassword)
+                return true;
+            return false;
+        },
+        newPasswordMatch(){
+            return this.facultyToReset.password==this.facultyToReset.confirmPassword;
+        },
+        filteredFaculties(){
+            return this.faculties.filter(faculty => {
+                if(this.lowerCaseSearchTxt == '')
+                    return true;
+                var name = this.lowerCaseSearchTxt.indexOf(faculty.name.toLowerCase()) != -1 || faculty.name.toLowerCase().indexOf(this.lowerCaseSearchTxt) != -1
+                var id = this.lowerCaseSearchTxt.indexOf(faculty.facultyId) != -1 || faculty.facultyId.indexOf(this.lowerCaseSearchTxt) != -1
+                var email = this.lowerCaseSearchTxt.indexOf(faculty.email) != -1 || faculty.email.indexOf(this.lowerCaseSearchTxt) != -1
+                return name || id || email;
+            });
+        },
+        lowerCaseSearchTxt(){
+            return this.searchTxt.toLowerCase()
+        },
+        validEmail() {
+            var email = this.facultyToUpdate.email
+            if(!email) return true;
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
         }
     },
     watch:{

@@ -229,9 +229,4 @@ var app = new Vue({
                     return ''
             },
         },
-        watch:{
-            students: function(){
-                
-            }
-        }
     });
