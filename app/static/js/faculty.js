@@ -58,13 +58,6 @@ var app = new Vue({
             $('#resetModal').modal('show');
         },
         addFaculty(){
-            if(!this.validEmail(this.facultyToUpdate.email)){
-                this.facultyToUpdate.emailError = 'Invalid Email address'
-
-                return
-            }
-            this.facultyToUpdate.emailError = ''
-            
             var vm = this;
             var loading = 'Adding ' + this.facultyToUpdate.name + '...'
             
@@ -93,7 +86,50 @@ var app = new Vue({
             if(!this.isFacultyUpdate){
                 return this.addFaculty();
             }
-            console.log('update', this.facultyToUpdate)
+            var vm = this;
+            var postData = this.facultyToUpdate
+            var loading = 'Updating ' + this.facultyToUpdate.name + '...'
+            var url = '/api/admin/faculty/update';
+            
+            vm.$http.post(url,postData, vm.getHeaders())
+            .then((response) => {
+                console.log(response);
+                if(response.body.status=='success'){
+                    vm.faculties.push(response.body.faculty)
+                }else{
+                    vm.error = response.body.message;
+                }
+                vm.loading = '';
+            },
+            (error) => {
+                console.log(error);
+                vm.error = error.statusText;
+                vm.loading = '';
+            });
+            
+        },
+        deleteFaculty(){
+            console.log('deleteFaculty', this.facultyToUpdate);
+            var vm = this;
+            var postData = this.facultyToUpdate
+            var loading = 'Deleting ' + this.facultyToUpdate.name + '...'
+            var url = '/api/admin/faculty/delete';
+            
+            vm.$http.post(url,postData, vm.getHeaders())
+            .then((response) => {
+                console.log(response);
+                if(response.body.status=='success'){
+                    vm.faculties.push(response.body.faculty)
+                }else{
+                    vm.error = response.body.message;
+                }
+                vm.loading = '';
+            },
+            (error) => {
+                console.log(error);
+                vm.error = error.statusText;
+                vm.loading = '';
+            });
         },
         markFacultyToUpdate(faculty){
             console.log('update', faculty);
@@ -103,6 +139,26 @@ var app = new Vue({
         },
         resetPassword(){
             console.log('reset password', this.facultyToReset);
+            var vm = this;
+            var postData = this.facultyToUpdate
+            var loading = 'Updating ' + this.facultyToUpdate.name + '\'s Password ...'
+            var url = '/api/admin/faculty/reset';
+            
+            vm.$http.post(url,postData, vm.getHeaders())
+            .then((response) => {
+                console.log(response);
+                if(response.body.status=='success'){
+                    vm.faculties.push(response.body.faculty)
+                }else{
+                    vm.error = response.body.message;
+                }
+                vm.loading = '';
+            },
+            (error) => {
+                console.log(error);
+                vm.error = error.statusText;
+                vm.loading = '';
+            });
         },
         resetFacultyForm(){
             this.isFacultyUpdate = false;

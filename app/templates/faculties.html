@@ -60,7 +60,7 @@
     <div class="ui form container">
         <div class="ui sub header"><h3>Add Faculty</h3></div>
         <br/>
-        <form id="addFacultyForm" v-on:submit.prevent="addFaculty">
+        <div id="addFacultyForm">
             <div class="ui fields">
                 <div class="required field" :class="{disabled: isFacultyUpdate}">
                     <label>Faculty ID</label>
@@ -96,11 +96,11 @@
               </div>
           </div>
           <div class="buttons">
-            <button class="ui positive button" @click="updateFaculty" v-bind:class="{loading: loading, disabled: !enableFacultyBtn }">{{facultyBtnTxt}}</button>
+            <button class="ui positive button" @click.prevent="updateFaculty" :class="{loading: loading, disabled: !enableFacultyBtn }">{{facultyBtnTxt}}</button>
             <button class="ui button" @click.prevent="resetFacultyForm">Reset</button>
-            <button class="ui negative right floated button" v-show="isFacultyUpdate">Delete</button>
+            <button class="ui negative right floated button" @click.prevent="deleteFaculty" v-show="isFacultyUpdate" >Delete</button>
         </div>
-    </form>
+    </div>
 </div>
 </div>
 <!-- Modals -->
