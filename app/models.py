@@ -58,6 +58,7 @@ class Faculty(User):
                     email=self.email,
                     admin=self.admin,
                     gender=self.gender,
+                    active=self.isActive,
                     )
 
     def __repr__(self):
@@ -128,6 +129,7 @@ class Student(User):
                     student_id=self.student_id,
                     contact=self.contact,
                     branch=self.branch,
+                    active=self.isActive,
                     )
 
 

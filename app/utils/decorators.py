@@ -27,7 +27,7 @@ def login_required(func):
             try:
                 email = Faculty.decode_auth_token(auth_code)
                 user = Faculty.query.filter_by(email=email).first()
-                if user:
+                if user and user.isActive:
                     request.user = user
                     return func(*args, **kwargs)
                 status = 'Fail'

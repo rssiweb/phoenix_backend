@@ -60,6 +60,8 @@ var app = new Vue({
                         },200);
                         if(response.body.added.length > 0 || response.body.updated.length > 0)
                             vm.loadStudents();
+                    }else{
+                        vm.importSummary = response.body.message
                     }
                     this.importing = false;
                     this.imported = true;

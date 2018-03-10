@@ -1,3 +1,7 @@
+Vue.use(Toasted, {
+    iconPack : 'fontawesome'
+})
+
 var app = new Vue({
     el: '#app',
     data:{
@@ -71,6 +75,7 @@ var app = new Vue({
                 console.log(response);
                 if(response.body.status=='success'){
                     vm.faculties.push(response.body.faculty)
+                    vm.resetFacultyForm();
                 }else{
                     vm.error = response.body.message;
                 }
@@ -108,29 +113,6 @@ var app = new Vue({
             });
             
         },
-        deleteFaculty(){
-            console.log('deleteFaculty', this.facultyToUpdate);
-            var vm = this;
-            var postData = this.facultyToUpdate
-            var loading = 'Deleting ' + this.facultyToUpdate.name + '...'
-            var url = '/api/admin/faculty/delete';
-            
-            vm.$http.post(url,postData, vm.getHeaders())
-            .then((response) => {
-                console.log(response);
-                if(response.body.status=='success'){
-                    vm.faculties.push(response.body.faculty)
-                }else{
-                    vm.error = response.body.message;
-                }
-                vm.loading = '';
-            },
-            (error) => {
-                console.log(error);
-                vm.error = error.statusText;
-                vm.loading = '';
-            });
-        },
         markFacultyToUpdate(faculty){
             console.log('update', faculty);
             this.isFacultyUpdate = true;
@@ -160,10 +142,48 @@ var app = new Vue({
                 vm.loading = '';
             });
         },
+        toogleActive(faculty){
+            faculty.loading = true;
+            var vm = this;
+            vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
+            console.log(faculty)
+            var url = '/api/admin/faculty/'+faculty.facultyId+'/active/'+faculty.active;
+            
+            vm.$http.put(url,{}, vm.getHeaders())
+            .then((response) => {
+                console.log(response);
+                if(response.body.status=='success'){
+                    console.log('done active')
+                    faculty.active = !faculty.active;
+                }else{
+                    this.$toasted.show(response.body.message+' '+faculty.name + '\'s status did not change.',{ 
+                        theme: 'primary',
+                        className: "ui orange label",
+                        position: "bottom-right", 
+                        icon : 'exclamation-triangle',
+                        duration : 3000
+                    });    
+                }
+                faculty.loading = false;
+                vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
+            },
+            (error) => {
+                faculty.activeLoading = false;  
+                console.log(error);
+                this.$toasted.show(error.statusText + ' error occured. '+faculty.name + '\'s status did not change.',{ 
+                    theme: 'primary',
+                    className: "ui orange label",
+                    position: "bottom-right", 
+                    icon : 'exclamation-triangle',
+                    duration : 3000
+                });
+            });
+        },
         resetFacultyForm(){
             this.isFacultyUpdate = false;
             this.facultyToUpdate = {};
-            $('#addFacultyForm select').dropdown('clear'    )
+            this.confirmPassword = '';
+            $('#addFacultyForm select').dropdown('clear')
         },
         getJsonFromForm(formInputArr){
             data = {}
@@ -173,6 +193,9 @@ var app = new Vue({
                 input.value = '';
             });
             return data;
+        },
+        clearError(){
+            this.error = '';
         }
     },
     computed:{

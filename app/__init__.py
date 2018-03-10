@@ -14,7 +14,9 @@ app.config.from_object('config')
 
 # Define Database object which is imported by some modules
 db = SQLAlchemy(app)
+
 migrate = Migrate(app, db)
+migrate.render_as_batch = True
 
 
 # Sample HTTP error handling

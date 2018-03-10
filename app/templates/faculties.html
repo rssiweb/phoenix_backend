@@ -7,7 +7,7 @@
 <div class="ui container">
     <div class="ui container" v-if="error">
         <div class="ui negative message">
-            <i class="close icon"></i>
+            <i class="close icon" @click="clearError"></i>
             <div class="header">
                 Unfortunately an error occured
             </div>
@@ -50,10 +50,19 @@
         <tbody>
             <tr v-for="faculty in filteredFaculties">
                 <td>{{faculty.facultyId}}</td>
-                <td>{{faculty.name}}</td>
+                <td>
+                    {{faculty.name}}
+                    <div class="ui mini olive horizontal label" v-if="faculty.admin">Admin</div>
+                    <div class="ui mini grey horizontal label" v-if="!faculty.active">Inactive</div>
+                </td>
                 <td><a href="#" @click="markFacultyToUpdate(faculty)">{{faculty.email}}</a></td>
                 <td>{{faculty.gender | capitalize}}</td>
-                <td><button class="ui mini compact button" @click="showResetDialog(faculty)">Reset Password</button></td>
+                <td>
+                    <div class="ui mini compact buttons">
+                        <button class="ui button" @click="showResetDialog(faculty)">Reset Password</button>
+                        <button class="ui button" v-bind:class="{ loading: faculty.loading, disabled: faculty.loading }" @click="toogleActive(faculty)">{{faculty.active? "Inactive" : "Active"}}</button>
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -98,7 +107,6 @@
           <div class="buttons">
             <button class="ui positive button" @click.prevent="updateFaculty" :class="{loading: loading, disabled: !enableFacultyBtn }">{{facultyBtnTxt}}</button>
             <button class="ui button" @click.prevent="resetFacultyForm">Reset</button>
-            <button class="ui negative right floated button" @click.prevent="deleteFaculty" v-show="isFacultyUpdate" >Delete</button>
         </div>
     </div>
 </div>

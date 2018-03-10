@@ -3,7 +3,7 @@ from app import db, jsonify
 from app.models import Faculty, Student, Attendance
 from datetime import datetime
 from operator import itemgetter
-from app.utils import decorators, parseDate
+from app.utils import decorators, parseDate, validEmail
 import csv
 
 
@@ -50,6 +50,9 @@ def add_faculty():
         res['message'] = 'values for field(s) {0} is required'\
                          .format(blank_values)
         return jsonify(res), res_code
+    if not validEmail(email):
+        res['message'] = 'Invalid Email address %s'.format(email)
+        return jsonify(res), res_code
 
     faculty = Faculty.query.filter_by(facultyId=facultyId).first()
     if not faculty:
@@ -64,6 +67,7 @@ def add_faculty():
             db.session.add(faculty)
             db.session.commit()
             res['status'] = 'success'
+            res['faculty'] = faculty.serialize()
             res['message'] = '{0} successfully registered.'\
                              .format(faculty.name)
             res_code = 201
@@ -74,6 +78,15 @@ def add_faculty():
         res['meassage'] = 'Faculty already exists.'
         res_code = 202
     return jsonify(res), res_code
+
+
+@adminapi.route('/faculty/<string:facid>/active/<string:active>', methods=['PUT'])
+@decorators.login_required
+@decorators.only_admins
+def set_faculty_state(facid, active):
+    # TODO: fill this placeholder
+    print facid, active
+    return jsonify(dict(status='fail', message='Cannot mark him inactive'))
 
 
 @adminapi.route('/student/<string:action>', methods=['POST'])
@@ -169,11 +182,18 @@ def import_students():
     csvreader = csv.reader(file, delimiter=',', quotechar='"')
     # TODO: check type of file
     heading = [title.strip().lower() for title in csvreader.next()]
+    required_headers = ('name of the student', 'category', 'student id',
+                        'date of birth', 'telephone number', 'preferred branch')
+    missing_headers = set(required_headers) - set(heading)
+    if missing_headers:
+        res['message'] = 'Missing %s required column(s)' % ', '.join(missing_headers)
+        return jsonify(res), 200
+
     getName = itemgetter(heading.index('name of the student'))
     getCategory = itemgetter(heading.index('category'))
     getStudentId = itemgetter(heading.index('student id'))
     getDob = itemgetter(heading.index('date of birth'))
-    getContact = itemgetter(heading.index('telephone no.'))
+    getContact = itemgetter(heading.index('telephone number'))
     getBranch = itemgetter(heading.index('preferred branch'))
 
     added = []
