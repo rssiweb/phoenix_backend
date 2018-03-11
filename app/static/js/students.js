@@ -22,7 +22,7 @@ var app = new Vue({
             this.loadStudents();
         },
         updated: function(){
-            $(this.$el.getElementsByTagName('table')[0]).tablesort()
+            $(this.$el).find('table').tablesort();
             console.log('sorted');
         },
         methods: {

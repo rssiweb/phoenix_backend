@@ -11,13 +11,21 @@
 
 <div class="ui container">
     <div class="sub header">
-        <button class="ui compact mini icon button" v-on:click="previousDay">
-            <i class="chevron left icon" ></i>
-        </button>
-        {{ currentAttendanceDate }}
-        <button class="ui compact mini icon button" v-on:click="nextDay" v-bind:class="{ disabled: nextIsFuture }">
-            <i class="chevron right icon"></i>
-        </button>
+        <div class="ui mini icon buttons">
+            <button class="ui mini icon button" v-on:click="previousDay">
+                <i class="chevron left icon" ></i>
+            </button>
+            
+            <div class="ui calendar" id="attendanceDate">
+                <button class="ui mini icon button">{{ currentAttendanceDate }}</button>
+                <!-- Hack to make the above button's right side flat -->
+                <button style="display: none;"></button>
+
+            </div>
+            <button class="ui mini icon button" v-on:click="nextDay" v-bind:class="{ disabled: nextIsFuture }">
+                <i class="chevron right icon"></i>
+            </button>
+        </div>
         <button class="ui mini right floated button" v-if="is_admin" @click="toggleEditMode" v-bind:class="[editMode? 'positive' : 'primary']">{{editModeBtnText}}</button>
     </div>
 </div>
@@ -88,8 +96,8 @@
                     <tr v-for="student in filteredStudents">
                         <td>{{student.category}}</td>
                         <td>{{student.student_id}}</td>
-                        <td>{{student.name}}</td>
-                        <td>{{moment(student.dob).fromNow(true)}}</td>
+                        <td :data-sort-value="student.name.toLowerCase()">{{student.name}}</td>
+                        <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>
                         <td>{{student.contact}}</td>
                         <td>
                             <div class="ui mini input" v-bind:class="{error: student.inerror}">
@@ -114,8 +122,8 @@
                     <tr v-for="student in filteredStudents">
                         <td>{{student.category}}</td>
                         <td>{{student.student_id}}</td>
-                        <td>{{student.name}}</td>
-                        <td>{{moment(student.dob).fromNow(true)}}</td>
+                        <td :data-sort-value="student.name.toLowerCase()">{{student.name}}</td>
+                        <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>
                         <td>{{student.contact}}</td>
                         <td>
                             <div v-if="student.in">
@@ -151,5 +159,7 @@
     {% endblock %}
 
     {% block script %}
+    <link href="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/attendance.js') }}"></script>
     {% endblock %}

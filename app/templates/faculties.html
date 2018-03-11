@@ -32,10 +32,13 @@
         <p><br/><br/><br/><br/></p>
     </div>
     
-    <div class="ui icon input">
-        <i class="search icon"></i>
-        <input class="prompt" type="text" placeholder="Search ID, Name or Email..." v-model="searchTxt">
+    <div class="ui basic segment">
+        <div class="ui icon input">
+            <i class="search icon"></i>
+            <input class="prompt" type="text" placeholder="Search ID, Name or Email..." v-model="searchTxt">
+        </div>
     </div>
+
 
     <table class="ui compact sortable striped table" v-if="faculties && !loading && !error">
         <thead>

@@ -23,7 +23,12 @@ var app = new Vue({
     },
     updated: function(){
         $('select').dropdown();
-        $(this.$el.getElementsByTagName('table')[0]).tablesort()
+        $(this.$el).find('table').tablesort();
+        $(this.$el).find('#attendanceDate').calendar({
+            type: 'date',
+            closable: true,
+            onChange: this.setDate,
+        });
     },
     methods: {
         logout: function(){
@@ -266,6 +271,17 @@ var app = new Vue({
             this.attendanceDate = moment(this.attendanceDate).subtract(1, 'day');
             this.viewOnly = true;
             this.getAttendance();
+        },
+        setDate(date, text, mode){
+            console.log('date', date);
+            this.attendanceDate = moment(date);
+            var today = moment()
+            if(today.diff(this.attendanceDate,'days')==0)
+                this.viewOnly = false;
+            else
+                this.viewOnly = true;
+            this.getAttendance();
+            return true;
         },
         toggleEditMode: function(){
             this.editMode = !this.editMode;
