@@ -18,9 +18,19 @@
 </head>
 <body>
 
-  {% block body %}
-  {% endblock %}
+  <div class="content">
+    {% block body %}
+    {% endblock %}
+  </div>
 
+  {% block footer %}
+  <footer class="ui secondary inverted vertical footer segment">
+    <div class="ui secondary inverted right aligned basic text segment">
+      By accessing this website and any pages thereof, you agree to be bound by the <a href="https://sites.google.com/site/brssihome/disclaimer">Terms Of Use</a>
+    </div>
+  </footer>
+
+  {% endblock %}
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>

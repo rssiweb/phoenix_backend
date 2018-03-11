@@ -1,7 +1,7 @@
 var app = new Vue({
     el: '#app',
     data: {
-        heading:'Attendance',
+        heading:'Students Attendance',
         token: Cookies.get('auth_token'),
         is_admin: (Cookies.get('is_admin')=='true'),
         students: [],
@@ -22,8 +22,8 @@ var app = new Vue({
         this.loadStudents();
     },
     updated: function(){
-        $('select').dropdown();
         $(this.$el).find('table').tablesort();
+        $(this.$el).find('.dropdown').dropdown();
         $(this.$el).find('#attendanceDate').calendar({
             type: 'date',
             closable: true,

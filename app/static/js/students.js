@@ -23,7 +23,7 @@ var app = new Vue({
         },
         updated: function(){
             $(this.$el).find('table').tablesort();
-            console.log('sorted');
+            $(this.$el).find('.dropdown').dropdown();
         },
         methods: {
             logout: function(){

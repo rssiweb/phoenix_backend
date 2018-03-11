@@ -27,8 +27,8 @@ var app = new Vue({
         this.loadFaculties();
     },
     updated: function(){
-        $(this.$el.getElementsByTagName('table')[0]).tablesort();
-        $(this.$el.getElementsByTagName('select')).dropdown();
+        $(this.$el).find('table').tablesort();
+        $(this.$el).find('.dropdown').dropdown();
     },
     methods: {
         logout(){
