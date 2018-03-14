@@ -16,13 +16,13 @@
   <div id="logincontainer" class="ui container">
     <div class="ui center aligned grid">
       <div class="ui compact piled padded segment">
-        <h2 class="ui teal image header ">
-          <img src="/static/img/logo.jpg" class="image">
+        <h3 class="ui teal image header ">
+          <img src="/static/img/logo.jpg" class="ui mini image">
           <div class="content">
             Log-in to your account
           </div>
-        </h2>
-        <form id="loginForm" class="ui large form" v-on:submit.prevent="getToken">
+        </h3>
+        <form id="loginForm" class="ui small form" v-on:submit.prevent="getToken">
           <div class="ui basic segment">
             <div class="field">
               <div class="ui left icon input">
@@ -39,11 +39,11 @@
             <div id="error-message" class="ui negative mini message" v-if="error">
               {{error}}
             </div>
-            <button type="submit" id="login-btn" class="ui fluid large teal submit button" v-bind:class="{disabled:loading, loading:loading}">Login</button>
+            <button type="submit" id="login-btn" class="ui fluid teal small submit button" v-bind:class="{disabled:loading, loading:loading}">Login</button>
           </div>
 
         </form>
-        <div class="ui message"><a href="#" @click="showForgotDialog">Forgot your password?</a></div>
+        <div class="ui mini message"><a href="#" @click="showForgotDialog">Forgot your password?</a></div>
       </div>
     </div>
   </div>
