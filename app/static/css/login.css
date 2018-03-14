@@ -4,6 +4,9 @@ body{
 #logincontainer{
     margin: 50px;
 }
+#logincontainer h3{
+    padding: 0 15px;
+}
 #header{
     padding-top: 70px;
     min-height: 230px;
