@@ -19,13 +19,59 @@ def list_faculties():
     return jsonify(data), 200
 
 
+@adminapi.route('/faculty/update', methods=['POST'])
+@decorators.login_required
+@decorators.only_admins
+def update_faculty():
+    res = dict(status='fail')
+    res_code = 200
+    required_fields = ('facultyId', 'email', 'name', 'gender')
+    data = request.json or request.data or request.form
+    if not data:
+        res['message'] = 'No data received.'
+        return jsonify(res), res_code
+    keys = data.keys()
+    missing_required_fields = set(required_fields) - set(keys)
+    if missing_required_fields:
+        res['message'] = 'expected fields {0} not found'\
+                         .format(missing_required_fields)
+        return jsonify(res), res_code
+
+    email = data.get('email')
+    name = data.get('name')
+    gender = data.get('gender')
+    facultyId = data.get('facultyId')
+    blank_values = [key for key in required_fields
+                    if not data.get(key, '').strip()]
+    if blank_values:
+        res['message'] = 'values for field(s) {0} is required'\
+                         .format(blank_values)
+        return jsonify(res), res_code
+    if not validEmail(email):
+        res['message'] = 'Invalid Email address %s'.format(email)
+        return jsonify(res), res_code
+    faculty = Faculty.query.filter_by(facultyId=facultyId).first()
+    if not faculty:
+        res['message'] = 'Faculty does not exists'
+        return jsonify(res), res_code
+    faculty.email = email
+    faculty.name = name
+    faculty.gender = gender
+    db.session.commit()
+    res['message'] = 'Faculty updated successfully'
+    res['status'] = 'success'
+    res['faculty'] = faculty.serialize()
+    return jsonify(res), res_code
+
+
 @adminapi.route('/faculty/add', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
 def add_faculty():
-    required_fields = ('facultyId', 'email', 'password', 'name', 'gender')
     res = dict(status='fail')
     res_code = 200
+
+    required_fields = ('facultyId', 'email', 'password', 'name', 'gender')
 
     data = request.json or request.data or request.form
     if not data:
