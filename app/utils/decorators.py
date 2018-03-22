@@ -20,7 +20,6 @@ def only_admins(func):
 def login_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
-        time.sleep(2)
         authorization = request.headers.get('Authorization', '')
         authorization = authorization.split()
         if len(authorization) > 1:
