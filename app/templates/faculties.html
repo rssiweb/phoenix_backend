@@ -25,12 +25,6 @@
         </div>
     </div>
 
-    <div class="ui segment" v-if="loading">
-        <div class="ui active inverted dimmer">
-            <div class="ui text loader">{{ loading }}</div>
-        </div>
-        <p><br/><br/><br/><br/></p>
-    </div>
     
     <div class="ui basic segment">
         <div class="ui icon input">
@@ -39,6 +33,12 @@
         </div>
     </div>
 
+    <div class="ui segment" v-if="loading">
+        <div class="ui active inverted dimmer">
+            <div class="ui text loader">{{ loading }}</div>
+        </div>
+        <p><br/><br/><br/><br/></p>
+    </div>
 
     <table class="ui compact sortable striped table" v-if="faculties && !loading && !error">
         <thead>
@@ -108,7 +108,7 @@
               </div>
           </div>
           <div class="buttons">
-            <button class="ui positive button" @click.prevent="updateFaculty" :class="{loading: loading, disabled: !enableFacultyBtn }">{{facultyBtnTxt}}</button>
+            <button class="ui positive button" @click.prevent="updateFaculty" :class="{'loading disabled': addingOrUpdating, disabled: !enableFacultyBtn }">{{facultyBtnTxt}}</button>
             <button class="ui button" @click.prevent="resetFacultyForm">Reset</button>
         </div>
     </div>
@@ -136,7 +136,7 @@
     </div>
     <div class="actions">
         <button class="ui positive button" @click.prevent="resetPassword">Change Password</button>
-        <button class="ui button">Cancel</button>
+        <button class="ui negative button">Cancel</button>
     </div>
 </div>
 {%endraw%}

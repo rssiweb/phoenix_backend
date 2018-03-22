@@ -126,6 +126,16 @@ def add_faculty():
     return jsonify(res), res_code
 
 
+@adminapi.route('/faculty/reset', methods=['POST'])
+@decorators.login_required
+@decorators.only_admins
+def reset_faculty_password():
+    # TODO: fill this placeholder
+    data = request.json or request.data or request.form
+    print data
+    return jsonify(dict(status='fail', message='Cannot mark him inactive'))
+
+
 @adminapi.route('/faculty/<string:facid>/active/<string:active>', methods=['PUT'])
 @decorators.login_required
 @decorators.only_admins

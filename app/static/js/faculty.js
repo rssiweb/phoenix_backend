@@ -10,9 +10,9 @@ var app = new Vue({
         token: Cookies.get('auth_token'),
         is_admin: (Cookies.get('is_admin')=='true'),
 
-        error:'',
-        message:'',
-        loading:'',
+        error: '',
+        message: '',
+        loading: 'Loading ...',
 
         faculties: [],
         facultyToReset: {},
@@ -20,129 +20,150 @@ var app = new Vue({
         facultyToUpdate: {},
         isFacultyUpdate: false,
         confirmPassword: '',
+        addingOrUpdating: false,
 
         searchTxt: '',
     },
     created: function(){
-        this.loadFaculties();
+        this.loadFaculties()
     },
     updated: function(){
-        $(this.$el).find('table').tablesort();
-        $(this.$el).find('.dropdown').dropdown();
+        $(this.$el).find('table').tablesort()
+        $(this.$el).find('.dropdown').dropdown()
     },
     methods: {
         logout(){
-            Cookies.remove('auth_token');
-            window.location = '/';
+            Cookies.remove('auth_token')
+            window.location = '/'
         },
         getHeaders(){
             return {headers: { Authorization: 'Basic ' +  this.token}}
         },
         loadFaculties(){
-            var url = '/api/admin/faculty';
-            var vm = this;
+            var url = '/api/admin/faculty'
+            var vm = this
             this.$http.get(url,this.getHeaders())
             .then((response) => {
-                console.log(response);
+                console.log(response)
                 if(response.body.status=='success'){
-                    vm.faculties = response.body.faculties;
+                    vm.faculties = response.body.faculties
                 }else{
-                    vm.message = response.body.message;
+                    vm.message = response.body.message
                 }
                 vm.loading = ''
-            }, 
-            (error) => {
-                console.log(error);
-                vm.loading = '';
-                vm.error = error.body.message || error.statusText;
-            });
+            }, (error) => {
+                console.log(error)
+                vm.loading = ''
+                vm.error = error.body.message || error.statusText
+            })
         },
-        showResetDialog(faculty){
-            this.facultyToReset = faculty;
-            $('#resetModal').modal('show');
+        showResetDialog(faculty) {
+            this.facultyToReset = faculty
+            $('#resetModal').modal('show')
         },
-        addFaculty(){
-            var vm = this;
+        addFaculty() {
+            var vm = this
             var loading = 'Adding ' + this.facultyToUpdate.name + '...'
             
             var postData = this.facultyToUpdate
-            console.log('adding', postData);
+            console.log('adding', postData)
 
-            var url = '/api/admin/faculty/add';
+            var url = '/api/admin/faculty/add'
             
             vm.$http.post(url,postData, vm.getHeaders())
             .then((response) => {
                 console.log(response);
                 if(response.body.status=='success'){
                     vm.faculties.push(response.body.faculty)
-                    vm.resetFacultyForm();
+                    vm.resetFacultyForm()
                 }else{
-                    vm.error = response.body.message;
+                    vm.error = response.body.message
                 }
-                vm.loading = '';
+                vm.loading = ''
             },
             (error) => {
-                console.log(error);
-                vm.error = error.statusText;
-                vm.loading = '';
+                console.log(error)
+                vm.error = error.statusText
+                vm.loading = ''
             });
         },
-        updateFaculty(){
+        updateFaculty() {
             if(!this.isFacultyUpdate){
-                return this.addFaculty();
+                return this.addFaculty()
             }
-            var vm = this;
+            var vm = this
             var postData = this.facultyToUpdate
-            var loading = 'Updating ' + this.facultyToUpdate.name + '...'
-            var url = '/api/admin/faculty/update';
+            var url = '/api/admin/faculty/update'
+            var facultyIndex = this.getFacIndex(this.facultyToUpdate)
+
+            vm.addingOrUpdating = true
             
             vm.$http.post(url,postData, vm.getHeaders())
             .then((response) => {
-                console.log(response);
-                if(response.body.status=='success'){
-                    vm.faculties.push(response.body.faculty)
+                console.log(response)
+                vm.addingOrUpdating = false
+                if(response.body.status == 'success'){
+                    vm.resetFacultyForm()
+                    vm.$set(vm.faculties, facultyIndex, response.body.faculty)
                 }else{
-                    vm.error = response.body.message;
+                    vm.error = response.body.message
                 }
-                vm.loading = '';
-            },
-            (error) => {
+            }, (error) => {
+                vm.addingOrUpdating = false
                 console.log(error);
-                vm.error = error.statusText;
-                vm.loading = '';
+                vm.error = error.statusText
             });
             
         },
-        markFacultyToUpdate(faculty){
-            console.log('update', faculty);
-            this.isFacultyUpdate = true;
-            this.facultyToUpdate = Object.assign({}, faculty);
+        markFacultyToUpdate(faculty) {
+            console.log('update', faculty)
+            this.isFacultyUpdate = true
+            this.facultyToUpdate = Object.assign({}, faculty)
             $('#addFacultyForm select').dropdown('set selected', this.facultyToUpdate.gender)
         },
-        resetPassword(){
-            console.log('reset password', this.facultyToReset);
-            var vm = this;
+        resetPassword() {
+            console.log('reset password', this.facultyToReset)
+            var vm = this
             var postData = this.facultyToUpdate
             var loading = 'Updating ' + this.facultyToUpdate.name + '\'s Password ...'
-            var url = '/api/admin/faculty/reset';
-            
-            vm.$http.post(url,postData, vm.getHeaders())
+            var url = '/api/admin/faculty/reset'
+            var facultyIndex = this.getFacIndex(this.facultyToUpdate)
+            console.log(postData)
+            vm.$http.post(url, postData, vm.getHeaders())
             .then((response) => {
-                console.log(response);
-                if(response.body.status=='success'){
-                    vm.faculties.push(response.body.faculty)
-                }else{
-                    vm.error = response.body.message;
+                console.log(response)
+                var toastConfig = {
+                    theme: 'primary',
+                    className: "ui teal label",
+                    position: "bottom-right", 
+                    icon : 'check',
+                    duration : 3000
                 }
-                vm.loading = '';
-            },
-            (error) => {
-                console.log(error);
-                vm.error = error.statusText;
-                vm.loading = '';
-            });
+                var msg = ''
+                if(response.body.status == 'success') {
+                    toastConfig.className = 'ui teal label'
+                    msg = postData.name + '\'s password was reset successfuly'
+                } else {
+                    toastConfig.className = 'ui orange label'
+                    msg = response.body.message
+                }
+                if(msg)
+                    vm.$toasted.show(msg, toastConfig)
+                vm.loading = ''
+            }, (error) => {
+                console.log(error)
+                var toastConfig = {
+                    theme: 'primary',
+                    className: "ui orange label",
+                    position: "bottom-right", 
+                    icon : 'exclamation-triangle',
+                    duration : 3000
+                }
+                var msg = error.body.message || error.statusText
+                vm.$toasted.show(msg, toastConfig) 
+            })
         },
-        toogleActive(faculty){
+        toogleActive(faculty) {
             faculty.loading = true;
             var vm = this;
             vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
@@ -179,34 +200,43 @@ var app = new Vue({
                 });
             });
         },
-        resetFacultyForm(){
-            this.isFacultyUpdate = false;
-            this.facultyToUpdate = {};
-            this.confirmPassword = '';
+        resetFacultyForm() {
+            this.isFacultyUpdate = false
+            this.facultyToUpdate = {}
+            this.confirmPassword = ''
             $('#addFacultyForm select').dropdown('clear')
         },
-        getJsonFromForm(formInputArr){
+        getJsonFromForm(formInputArr) {
             data = {}
             $(formInputArr).each(function(index, input){
                 console.log(input)
-                data[input.name] = input.value;
-                input.value = '';
+                data[input.name] = input.value
+                input.value = ''
             });
-            return data;
+            return data
         },
         clearError(){
-            this.error = '';
+            this.error = ''
+        },
+        getFacIndex(fac) {
+            var facultyIndex = -1
+            this.faculties.forEach((fac, index) => {
+                if (fac.facultyId == this.facultyToUpdate.facultyId) {
+                    facultyIndex = index
+                }
+            })
+            return facultyIndex
         }
     },
     computed:{
-        matchPassword(){
+        matchPassword() {
             return !this.facultyToUpdate.password ||
             this.facultyToUpdate.password == this.confirmPassword;
         },
-        facultyBtnTxt(){
+        facultyBtnTxt() {
             return this.isFacultyUpdate ?  "Update" : "Add";
         },
-        enableFacultyBtn(){
+        enableFacultyBtn() {
             if(this.loading) return false;
             if(this.isFacultyUpdate &&
                this.facultyToUpdate.name &&

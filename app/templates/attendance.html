@@ -57,7 +57,7 @@
         <p><br/><br/><br/><br/></p>
     </div>
 
-    <div class="ui container">
+    <div class="ui container" v-if="!loading">
         <div class="ui form">
 
             <div class="fields">
@@ -145,8 +145,8 @@
                         </td>
                         <td v-if="!viewOnly">
                             <div class="compact mini ui buttons">
-                                <button class="ui left attached button" v-on:click="savePunchIn(student)" v-bind:class="[ student.in ? 'disabled' : '' ]">Punch in</button>
-                                <button class="ui right attached button" v-on:click="savePunchOut(student)" v-bind:class="[ student.out ? 'disabled' : '', student.in ? '' : 'disabled' ]">Punch out</button>
+                                <button class="ui left attached button" v-on:click="savePunchIn(student)" v-bind:class="{ disabled: student.in, 'loading disabled': student.inloading }">Punch in</button>
+                                <button class="ui right attached button" v-on:click="savePunchOut(student)" v-bind:class="{disabled: !student.in || student.out, 'loading disabled': student.outloading }">Punch out</button>
                             </div>
                         </td>
                     </tr>
