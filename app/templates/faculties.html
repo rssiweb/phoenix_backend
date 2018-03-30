@@ -118,24 +118,28 @@
 <div id="resetModal" class="ui tiny modal">
     <div class="header">Reset {{facultyToReset.name}}'s Password</div>
     <div class="content">
-
         <div class="ui form">
             <div class="ui field">
                 <label>Email</label>
                 {{facultyToReset.email}}
             </div>
-            <div class="ui field">
+            <div class="ui field" :class="{'error': !isValidPassword(facultyToReset.password).result }">
                 <label>New Password</label>
-                <input type="password" name="password" placeholder="New Password" v-model="facultyToReset.password"/>
+                <input type="password" name="password" placeholder="New Password" v-model="facultyToReset.password"  />
             </div>
             <div class="ui field" :class="{error: !newPasswordMatch}">
                 <label>Confirm Password</label>
                 <input type="password" name="confirmPassword" placeholder="Confirm Password" v-model="facultyToReset.confirmPassword"/>
             </div>
         </div>
+        <div class="ui error message" v-show="!isValidPassword(facultyToReset.password).result">
+            <ul class="ui list" v-if="isValidPassword(facultyToReset.password).message">
+                <li v-for="message in isValidPassword(facultyToReset.password).message">{{message}}</li>
+            </ul>
+        </div>
     </div>
     <div class="actions">
-        <button class="ui positive button" @click.prevent="resetPassword">Change Password</button>
+        <button class="ui positive button" @click.prevent="resetPassword" :class="{'disabled': !facultyToReset.password || !newPasswordMatch}">Change Password</button>
         <button class="ui negative button">Cancel</button>
     </div>
 </div>

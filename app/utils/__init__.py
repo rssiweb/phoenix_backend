@@ -16,3 +16,15 @@ def validEmail(email):
     if not email:
         return False
     return _email_pattern.match(email)
+
+
+def isValidPassword(password):
+    if not password and len(password) < 5:
+        return False, 'Min length should be 5 chars'
+    if not re.search('[A-Z]', password):
+        return False, 'Must contain one capital case letter'
+    if not re.search('[a-z]', password):
+        return False, 'Must contain one small case letter'
+    if not re.search('[!@#$%&*]', password):
+        return False, "Must contain one special character out of '!', '@', '#', '$', '%', '&', '*'"
+    return True, 'Strong Password'

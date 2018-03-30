@@ -60,7 +60,7 @@ def get_attendance(date):
 
 
 def set_punch_in(attendance, inTime, studentid=None):
-    if attendance:
+    if attendance and attendance.punch_in:
         return jsonify(dict(status='fail',
                             message='student already punched in'
                             )), 200
@@ -83,11 +83,12 @@ def set_punch_in(attendance, inTime, studentid=None):
 
 
 def set_punch_out(attendance, outTime):
+    print attendance
     if not attendance or not attendance.punch_in:
         return jsonify(dict(status='fail',
                             message='Cannot puch out before puch in'
                             )), 200
-    if attendance.punch_out is not None:
+    if attendance.punch_out:
         return jsonify(dict(status='fail',
                             message='student already punched out'
                             )), 200

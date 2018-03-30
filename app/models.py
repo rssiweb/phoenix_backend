@@ -2,6 +2,7 @@ import jwt
 from app import db, app, bcrypt
 from datetime import datetime, timedelta
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy import UniqueConstraint
 
 
 class Base(db.Model):
@@ -41,15 +42,17 @@ class Faculty(User):
         super(Faculty, self).__init__(name)
         self.facultyId = facultyId
         self.email = email
-        self.password = bcrypt.generate_password_hash(
-            password, app.config.get('BCRYPT_LOG_ROUNDS')
-        ).decode()
-
+        self.set_password(password)
         gender = gender.lower()
         if gender in ['male', 'female', 'others']:
             self.gender = gender
         else:
             raise ValueError('Invalid gender value "%s"' % gender)
+
+    def set_password(self, newPassword):
+        self.password = bcrypt.generate_password_hash(
+            newPassword, app.config.get('BCRYPT_LOG_ROUNDS')
+        ).decode()
 
     def serialize(self):
         return dict(id=self.id,
@@ -153,6 +156,9 @@ class Attendance(Base):
     student = relationship('Student',
                            backref=backref("person",
                                            cascade="all, delete-orphan"))
+    __table_args__ = (UniqueConstraint('date', 'student_id',
+                      name='unique_attendance_per_day_student'),
+                      )
 
     def __init__(self, date, student_id, punch_in, punch_in_by_id,
                  punch_out=None, punch_out_by_id=None, comments=None,

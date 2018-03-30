@@ -124,10 +124,10 @@ var app = new Vue({
         resetPassword() {
             console.log('reset password', this.facultyToReset)
             var vm = this
-            var postData = this.facultyToUpdate
-            var loading = 'Updating ' + this.facultyToUpdate.name + '\'s Password ...'
+            var postData = this.facultyToReset
+            var loading = 'Updating ' + this.facultyToReset.name + '\'s Password ...'
             var url = '/api/admin/faculty/reset'
-            var facultyIndex = this.getFacIndex(this.facultyToUpdate)
+            var facultyIndex = this.getFacIndex(this.facultyToReset)
             console.log(postData)
             vm.$http.post(url, postData, vm.getHeaders())
             .then((response) => {
@@ -142,11 +142,10 @@ var app = new Vue({
                 var msg = ''
                 if(response.body.status == 'success') {
                     toastConfig.className = 'ui teal label'
-                    msg = postData.name + '\'s password was reset successfuly'
                 } else {
                     toastConfig.className = 'ui orange label'
-                    msg = response.body.message
                 }
+                msg = response.body.message
                 if(msg)
                     vm.$toasted.show(msg, toastConfig)
                 vm.loading = ''
@@ -226,6 +225,33 @@ var app = new Vue({
                 }
             })
             return facultyIndex
+        },
+        isValidPassword(password){
+            if(!password){
+                return {result:true}
+            }
+            res = {result: true, message:[]}
+            if(password.length < 5){
+                res.message.push('Must contain atleast 5 characters')
+                res.result = false
+            }
+            if(password.search('[A-Z]') == -1){
+                res.message.push('Must contain atleast one capital case character')
+                res.result = false   
+            }
+            if(password.search('[a-z]') == -1){
+                res.message.push('Must contain atleast one small case character')
+                res.result = false
+            }
+            if (password.search('[0-9]') == -1){
+                res.message.push('Must contain atleast one digit')
+                res.result = false
+            }
+            if (password.search('[!@#$%&*]') == -1){
+                res.message.push("Must contain atleast one special character out of '!','@','#','$','%','&','*'")
+                res.result = false
+            }
+            return res
         }
     },
     computed:{
