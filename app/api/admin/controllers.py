@@ -3,7 +3,7 @@ from app import db, jsonify
 from app.models import Faculty, Student, Attendance
 from datetime import datetime
 from operator import itemgetter
-from app.utils import decorators, parseDate, validEmail
+from app.utils import decorators, parseDate, validEmail, isValidPassword
 import csv
 
 
@@ -130,10 +130,22 @@ def add_faculty():
 @decorators.login_required
 @decorators.only_admins
 def reset_faculty_password():
-    # TODO: fill this placeholder
     data = request.json or request.data or request.form
-    print data
-    return jsonify(dict(status='fail', message='Cannot mark him inactive'))
+    if not data:
+        return jsonify(dict(status='fail', message='No data recevied')), 200
+    facId = data.get('facultyId')
+    if not facId:
+        return jsonify(dict(status='fail', message='Invalid faculty')), 200
+    pswd = data.get('password')
+    valid = isValidPassword(pswd)
+    if not valid or not valid[0]:
+        return jsonify(dict(status='fail', message=valid[1])), 200
+    fac = Faculty.query.filter_by(facultyId=facId).first()
+    if not fac:
+        return jsonify(dict(status='fail', message='Invalid faculty')), 200
+    fac.set_password(pswd)
+    db.session.commit()
+    return jsonify(dict(status='success', message='Password updated successfully')), 200
 
 
 @adminapi.route('/faculty/<string:facid>/active/<string:active>', methods=['PUT'])
@@ -141,8 +153,15 @@ def reset_faculty_password():
 @decorators.only_admins
 def set_faculty_state(facid, active):
     # TODO: fill this placeholder
-    print facid, active
-    return jsonify(dict(status='fail', message='Cannot mark him inactive'))
+    active = active == 'true'
+    if not facid:
+        return jsonify(dict(status='fail', message='Invalid faculty')), 200
+    fac = Faculty.query.filter_by(facultyId=facid).first()
+    if not fac:
+        return jsonify(dict(status='fail', message='Invalid faculty')), 200
+    fac.isActive = active
+    db.session.commit()
+    return jsonify(dict(status='success', message='Successfully', active=fac.isActive))
 
 
 @adminapi.route('/student/<string:action>', methods=['POST'])
@@ -292,24 +311,28 @@ def import_students():
 
 
 def set_punch_in(attendance, date, inTime, studentid=None):
-    if inTime != '':
+    msg = 'student successfuly puched in',
+    if inTime == '' and attendance:
+        attendance.punch_in = None
+        db.session.delete(attendance)
+        msg = 'attendance delete'
+    else:
         isValid, dateOrError = parseDate(inTime, '%H:%M:%S')
         if not isValid:
             return jsonify(dict(status='fail',
                                 message='time is not valid {}'.format(inTime)
                                 )), 200
-
-    if attendance:
-        attendance.punch_in = inTime
-    else:
-        attendance = Attendance(date=date,
-                                student_id=studentid,
-                                punch_in=inTime,
-                                punch_in_by_id=request.user.id)
-        db.session.add(attendance)
+        if attendance:
+            attendance.punch_in = inTime
+        else:
+            attendance = Attendance(date=date,
+                                    student_id=studentid,
+                                    punch_in=inTime,
+                                    punch_in_by_id=request.user.id)
+            db.session.add(attendance)
     db.session.commit()
     return jsonify(dict(status='success',
-                        message='student successfuly puched in',
+                        message=msg,
                         attendance=attendance.serialize()
                         )), 200
 
@@ -317,7 +340,8 @@ def set_punch_in(attendance, date, inTime, studentid=None):
 def set_punch_out(attendance, date, outTime):
     if not attendance or not attendance.punch_in:
         return jsonify(dict(status='fail',
-                            message='Cannot puch out before puch in'
+                            message='Cannot puch out before puch in',
+                            attendance=attendance.serialize()
                             )), 200
     if outTime != '':
         isValid, dateOrError = parseDate(outTime, '%H:%M:%S')

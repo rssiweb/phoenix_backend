@@ -100,11 +100,11 @@ var app = new Vue({
             updatedStd.inloading = true
             var indexOfStd = this.students.indexOf(student)
 
-            if(updatedStd.in == undefined){
+            //after clearing the vales if tries to punch in its not able to do so
+            if(!this.editMode){
                 //when faculty clicks punchIn button
                 updatedStd.in = moment().format('HH:mm:ss')
-            }
-            else{
+            }else{
                 //when admin modifies the punchOut
                 if (updatedStd.in == ''){
                     //admin clears the puchIn field
@@ -235,19 +235,38 @@ var app = new Vue({
                     }
                 }
                 else{
-                    // undo the changes in ui
-                    var redoUpdatedStd = updatedStd
-                    if(what == 'in'){
-                        redoUpdatedStd.in = undefined
-                        redoUpdatedStd.inloading = false
-                    }
-                    else if(what == 'out'){
-                        redoUpdatedStd.out = undefined
-                        redoUpdatedStd.outloading = false
-                    }
-                    else if(what == 'comment'){
-                        redoUpdatedStd.comment = undefined
-                        redoUpdatedStd.commentloading = false
+                    if(!this.editMode){
+                        //case 1 when user is adding the changse
+                        // undo the changes in ui
+                        var redoUpdatedStd = updatedStd
+                        if(what == 'in'){
+                            redoUpdatedStd.in = undefined
+                            redoUpdatedStd.inloading = false
+                        }
+                        else if(what == 'out'){
+                            redoUpdatedStd.out = undefined
+                            redoUpdatedStd.outloading = false
+                        }
+                        else if(what == 'comment'){
+                            redoUpdatedStd.comment = undefined
+                            redoUpdatedStd.commentloading = false
+                        }
+                    } else {
+                        //case 2 admin removing the changes
+                        // undo the changes in ui
+                        var redoUpdatedStd = updatedStd
+                        if(what == 'in'){
+                            redoUpdatedStd.in = response.body.attendance.punchIn
+                            redoUpdatedStd.inloading = false
+                        }
+                        else if(what == 'out'){
+                            redoUpdatedStd.out = response.body.attendance.punchOut
+                            redoUpdatedStd.outloading = false
+                        }
+                        else if(what == 'comment'){
+                            redoUpdatedStd.comment = response.body.attendance.comment
+                            redoUpdatedStd.commentloading = false
+                        }
                     }
                     vm.$set(vm.students, stdIndex, redoUpdatedStd)
                 }
@@ -270,7 +289,12 @@ var app = new Vue({
             });
         },
         getTimeString: function(datetime){
-            return moment(datetime,['HH:mm:ss']).format('hh:mm A')
+            if (datetime){
+                return moment(datetime,['HH:mm:ss']).format('hh:mm A')
+            }
+            else{
+                return datetime
+            }
         },
         nextDay: function(){
             console.log('nextDay')
