@@ -2,7 +2,7 @@ from flask import request, Blueprint
 from app import db, jsonify, bcrypt
 from app.models import Faculty, Student, Attendance
 from datetime import datetime
-from app.utils import decorators, parseDate
+from app.utils import decorators, parseDate, isValidPassword
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -162,3 +162,34 @@ def set_attendance(studentid, what):
         return set_punch_out(attendance, data.get('out'))
     elif what == 'comment':
         return set_comment(attendance, data.get('comment'))
+
+
+@api.route('/myprofile',
+           methods=['GET'])
+@decorators.login_required
+def get_profile():
+    res = {}
+    res['me'] = request.user.serialize()
+    return jsonify(res), 200
+
+
+@api.route('/changepassword', methods=['POST'])
+@decorators.login_required
+def reset_password():
+    data = request.json or request.data or request.form
+    print data
+    if not data:
+        return jsonify(dict(status='fail', message='No data recevied')), 200
+    currentPassword = data.get('currentPassword')
+    if not currentPassword or not request.user.check_password(currentPassword):
+        return jsonify(dict(status='fail', message='Invalid password')), 200
+    new_pswd = data.get('password')
+    valid = isValidPassword(new_pswd)
+    if not valid or not valid[0]:
+        return jsonify(dict(status='fail', message=valid[1])), 200
+    fac = request.user
+    if not fac:
+        return jsonify(dict(status='fail', message='Invalid faculty')), 200
+    fac.set_password(new_pswd)
+    db.session.commit()
+    return jsonify(dict(status='success', message='Password updated successfully')), 200

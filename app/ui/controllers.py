@@ -21,3 +21,8 @@ def students():
 @ui.route('/faculties')
 def faculties():
     return render_template('faculties.html', page=3)
+
+
+@ui.route('/me')
+def me():
+    return render_template('myprofile.html', page=4)

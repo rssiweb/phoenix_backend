@@ -1,0 +1,87 @@
+{% extends 'lbase.html' %}
+
+{% block bodywh %}
+{% raw %}
+
+<div class="ui basic segment" >
+    <div v-if="!landed">
+        <div class="ui active inverted dimmer">
+            <div class="ui medium text loader">loading your profile...</div>
+        </div>
+    </div>
+    <div style="display: none;" id="afterLanding">
+        <h3>
+            {{me.name}}
+            <label class="ui mini olive label" v-if="me.admin">Admin</label>
+        </h3>
+        <div class="ui form">
+            <div class="ui field">
+                <label>ID</label>
+                {{me.facultyId}}
+            </div>
+            <div class="ui field">
+                <label>Email</label>
+                {{me.email}}
+            </div>
+            <div class="ui field">
+                <label>Gender</label>
+                {{me.gender}}
+            </div>
+        </div>
+
+        <h3>Change Password</h3>
+        <form class="ui form" id="passwordForm" @submit.prevent="changePassword">
+            <div class="fields">
+                <div class="field " :class="{error: currentPassword && currentPassword.length <= 0}" >
+                    <label>Current Password</label>
+                    <input type="password" name="current-password" placeholder="Current Password" v-model="currentPassword">
+                </div>
+                <div class="field " :class="{error: passwordErrors.length > 0}" >
+                    <label>New Password</label>
+                    <input type="password" name="password" placeholder="Password" v-model="password">
+                </div>
+                <div class="field" :class="{error: password && password !== confirmPassword}">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm-password" placeholder="Confirm Password" v-model="confirmPassword" >
+                </div>
+            </div>
+            <button class="ui positive button" type="submit" :class="{disabled: !password || password !== confirmPassword || passwordErrors.length > 0 }">Change password</button>
+        </form>
+        <div class="ui error message" v-if="passwordErrors.length">
+            <ul class="list">
+                <li v-for="err in passwordErrors">{{err}}</li>
+            </ul>
+        </div>
+
+
+        <form class="ui form" v-if="false" >
+            <div class="ui fields">
+                <div class="field ">
+                    <label>Name</label>
+                    <input type="text" name="first-name" placeholder="Full Name" v-model="me.name">
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <input type="text" name="last-name" placeholder="Email" v-model="me.email">
+                </div>
+                <div class="field">    
+                    <label>Gender</label>
+                    <select name="gender" class="ui dropdown" v-model="me.gender">
+                      <option value="">Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="others">Others</option>
+                  </select>
+              </div>
+          </div>
+          <button class="ui button" type="submit">Update</button>
+      </form>
+  </div>
+</div>
+
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/myprofile.js') }}"></script>
+{% endblock%}

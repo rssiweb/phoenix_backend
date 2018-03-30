@@ -163,11 +163,11 @@ var app = new Vue({
             })
         },
         toogleActive(faculty) {
-            faculty.loading = true;
+            faculty.stateLoading = true;
             var vm = this;
             vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
             console.log(faculty)
-            var url = '/api/admin/faculty/'+faculty.facultyId+'/active/'+faculty.active;
+            var url = '/api/admin/faculty/'+faculty.facultyId+'/active/'+(!faculty.active)
             
             vm.$http.put(url,{}, vm.getHeaders())
             .then((response) => {
@@ -184,11 +184,11 @@ var app = new Vue({
                         duration : 3000
                     });    
                 }
-                faculty.loading = false;
+                faculty.stateLoading = false;
                 vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
             },
             (error) => {
-                faculty.activeLoading = false;  
+                faculty.stateLoading = false;  
                 console.log(error);
                 this.$toasted.show(error.statusText + ' error occured. '+faculty.name + '\'s status did not change.',{ 
                     theme: 'primary',
@@ -197,7 +197,16 @@ var app = new Vue({
                     icon : 'exclamation-triangle',
                     duration : 3000
                 });
+                vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
             });
+        },
+        toggleAdmin(faculty){
+            faculty.adminLoading = true;
+            var vm = this;
+            vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
+            console.log(faculty)
+            var url = '/api/admin/faculty/'+faculty.facultyId+'/admin/'+faculty.admin;
+            console.log('WIP')
         },
         resetFacultyForm() {
             this.isFacultyUpdate = false
@@ -277,6 +286,8 @@ var app = new Vue({
                this.facultyToUpdate.email &&
                this.validEmail &&
                this.facultyToUpdate.gender &&
+               this.isValidPassword(this.facultyToUpdate.password).result &&
+               this.isValidPassword(this.facultyToUpdate.password).message.length == 0 &&
                this.facultyToUpdate.password == this.confirmPassword)
                 return true;
             return false;

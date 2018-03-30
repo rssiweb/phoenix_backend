@@ -52,66 +52,88 @@
         </thead>
         <tbody>
             <tr v-for="faculty in filteredFaculties">
-                <td>{{faculty.facultyId}}</td>
+                <td><a href="#" @click="markFacultyToUpdate(faculty)">{{faculty.facultyId}}</a></td>
                 <td>
                     {{faculty.name}}
                     <div class="ui mini olive horizontal label" v-if="faculty.admin">Admin</div>
                     <div class="ui mini grey horizontal label" v-if="!faculty.active">Inactive</div>
                 </td>
-                <td><a href="#" @click="markFacultyToUpdate(faculty)">{{faculty.email}}</a></td>
+                <td>{{faculty.email}}</td>
                 <td>{{faculty.gender | capitalize}}</td>
                 <td>
-                    <div class="ui mini compact buttons">
-                        <button class="ui button" @click="showResetDialog(faculty)">Reset Password</button>
-                        <button class="ui button" v-bind:class="{ loading: faculty.loading, disabled: faculty.loading }" @click="toogleActive(faculty)">{{faculty.active? "Inactive" : "Active"}}</button>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div class="ui form container">
-        <div class="ui sub header"><h3>Add Faculty</h3></div>
-        <br/>
-        <div id="addFacultyForm">
-            <div class="ui fields">
-                <div class="required field" :class="{disabled: isFacultyUpdate}">
-                    <label>Faculty ID</label>
-                    <input type="text" name="id" placeholder="Faculty ID" v-model="facultyToUpdate.facultyId"  :tabindex="isFacultyUpdate ? -1 : 0">
-                </div>
-                <div class="required field">
-                    <label>Name</label>
-                    <input type="text" name="name" placeholder="Full Name" v-model="facultyToUpdate.name">
-                </div>
-                <div class="required field" :class="{error: !validEmail}">
-                    <label>Email</label>
-                    <input type="text" name="email" placeholder="Email" v-model="facultyToUpdate.email">
-                </div>
-                <div class="required field" v-show="!isFacultyUpdate">
-                    <label>Password</label>
-                    <input type="password" name="password" placeholder="Password" v-model="facultyToUpdate.password">
-                </div>
-                <div class="required field" v-bind:class="{error: !matchPassword}" v-show="!isFacultyUpdate">
-                    <label>Confirm Password</label>
-                    <input type="password" name="confirmPassword" placeholder="Confirm Password" v-model="confirmPassword">
-                </div>
 
-                <div class="required field">
+                    <button 
+                    class="ui mini compact yellow button"
+                    @click="showResetDialog(faculty)">
+                    RESET PASSWORD
+                </button>
 
-                    <label>Gender</label>
-                    <select name="gender" class="ui dropdown" v-model="facultyToUpdate.gender">
-                      <option value="">Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="others">Others</option>
-                  </select>
+                <button 
+                class="ui mini compact button"
+                v-bind:class="{ loading: faculty.stateLoading, disabled: faculty.stateLoading, olive: !faculty.active, orange: faculty.active }"
+                @click="toogleActive(faculty)">
+                {{faculty.active? "MARK INACTIVE" : "ACTIVE"}}
+            </button>
 
-              </div>
+            <button
+            class="ui mini compact button disabled"
+            v-bind:class="{ loading: faculty.loading, disabled: faculty.loading, olive: !faculty.admin, orange: faculty.admin}"
+            @click="toogleAdmin(faculty)">
+            {{faculty.admin? "REVOKE ADMIN ACCESS" : "PROMOTE TO ADMIN"}}
+        </button>
+
+    </td>
+</tr>
+</tbody>
+</table>
+<div class="ui container">
+    <div class="ui sub header"><h3>Add Faculty</h3></div>
+    <br/>
+    <div class="ui form">
+        <div class="ui fields" id="addFacultyForm">
+            <div class="required field" :class="{disabled: isFacultyUpdate}">
+                <label>Faculty ID</label>
+                <input type="text" name="id" placeholder="Faculty ID" v-model="facultyToUpdate.facultyId"  :tabindex="isFacultyUpdate ? -1 : 0">
+            </div>
+            <div class="required field">
+                <label>Name</label>
+                <input type="text" name="name" placeholder="Full Name" v-model="facultyToUpdate.name">
+            </div>
+            <div class="required field" :class="{error: !validEmail}">
+                <label>Email</label>
+                <input type="text" name="email" placeholder="Email" v-model="facultyToUpdate.email">
+            </div>
+            <div class="required field" v-show="!isFacultyUpdate">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Password" v-model="facultyToUpdate.password">
+            </div>
+            <div class="required field" v-bind:class="{error: !matchPassword}" v-show="!isFacultyUpdate">
+                <label>Confirm Password</label>
+                <input type="password" name="confirmPassword" placeholder="Confirm Password" v-model="confirmPassword">
+            </div>
+
+            <div class="required field">
+
+                <label>Gender</label>
+                <select name="gender" class="ui dropdown" v-model="facultyToUpdate.gender">
+                  <option value="">Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="others">Others</option>
+              </select>
+
           </div>
-          <div class="buttons">
-            <button class="ui positive button" @click.prevent="updateFaculty" :class="{'loading disabled': addingOrUpdating, disabled: !enableFacultyBtn }">{{facultyBtnTxt}}</button>
-            <button class="ui button" @click.prevent="resetFacultyForm">Reset</button>
-        </div>
-    </div>
+      </div>
+  </div>
+  <div class="ui error message" v-if="!isValidPassword(facultyToUpdate.password).result">
+      <ul class="list">
+          <li v-for="err in isValidPassword(facultyToUpdate.password).message">{{err}}</li>
+      </ul>
+  </div>
+  <div class="buttons">
+    <button class="ui positive button" @click.prevent="updateFaculty" :class="{'loading disabled': addingOrUpdating, disabled: !enableFacultyBtn }">{{facultyBtnTxt}}</button>
+    <button class="ui button" @click.prevent="resetFacultyForm">Reset</button>
+</div>
 </div>
 </div>
 <!-- Modals -->

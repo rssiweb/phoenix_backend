@@ -54,6 +54,9 @@ class Faculty(User):
             newPassword, app.config.get('BCRYPT_LOG_ROUNDS')
         ).decode()
 
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self.password, password)
+
     def serialize(self):
         return dict(id=self.id,
                     facultyId=self.facultyId,
