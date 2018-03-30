@@ -27,6 +27,7 @@ var app = new Vue({
         $(this.$el).find('#attendanceDate').calendar({
             type: 'date',
             closable: true,
+            maxDate: new Date(),
             onChange: this.setDate,
         });
     },
