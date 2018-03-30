@@ -134,14 +134,16 @@ var app = new Vue({
                 console.log(response)
                 var toastConfig = {
                     theme: 'primary',
-                    className: "ui teal label",
+                    className: "ui olive label",
                     position: "bottom-right", 
                     icon : 'check',
                     duration : 3000
                 }
                 var msg = ''
                 if(response.body.status == 'success') {
-                    toastConfig.className = 'ui teal label'
+                    toastConfig.className = 'ui olive label'
+                    vm.facultyToReset.password = ''
+                    vm.facultyToReset.confirmPassword = ''
                 } else {
                     toastConfig.className = 'ui orange label'
                 }
