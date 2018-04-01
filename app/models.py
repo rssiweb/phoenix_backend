@@ -19,6 +19,7 @@ class User(Base):
 
     name = db.Column(db.String(128))
     isActive = db.Column(db.Boolean, default=True)
+    superUser = db.Column(db.Boolean, default=False)
 
     def __init__(self, name, isActive=True):
         self.name = name
@@ -65,6 +66,7 @@ class Faculty(User):
                     admin=self.admin,
                     gender=self.gender,
                     active=self.isActive,
+                    superUser=self.superUser,
                     )
 
     def __repr__(self):

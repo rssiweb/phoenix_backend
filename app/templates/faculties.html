@@ -71,7 +71,9 @@
                 <button 
                 class="ui mini compact button"
                 v-bind:class="{ loading: faculty.stateLoading, disabled: faculty.stateLoading, olive: !faculty.active, orange: faculty.active }"
-                @click="toogleActive(faculty)">
+                @click="toogleActive(faculty)"
+                v-if="!faculty.superUser"
+                >
                 {{faculty.active? "MARK INACTIVE" : "ACTIVE"}}
             </button>
 

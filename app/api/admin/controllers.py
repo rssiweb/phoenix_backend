@@ -159,6 +159,8 @@ def set_faculty_state(facid, active):
     fac = Faculty.query.filter_by(facultyId=facid).first()
     if not fac:
         return jsonify(dict(status='fail', message='Invalid faculty')), 200
+    if fac.superUser:
+        return jsonify(dict(status='fail', message='Cannot mark him Inactive')), 200
     fac.isActive = active
     db.session.commit()
     return jsonify(dict(status='success', message='Successfully', active=fac.isActive))

@@ -5,12 +5,9 @@ DEBUG = os.getenv('DEBUG', False)
 
 # Define the application directory
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-print BASE_DIR
 # Define the database - we are working with
 # SQLite for this example
 SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-
-print SQLALCHEMY_DATABASE_URI
 
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
