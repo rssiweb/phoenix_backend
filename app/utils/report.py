@@ -65,7 +65,7 @@ def draw_row(srno, draw, student, month):
 
 
 def draw_header(header2, month, categories, branches):
-    font = ImageFont.truetype("Ubuntu-M.ttf", 60)
+    font = ImageFont.truetype("app/Ubuntu-M.ttf", 60)
     draw = ImageDraw.Draw(header2)
     # Group (Categories)
     draw.text((1175, 290), ', '.join([cat.name for cat in categories]), font=font)
