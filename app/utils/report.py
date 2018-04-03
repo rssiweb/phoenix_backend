@@ -5,7 +5,7 @@ from app.models import Attendance
 from datetime import datetime, timedelta
 import copy
 import calendar
-from pytz import timezone
+import pytz
 
 
 def draw_row(srno, draw, student, month):
@@ -70,7 +70,8 @@ def draw_header(header2, month, categories, branches):
     # Location (Branches)
     draw.text((4300, 290), ', '.join([b.name for b in branches]), font=font)
     # Time
-    time = timezone('Asia/Kolkata').localize(datetime.now())
+    time = datetime.now(pytz.utc)
+    time = time.astimezone(pytz.timezone('Asia/Kolkata'))
     draw.text((4300, 110), time.strftime('%H:%M:%S %p'), font=font)
     # Month 6020 110
     draw.text((6020, 110), month.strftime('%B'), font=font)
