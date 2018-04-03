@@ -107,23 +107,45 @@ class Faculty(User):
 class Student(User):
     __tablename__ = 'student'
 
-    student_id = db.Column(db.String(50), nullable=False)
-    category = db.Column(db.String(50), nullable=False)
+    student_id = db.Column(db.String(50), nullable=False, unique=True)
+
+    category_id = db.Column(db.Integer(), db.ForeignKey('category.id'))
+    category = relationship('Category', foreign_keys=[category_id])
+
     dob = db.Column(db.Date(), nullable=True)
     contact = db.Column(db.String(50), nullable=True)
-    branch = db.Column(db.String(50), nullable=True)
+
+    branch_id = db.Column(db.Integer(), db.ForeignKey('branch.id'))
+    branch = relationship('Branch', foreign_keys=[branch_id])
 
     def __init__(self, student_id, category, name,
                  dob=None, contact=None, branch=None):
         super(Student, self).__init__(name)
         self.student_id = student_id
-        self.category = category
+
+        cat = Category.query.filter(name=category).first()
+        if not cat:
+            if not category.isdigit():
+                raise ValueError('Category %s not found' % category)
+            cat = Category.query.filter(id=int(category)).first()
+            if not cat:
+                raise ValueError('Category %s not found' % category)
+        self.category = cat
+
         if isinstance(dob, basestring):
             self.dob = datetime.strptime(dob, '%Y-%m-%d').date()
         else:
             self.dob = dob
         self.contact = contact
-        self.branch = branch
+
+        br = Branch.query.filter(name=branch)
+        if not br:
+            if not branch.isdigit():
+                raise ValueError('Branch %s not found' % branch)
+            br = Branch.query.filter(id=int(branch))
+            if not br:
+                raise ValueError('Branch %s not found' % branch)
+        self.branch = br
 
     def __repr__(self):
         class_type = type(self)
@@ -133,12 +155,42 @@ class Student(User):
         return dict(id=self.id,
                     name=self.name,
                     dob=self.dob,
-                    category=self.category,
+                    category=self.category.serialize(),
                     student_id=self.student_id,
                     contact=self.contact,
-                    branch=self.branch,
+                    branch=self.branch.serialize(),
                     active=self.isActive,
                     )
+
+
+class Category(Base):
+
+    __tablename__ = 'category'
+    name = db.Column(db.String(100), nullable=False, unique=True)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '%s(%r)' % (type(self), self.name)
+
+    def serialize(self):
+        return dict(name=self.name, id=self.id)
+
+
+class Branch(Base):
+
+    __tablename__ = 'branch'
+    name = db.Column(db.String(100), nullable=False, unique=True)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '%s(%r)' % (type(self), self.name)
+
+    def serialize(self):
+        return dict(name=self.name, id=self.id)
 
 
 class Attendance(Base):

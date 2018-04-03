@@ -26,3 +26,8 @@ def faculties():
 @ui.route('/me')
 def me():
     return render_template('myprofile.html', page=4)
+
+
+@ui.route('/report')
+def report():
+    return render_template('report.html', page=5)

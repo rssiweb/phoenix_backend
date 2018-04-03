@@ -50,7 +50,7 @@
         <tr v-for="student in students">
             <!-- clicking on a student will add its details to the below form and the add button will become update button -->
             <td>{{student.student_id}}</td>
-            <td>{{student.category}}</td>
+            <td>{{student.category.name}}</td>
             <td :data-sort-value="student.name.toLowerCase()"><a href="#" v-on:click="updateStudent(student.id, $event)">{{student.name}}</a></td>
             <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>
             <td>{{student.contact}}</td>

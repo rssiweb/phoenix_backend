@@ -1,6 +1,6 @@
 from flask import request, Blueprint, make_response
 from app import db, jsonify
-from app.models import Faculty, Student, Attendance
+from app.models import Faculty, Student, Attendance, Branch, Category
 from datetime import datetime
 from operator import itemgetter
 from app.utils import decorators, parseDate, validEmail, isValidPassword
@@ -277,10 +277,19 @@ def import_students():
     updated = []
     for row in csvreader:
         student = Student.query.filter_by(student_id=getStudentId(row)).first()
-        category, student_id = getCategory(row), getStudentId(row)
+        category_name, student_id = getCategory(row), getStudentId(row)
         name, contact = getName(row), getContact(row)
         dob = datetime.strptime(getDob(row), '%d/%m/%Y').date()
-        branch = getBranch(row)
+        branch_name = getBranch(row)
+
+        category = Category.query.filter_by(name=category_name).first()
+        if not category:
+            res['message'] = 'Unknown category %s for student %s' % (category_name, name)
+            return jsonify(res), 200
+        branch = Branch.query.filter_by(name=branch_name).first()
+        if not branch:
+            res['message'] = 'Unknown branch %s for student %s' % (branch_name, name)
+            return jsonify(res), 200
         if student:
             unchanged = all([student.category == category,
                              student.dob == dob,

@@ -12,6 +12,7 @@
             <div class="menu">
                 <a class="item {%if page == 1%}active{%endif%}" href="/attendance">Students</a>
                 <a class="item disabled">Faculties</a>
+                <a class="item {%if page == 5%}active{%endif%}" href="/report">Report</a>
             </div>
         </div>
         <a class="item {%if page == 2%}active{%endif%}" href="/students" v-if="is_admin">Students</a>

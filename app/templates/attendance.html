@@ -94,7 +94,7 @@
                 </thead>
                 <tbody v-if="editMode">
                     <tr v-for="student in filteredStudents">
-                        <td>{{student.category}}</td>
+                        <td>{{student.category.name}}</td>
                         <td>{{student.student_id}}</td>
                         <td :data-sort-value="student.name.toLowerCase()">{{student.name}}</td>
                         <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>
@@ -120,7 +120,7 @@
                 </tbody>
                 <tbody v-else>
                     <tr v-for="student in filteredStudents">
-                        <td>{{student.category}}</td>
+                        <td>{{student.category.name}}</td>
                         <td>{{student.student_id}}</td>
                         <td :data-sort-value="student.name.toLowerCase()">{{student.name}}</td>
                         <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>

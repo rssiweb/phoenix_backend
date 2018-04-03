@@ -1,0 +1,78 @@
+{% extends 'lbase.html' %}
+
+{% block bodywh %}
+{% raw %}
+
+<div class="ui basic segment">
+    <h2>Report</h2>
+    <form class="ui form" id="reportForm" @submit.prevent="exportReport">
+        <div class="fields">
+            <div class="field">
+                <label>Select Type</label>
+                <select class="ui dropdown" type="text">
+                    <option value="monthly">Monthly</option>
+                    <option value="detailed" disabled="">Detailed</option>
+                </select>
+            </div>
+            
+            <div class="field">
+                <label>Select Branch(s)</label>
+                <select class="dropdown multiple" type="text" name="branches" v-model="selectedBranches" multiple>
+                    <option value="">All Branches</option>
+                    <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Select Category(s)</label>
+                <select class="dropdown multiple" name="cats" v-model="selectedCategories" multiple>
+                    <option value="">All Categories</option>
+                    <option v-for="cat in categories" v-bind:value="cat.id">{{cat.name}}</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Select Month</label>
+                <div class="ui calendar" id="month">
+                    <input type="text" v-bind:placeholder="moment().format('MMMM YYYY')" name="month"/>
+                </div>
+            </div>
+        </div>
+        <div class="field">
+                <button type="submit" class="ui mini primary button" :class="{disabled: !selectedStudents.length && !filteredStudents.length}">Export Selected</button>
+            </div>
+    </form>
+    
+    <p>{{selectedStudents.length || filteredStudents.length}} students selected</p>
+    
+    <button class="ui mini compact icon button disabled">Select All</button>
+    <button class="ui mini compact icon button disabled">Invert Selection</button>
+    <button class="ui mini compact icon button disabled">Clear Selection</button>
+
+    <table class="ui stripped selectable sortable table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Branch</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="student in filteredStudents" v-on:click="toggleStudentSelection(student)" :class="{positive: selectedStudents.indexOf(student) != -1 }">
+                <td>{{student.category.name}}</td>
+                <td>{{student.student_id}}</td>
+                <td>{{student.name}}</td>
+                <td>{{student.branch.name}}</td>
+            </tr>
+        </tbody>
+    </table>
+    
+</div>
+
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/report.js') }}"></script>
+{% endblock%}

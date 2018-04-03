@@ -33,3 +33,5 @@ BCRYPT_LOG_ROUNDS = int(os.getenv('BCRYPT_LOG_ROUNDS', 10))
 
 # default token life to 2 hours
 TOKEN_LIFESPAN_SEC = int(os.getenv('TOKEN_LIFESPAN_SEC', 7200))
+
+REPORT_FOLDER = os.getenv('REPORT_FOLDER', 'reports')

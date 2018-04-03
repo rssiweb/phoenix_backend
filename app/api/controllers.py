@@ -1,8 +1,9 @@
-from flask import request, Blueprint
+from flask import request, Blueprint, send_from_directory
 from app import db, jsonify, bcrypt
-from app.models import Faculty, Student, Attendance
+from app.models import Faculty, Student, Attendance, Branch, Category
 from datetime import datetime
 from app.utils import decorators, parseDate, isValidPassword
+from app.utils import report
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -192,4 +193,53 @@ def reset_password():
         return jsonify(dict(status='fail', message='Invalid faculty')), 200
     fac.set_password(new_pswd)
     db.session.commit()
-    return jsonify(dict(status='success', message='Password updated successfully')), 200
+    data = dict(status='success', message='Password updated successfully')
+    return jsonify(data), 200
+
+
+@api.route('/branches', methods=['GET'])
+@decorators.login_required
+def get_branches():
+    data = dict(branches=[branch.serialize() for branch in Branch.query.all()],
+                status='success')
+    return jsonify(data), 200
+
+
+@api.route('/categories', methods=['GET'])
+@decorators.login_required
+def get_categories():
+    data = dict(categories=[cat.serialize() for cat in Category.query.all()],
+                status='success')
+    return jsonify(data), 200
+
+
+@api.route('/exportReport', methods=['POST'])
+@decorators.login_required
+def export_report():
+    data = request.json or request.data or request.form
+    print data
+    month = data.get('month')
+    if not month:
+        pass
+    ids = data.get('students')
+    categories = data.get('categories', [])
+    branches = data.get('branches', [])
+    print ids, month
+    students = db.session.query(Student)\
+                         .join(Student.category)\
+                         .filter(Student.id.in_(ids))\
+                         .order_by(Category.name)\
+                         .order_by(Student.name).all()
+    if categories:
+        categories = db.session.query(Category)\
+                               .filter(Category.id.in_(categories)).all()
+    else:
+        categories = Category.query.all()
+    if branches:
+        branches = db.session.query(Branch)\
+                             .filter(Branch.id.in_(branches)).all()
+    else:
+        branches = Branch.query.all()
+
+    reportFileName = report.buildReport(students, month, categories, branches)
+    return send_from_directory(directory='.', filename=reportFileName)

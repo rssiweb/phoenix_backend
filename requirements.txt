@@ -5,3 +5,4 @@ pyjwt
 flask_bcrypt
 flask_migrate
 psycopg2
+Pillow
