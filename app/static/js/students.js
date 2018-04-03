@@ -9,7 +9,7 @@ var app = new Vue({
             message: '',
             
             loading: '',
-            studentToUpdate: {},
+            studentToUpdate: {category:{}},
             isUpdate: false,
 
             loadedStudents: [],
@@ -189,7 +189,7 @@ var app = new Vue({
                 this.studentToUpdate = jQuery.extend({}, stdToUpdate);
             },
             resetStudent: function(){
-                this.studentToUpdate = {};
+                this.studentToUpdate = {category:{}};
                 this.isUpdate = false;
                 $('#addStudentForm input').each(function(index,input){
                     input.value ='';

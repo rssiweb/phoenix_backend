@@ -10,7 +10,6 @@ import os
 
 
 def draw_row(srno, draw, student, month):
-    print os.listdir('.')
     font = ImageFont.truetype("app/Ubuntu-M.ttf", 60)
     text_y = 25
     vals = []
@@ -80,8 +79,6 @@ def draw_header(header2, month, categories, branches):
 
 def buildReport(students, month, categories, branches):
     month = datetime.strptime(month, '%B %Y')
-    import os
-    print os.listdir('.')
     header1, header2, row, footer = map(Image.open, ['./monthly_report/header1.jpg','./monthly_report/header2.jpg','./monthly_report/row.jpg','./monthly_report/footer.jpg'])
 
     max_width = max([item.size[0] for item in (header1, header2, row, footer)])

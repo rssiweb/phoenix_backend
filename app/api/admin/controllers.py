@@ -191,10 +191,10 @@ def add_update_student(action):
 
     dob = data.get('dob').strip()
     name = data.get('name').strip()
-    category = data.get('category').strip()
+    category_name = data.get('category').strip()
     contact = data.get('contact').strip()
     student_id = data.get('id').strip()
-    if not all([dob, name, category, student_id]):
+    if not all([dob, name, category_name, student_id]):
         res['message'] = 'required fields are missing or blank'
         return jsonify(res), res_code
     try:
@@ -204,6 +204,7 @@ def add_update_student(action):
         return jsonify(res), res_code
 
     student = Student.query.filter_by(student_id=student_id).first()
+    category = Category.query.filter_by(name=category_name).first()
     if not student and action == 'add':
         try:
             student = Student(

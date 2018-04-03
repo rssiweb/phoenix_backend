@@ -72,7 +72,7 @@
             </div>
             <div class="required field">
                 <label>Category</label>
-                <input type="text" name="category" placeholder="Category" v-model="studentToUpdate.category">
+                <input type="text" name="category" placeholder="Category" v-model="studentToUpdate.category.name">
             </div>
             <div class="required field">
                 <label>Name</label>
@@ -136,7 +136,7 @@
                 <tbody>
                     <tr v-for=" student in loadedStudents" v-bind:class="[student.added?'positive':'warning']">
                         <td >{{student.student_id}}</td>
-                        <td>{{student.category}}</td>
+                        <td>{{student.category.name}}</td>
                         <td>{{student.name}}</td>
                         <td>{{moment(student.dob).fromNow(true)}}</td>
                         <td>{{student.contact || 'No contact info'}}</td>
