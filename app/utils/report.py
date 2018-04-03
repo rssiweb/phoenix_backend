@@ -1,12 +1,11 @@
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
-from app import db
 from app.models import Attendance
 from datetime import datetime, timedelta
 import copy
 import calendar
-import os
+from pytz import timezone
 
 
 def draw_row(srno, draw, student, month):
@@ -35,7 +34,7 @@ def draw_row(srno, draw, student, month):
     _, no_of_days = calendar.monthrange(month.year, month.month)
     for d in range(1, 32):
         if d <= no_of_days:
-            curr_date = month + timedelta(days=d)
+            curr_date = month + timedelta(days=d - 1)
             attendance = Attendance.query.filter_by(student_id=student.id, date=curr_date).first()
             val = 'A'
             if attendance and attendance.punch_in and attendance.punch_in.strip():
@@ -71,11 +70,13 @@ def draw_header(header2, month, categories, branches):
     # Location (Branches)
     draw.text((4300, 290), ', '.join([b.name for b in branches]), font=font)
     # Time
-    draw.text((4300, 110), datetime.today().strftime('%H:%M:%S %p'), font=font)
+    time = timezone('Asia/Kolkata').localize(datetime.now())
+    draw.text((4300, 110), time.strftime('%H:%M:%S %p'), font=font)
     # Month 6020 110
     draw.text((6020, 110), month.strftime('%B'), font=font)
     # YEAR 6020 290
     draw.text((6020, 290), month.strftime('%Y'), font=font)
+
 
 def buildReport(students, month, categories, branches):
     month = datetime.strptime(month, '%B %Y')
