@@ -6,9 +6,12 @@ from app.models import Attendance
 from datetime import datetime, timedelta
 import copy
 import calendar
+import os
+
 
 def draw_row(srno, draw, student, month):
-    font = ImageFont.truetype("Ubuntu-M.ttf", 60)
+    print os.listdir('.')
+    font = ImageFont.truetype("app/Ubuntu-M.ttf", 60)
     text_y = 25
     vals = []
 
