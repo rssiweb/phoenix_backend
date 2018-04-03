@@ -123,11 +123,11 @@ class Student(User):
         super(Student, self).__init__(name)
         self.student_id = student_id
 
-        cat = Category.query.filter(name=category).first()
+        cat = Category.query.filter_by(name=category).first()
         if not cat:
             if not category.isdigit():
                 raise ValueError('Category %s not found' % category)
-            cat = Category.query.filter(id=int(category)).first()
+            cat = Category.query.filter_by(id=int(category)).first()
             if not cat:
                 raise ValueError('Category %s not found' % category)
         self.category = cat
@@ -138,11 +138,11 @@ class Student(User):
             self.dob = dob
         self.contact = contact
 
-        br = Branch.query.filter(name=branch)
+        br = Branch.query.filter_by(name=branch)
         if not br:
             if not branch.isdigit():
                 raise ValueError('Branch %s not found' % branch)
-            br = Branch.query.filter(id=int(branch))
+            br = Branch.query.filter_by(id=int(branch))
             if not br:
                 raise ValueError('Branch %s not found' % branch)
         self.branch = br
