@@ -72,7 +72,7 @@ def draw_header(header2, month, categories, branches):
     # Time
     time = datetime.now(pytz.utc)
     time = time.astimezone(pytz.timezone('Asia/Kolkata'))
-    draw.text((4300, 110), time.strftime('%H:%M:%S %p'), font=font)
+    draw.text((4300, 110), time.strftime('%I:%M:%S %p'), font=font)
     # Month 6020 110
     draw.text((6020, 110), month.strftime('%B'), font=font)
     # YEAR 6020 290
