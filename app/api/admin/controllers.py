@@ -305,11 +305,11 @@ def import_students():
                 updated.append(student)
         else:
             student = Student(student_id=student_id,
-                              category=category,
+                              category=category.name,
                               dob=dob,
                               name=name,
                               contact=contact,
-                              branch=branch)
+                              branch=branch.name)
             db.session.add(student)
             added.append(student)
     db.session.commit()

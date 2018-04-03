@@ -130,7 +130,7 @@ class Student(User):
             cat = Category.query.filter_by(id=int(category)).first()
             if not cat:
                 raise ValueError('Category %s not found' % category)
-        self.category_id = cat.id
+        self.category = cat
 
         if isinstance(dob, basestring):
             self.dob = datetime.strptime(dob, '%Y-%m-%d').date()
@@ -138,14 +138,14 @@ class Student(User):
             self.dob = dob
         self.contact = contact
 
-        br = Branch.query.filter_by(name=branch)
+        br = Branch.query.filter_by(name=branch).first()
         if not br:
             if not branch.isdigit():
                 raise ValueError('Branch %s not found' % branch)
-            br = Branch.query.filter_by(id=int(branch))
+            br = Branch.query.filter_by(id=int(branch)).first()
             if not br:
                 raise ValueError('Branch %s not found' % branch)
-        self.branch_id = br.id
+        self.branch = br
 
     def __repr__(self):
         class_type = type(self)
