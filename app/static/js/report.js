@@ -14,7 +14,9 @@ var app = new Vue({
         selectedBranches: [],
         selectedStudents: [],
         month: '',
+        loading: false,
         taskCount: 0,
+        error: '',
     },
     created(){
         console.log('created')
@@ -111,6 +113,8 @@ var app = new Vue({
             this.month = moment(date).format('MMMM YYYY')
         },
         exportReport(){
+            this.loading = true
+            this.error = ''
             var vm = this
             var url = '/api/exportReport'
             var students = this.selectedStudents
@@ -132,6 +136,7 @@ var app = new Vue({
             config.responseType = 'blob'
             this.$http.post(url, postData, config)
             .then(response => {
+                this.loading = false
                 var blob = new Blob([response.data])
                 var link = document.createElement('a')
                 link.href = window.URL.createObjectURL(blob)
@@ -139,6 +144,8 @@ var app = new Vue({
                 link.click()
             },
             error => {
+                this.loading = false
+                this.error = 'Error occured'
                 console.log(error)
             })
         }

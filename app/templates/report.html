@@ -37,12 +37,13 @@
             </div>
         </div>
         <div class="field">
-                <button type="submit" class="ui mini primary button" :class="{disabled: !selectedStudents.length && !filteredStudents.length}">Export Selected</button>
-            </div>
+            <button type="submit" class="ui mini primary button" :class="{disabled: (!selectedStudents.length && !filteredStudents.length) || loading, loading: loading}">Export Selected</button>
+        </div>
     </form>
     
     <p>{{selectedStudents.length || filteredStudents.length}} students selected</p>
-    
+    <div class="ui error message" v-if="error">{{error}}</div>
+
     <button class="ui mini compact icon button disabled">Select All</button>
     <button class="ui mini compact icon button disabled">Invert Selection</button>
     <button class="ui mini compact icon button disabled">Clear Selection</button>
