@@ -31,16 +31,17 @@ def draw_row(srno, draw, student, month):
     col_gap = 7
 
     _, no_of_days = calendar.monthrange(month.year, month.month)
-    for d in range(1, no_of_days + 1):
-        curr_date = month + timedelta(days=d)
-        attendance = Attendance.query.filter_by(student_id=student.id, date=curr_date).first()
-        val = 'A'
-        if attendance and attendance.punch_in and attendance.punch_in.strip():
-            val = 'P'
-        vals.append(val)
-        text_width, text_height = draw.textsize(val, font=font)
-        text_x = x_offset + (col_width - text_width) / 2
-        draw.text((text_x, text_y), val, font=font)
+    for d in range(1, 32):
+        if d <= no_of_days:
+            curr_date = month + timedelta(days=d)
+            attendance = Attendance.query.filter_by(student_id=student.id, date=curr_date).first()
+            val = 'A'
+            if attendance and attendance.punch_in and attendance.punch_in.strip():
+                val = 'P'
+            vals.append(val)
+            text_width, text_height = draw.textsize(val, font=font)
+            text_x = x_offset + (col_width - text_width) / 2
+            draw.text((text_x, text_y), val, font=font)
         x_offset += col_width + col_gap
 
     # Total A and P
