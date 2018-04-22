@@ -177,9 +177,10 @@ def add_update_student(action):
         res['message'] = 'Invalid url'
         return jsonify(res), 401
 
-    required_fields = ['dob', 'name', 'category', 'id', 'contact']
+    required_fields = 'dob name category id contact branch'.split()
 
     data = request.json or request.data or request.form
+    print data
     if not data:
         res['message'] = 'No data received.'
         return make_response(jsonify(res)), res_code
@@ -198,7 +199,7 @@ def add_update_student(action):
         res['statusData'] = error.BLANK_VALUES_FOR_REQUIRED_FIELDS.type(blanks)
         return jsonify(res), res_code
 
-    dob, name, category_name, student_id, contact = required_values
+    dob, name, category_id, student_id, contact, branch = required_values
 
     try:
         dob = datetime.strptime(dob, '%Y-%m-%d')
@@ -207,21 +208,34 @@ def add_update_student(action):
         return jsonify(res), res_code
 
     student = Student.query.filter_by(student_id=student_id).first()
-    category = Category.query.filter_by(name=category_name).first()
+    category = Category.query.filter_by(id=category_id).first()
+    branch = Branch.query.filter_by(id=branch).first()
     if action == 'add':
-        try:
-            student = Student(
-                name=name,
-                student_id=student_id,
-                category=category)
-            # insert the user
-            db.session.add(student)
-            res['message'] = '{0} Successfully registered.'\
-                             .format(student.name)
+        if not category:
+            res['message'] = 'Category %s not found'.format(category)
             res_code = 201
-        except Exception as e:
-            print e
-            res['message'] = 'Some error occurred. Please try again.'
+        if not branch:
+            res['message'] = 'Branch %s not found'.format(branch)
+            res_code = 201
+        else:
+            try:
+                student = Student(
+                    name=name,
+                    student_id=student_id,
+                    category=category.id,
+                    contact=contact,
+                    dob=dob,
+                    branch=branch.id)
+                # insert the user
+                db.session.add(student)
+                db.session.commit()
+                res['message'] = '{0} Successfully registered.'\
+                                 .format(student.name)
+                res['status'] = True
+                res_code = 201
+            except Exception as e:
+                print e
+                res['message'] = 'Some error occurred. Please try again.'
     elif action == 'update':
         if student:
             res['message'] = 'Student ID {} alreay exists'.format(student_id)

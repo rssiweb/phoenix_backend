@@ -70,7 +70,7 @@ var app = new Vue({
                 var blob = new Blob([response.data])
                 var link = document.createElement('a')
                 link.href = window.URL.createObjectURL(blob)
-                link.download = 'Report ' + vm.month + '.jpg'
+                link.download = 'Report ' + vm.month + '.pdf'
                 link.click()
             },
             error => {

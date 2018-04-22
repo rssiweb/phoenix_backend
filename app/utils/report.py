@@ -36,7 +36,7 @@ def draw_row(srno, draw, student, month):
         if d <= no_of_days:
             curr_date = month + timedelta(days=d - 1)
             attendance = Attendance.query.filter_by(student_id=student.id, date=curr_date).first()
-            val = 'A'
+            val = ' '
             if attendance and attendance.punch_in and attendance.punch_in.strip():
                 val = 'P'
             vals.append(val)
@@ -46,7 +46,7 @@ def draw_row(srno, draw, student, month):
         x_offset += col_width + col_gap
 
     # Total A and P
-    total_a = sum([v == 'A' for v in vals])
+    total_a = sum([v == ' ' for v in vals])
     total_p = sum([v == 'P' for v in vals])
 
     col_width = 141
@@ -102,5 +102,5 @@ def buildReport(students, month, categories, branches):
         att_sheet.paste(tmp_row, (0, y_offset))
         y_offset += row.size[1]
     att_sheet.paste(footer, (0, y_offset))
-    att_sheet.save('app/report.jpg')
-    return 'report.jpg'
+    att_sheet.save('app/report.pdf', 'PDF', resolution=100.0)
+    return 'report.pdf'

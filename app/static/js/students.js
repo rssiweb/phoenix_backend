@@ -154,35 +154,7 @@ var app = new Vue({
                     vm.loading = ''
                 })
             },
-            // deleteStudent:function(student){
-            //     console.log('delete', student);
-            //     this.loading = 'Deleting '+student.name+'...'
-            //     var vm = this;
-            //     var url = '/api/admin/student/delete/'+student.id
-            //     this.$http.get(url,this.getHeaders())
-            //     .then(response => {
-            //         console.log(response)
-            //         this.loading = ''
-            //         if(response.body.status=='success'){
-            //             //remove the student from list
-            //             vm.resetStudent()
-            //             var removedStudentIndex = -1
-            //             vm.students.forEach((tmpStd, index) => {
-            //                 if(tmpStd.id == response.body.studentid){
-            //                     removedStudentIndex = index
-            //                 }
-            //             })
-            //             if(removedStudentIndex!=-1)
-            //                 vm.students.splice(removedStudentIndex, 1)
-            //         }
-            //     },
-            //     error => {
-            //         console.log(error);
-            //         this.loading = ''
-            //     })
-            // },
-            updateStudent: function(id, event){
-                if (event) event.preventDefault()
+            updateStudent (id) {
                 console.log(id)
                 var stdToUpdate = null
                 this.students.forEach(function(student, index){
@@ -194,6 +166,7 @@ var app = new Vue({
                 if(!stdToUpdate) return
                 this.isUpdate= true
                 this.studentToUpdate = jQuery.extend({}, stdToUpdate)
+                $(this.$el).find('#addStudentForm :input[name="category"]').dropdown('set selected', stdToUpdate.category)
             },
             resetStudent: function(){
                 // clear the drop down and reset the studentToUpdate

@@ -123,11 +123,12 @@ class Student(User):
         super(Student, self).__init__(name)
         self.student_id = student_id
 
-        cat = Category.query.filter_by(name=category).first()
+        if not category:
+            raise ValueError('Category (%s) cannot be blank' % category)
+        cat = Category.query.filter_by(id=category).first()
         if not cat:
-            if not category.isdigit():
-                raise ValueError('Category %s not found' % category)
-            cat = Category.query.filter_by(id=int(category)).first()
+            if category:
+                cat = Category.query.filter_by(name=category).first()
             if not cat:
                 raise ValueError('Category %s not found' % category)
         self.category = cat
@@ -138,11 +139,12 @@ class Student(User):
             self.dob = dob
         self.contact = contact
 
-        br = Branch.query.filter_by(name=branch).first()
+        if not branch:
+            raise ValueError('Branch %s cannot be blank' % branch)
+
+        br = Branch.query.filter_by(id=branch).first()
         if not br:
-            if not branch.isdigit():
-                raise ValueError('Branch %s not found' % branch)
-            br = Branch.query.filter_by(id=int(branch)).first()
+            br = Branch.query.filter_by(name=branch).first()
             if not br:
                 raise ValueError('Branch %s not found' % branch)
         self.branch = br
