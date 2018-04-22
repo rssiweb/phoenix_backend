@@ -3,6 +3,7 @@ Vue.use(Toasted, {
 })
 
 var app = new Vue({
+    mixins: [utils],
     el: '#app',
     data: {
         landed: false,

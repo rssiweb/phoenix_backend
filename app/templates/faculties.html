@@ -101,6 +101,19 @@
                 <label>Name</label>
                 <input type="text" name="name" placeholder="Full Name" v-model="facultyToUpdate.name">
             </div>
+            <div class="required field">
+                <label>Gender</label>
+                <select name="gender" class="ui dropdown" v-model="facultyToUpdate.gender">
+                    <option value="">Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="others">Others</option>
+                </select>
+            </div>
+            <div class="required field">
+                <label>Contact</label>
+                <input type="text" name="contact" placeholder="Contact Number" v-model="facultyToUpdate.contact">
+            </div>
             <div class="required field" :class="{error: !validEmail}">
                 <label>Email</label>
                 <input type="text" name="email" placeholder="Email" v-model="facultyToUpdate.email">
@@ -113,21 +126,9 @@
                 <label>Confirm Password</label>
                 <input type="password" name="confirmPassword" placeholder="Confirm Password" v-model="confirmPassword">
             </div>
-
-            <div class="required field">
-
-                <label>Gender</label>
-                <select name="gender" class="ui dropdown" v-model="facultyToUpdate.gender">
-                  <option value="">Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="others">Others</option>
-              </select>
-
-          </div>
-      </div>
-  </div>
-  <div class="ui error message" v-if="!isValidPassword(facultyToUpdate.password).result">
+        </div>
+    </div>
+    <div class="ui error message" v-if="!isValidPassword(facultyToUpdate.password).result">
       <ul class="list">
           <li v-for="err in isValidPassword(facultyToUpdate.password).message">{{err}}</li>
       </ul>
@@ -171,5 +172,6 @@
 {% endblock %}
 
 {% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/utils.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/faculty.js') }}"></script>
 {% endblock%}

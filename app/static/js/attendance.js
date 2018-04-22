@@ -1,10 +1,14 @@
 var app = new Vue({
+    mixins: [utils],
     el: '#app',
     data: {
         heading:'Students Attendance',
         token: Cookies.get('auth_token'),
         is_admin: (Cookies.get('is_admin')=='true'),
         students: [],
+        branches: [],
+        categories: [],
+
         error: '',
         message: '',
         loading: '',
@@ -19,7 +23,7 @@ var app = new Vue({
     },
     created: function(){
         console.log('stating')
-        this.loadStudents()
+        this.load(['students', 'branches', 'categories'])
     },
     updated: function(){
         $(this.$el).find('table').tablesort();
@@ -32,10 +36,6 @@ var app = new Vue({
         });
     },
     methods: {
-        logout: function(){
-            Cookies.remove('auth_token')
-            window.location = '/'
-        },
         loadStudents: function(){
             this.loading = 'Loading students...'
             var token = this.token;
@@ -61,9 +61,6 @@ var app = new Vue({
                 this.loading = ''
             });
 
-        },
-        getHeaders: function(){
-            return {headers: { Authorization: 'Basic ' +  this.token}}
         },
         getAttendance: function(){
             this.loading = 'Loading attendance...'
@@ -351,26 +348,10 @@ var app = new Vue({
         },
         filteredStudents(){
             return this.students.filter(student => {
-                var inSearchedCat = this.categoryFilter.length==0 || this.categoryFilter.indexOf(student.category.name) != -1
-                var inSearchedBranch = this.branchFilter.length==0 || this.branchFilter.indexOf(student.branch.name) != -1
+                var inSearchedCat = this.categoryFilter.length==0 || this.categoryFilter.indexOf(student.category) != -1
+                var inSearchedBranch = this.branchFilter.length==0 || this.branchFilter.indexOf(student.branch) != -1
                 return inSearchedCat && inSearchedBranch
             })
-        },
-        categories(){
-            var categories=[]
-            this.students.forEach((std,index)=>{
-                if(categories.indexOf(std.category.name)==-1)
-                    categories.push(std.category.name)
-            })
-            return categories;
-        },
-        branches(){
-            var branches=[]
-            this.students.forEach((std,index)=>{
-                if(branches.indexOf(std.branch.name)==-1)
-                    branches.push(std.branch.name)
-            })
-            return branches
         },
         editModeBtnText: function(){
             return this.editMode ? "Done" : "Edit Mode"

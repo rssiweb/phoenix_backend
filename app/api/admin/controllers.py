@@ -4,6 +4,7 @@ from app.models import Faculty, Student, Attendance, Branch, Category
 from datetime import datetime
 from operator import itemgetter
 from app.utils import decorators, parseDate, validEmail, isValidPassword
+from app.utils.constants import StatusErrors as error
 import csv
 
 
@@ -176,27 +177,29 @@ def add_update_student(action):
         res['message'] = 'Invalid url'
         return jsonify(res), 401
 
-    required_fields = ['dob', 'name', 'category', 'id']
+    required_fields = ['dob', 'name', 'category', 'id', 'contact']
 
     data = request.json or request.data or request.form
     if not data:
         res['message'] = 'No data received.'
         return make_response(jsonify(res)), res_code
 
-    keys = [str(key) for key in data.keys()]
-    if not set(required_fields).issubset(set(keys)):
+    if not set(required_fields).issubset(set(data.keys())):
         res['message'] = 'expected atleast {0} got only {1}'\
-                         .format(required_fields, keys)
+                         .format(required_fields, data.keys())
         return jsonify(res), res_code
 
-    dob = data.get('dob').strip()
-    name = data.get('name').strip()
-    category_name = data.get('category').strip()
-    contact = data.get('contact').strip()
-    student_id = data.get('id').strip()
-    if not all([dob, name, category_name, student_id]):
-        res['message'] = 'required fields are missing or blank'
+    required_values = [data.get(f).strip() for f in required_fields]
+
+    if not all(required_values):
+        blanks = [f for f, v in zip(required_fields, required_values) if not v]
+        res['message'] = '%s cannot have blank values' % ', '.join(blanks)
+        res['statusText'] = error.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
+        res['statusData'] = error.BLANK_VALUES_FOR_REQUIRED_FIELDS.type(blanks)
         return jsonify(res), res_code
+
+    dob, name, category_name, student_id, contact = required_values
+
     try:
         dob = datetime.strptime(dob, '%Y-%m-%d')
     except Exception:
@@ -205,7 +208,7 @@ def add_update_student(action):
 
     student = Student.query.filter_by(student_id=student_id).first()
     category = Category.query.filter_by(name=category_name).first()
-    if not student and action == 'add':
+    if action == 'add':
         try:
             student = Student(
                 name=name,
@@ -219,9 +222,10 @@ def add_update_student(action):
         except Exception as e:
             print e
             res['message'] = 'Some error occurred. Please try again.'
-    elif action == 'add':
-        res['message'] = 'Student ID {} alreay exists'.format(student_id)
-        res_code = 201
+    elif action == 'update':
+        if student:
+            res['message'] = 'Student ID {} alreay exists'.format(student_id)
+            res_code = 201
     else:
         student.name = name
         student.dob = dob
@@ -233,22 +237,22 @@ def add_update_student(action):
     return jsonify(res), res_code
 
 
-@adminapi.route('/student/delete/<int:studentid>', methods=['GET'])
-@decorators.login_required
-@decorators.only_admins
-def delete_student(studentid):
-    res = dict(status='fail')
-    res_code = 200
-    student = Student.query.get(studentid)
-    if student:
-        db.session.delete(student)
-        db.session.commit()
-        res['message'] = 'Student deleted'
-        res['studentid'] = studentid
-        res['status'] = 'success'
-    else:
-        res['message'] = 'No such student'
-    return make_response(jsonify(res)), res_code
+# @adminapi.route('/student/delete/<int:studentid>', methods=['GET'])
+# @decorators.login_required
+# @decorators.only_admins
+# def delete_student(studentid):
+#     res = dict(status='fail')
+#     res_code = 200
+#     student = Student.query.get(studentid)
+#     if student:
+#         db.session.delete(student)
+#         db.session.commit()
+#         res['message'] = 'Student deleted'
+#         res['studentid'] = studentid
+#         res['status'] = 'success'
+#     else:
+#         res['message'] = 'No such student'
+#     return make_response(jsonify(res)), res_code
 
 
 @adminapi.route('/student/import', methods=['POST'])

@@ -3,6 +3,7 @@ Vue.use(Toasted, {
 })
 
 var app = new Vue({
+    mixins: [utils],
     el: '#app',
     data:{
         heading: 'Faculties',
@@ -32,13 +33,6 @@ var app = new Vue({
         $(this.$el).find('.dropdown').dropdown()
     },
     methods: {
-        logout(){
-            Cookies.remove('auth_token')
-            window.location = '/'
-        },
-        getHeaders(){
-            return {headers: { Authorization: 'Basic ' +  this.token}}
-        },
         loadFaculties(){
             var url = '/api/admin/faculty'
             var vm = this

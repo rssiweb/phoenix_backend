@@ -52,6 +52,6 @@ def login_required(func):
 def addLag(func):
     @wraps(func)
     def decorated(*args, **kwargs):
-        time.sleep(2)
+        time.sleep(1)
         return func(*args, **kwargs)
     return decorated

@@ -59,10 +59,10 @@
         </thead>
         <tbody>
             <tr v-for="student in filteredStudents" v-on:click="toggleStudentSelection(student)" :class="{positive: selectedStudents.indexOf(student) != -1 }">
-                <td>{{student.category.name}}</td>
+                <td>{{getCategoryName(student.category)}}</td>
                 <td>{{student.student_id}}</td>
                 <td>{{student.name}}</td>
-                <td>{{student.branch.name}}</td>
+                <td>{{getBranchName(student.branch)}}</td>
             </tr>
         </tbody>
     </table>
@@ -75,5 +75,6 @@
 {% block script %}
 <link href="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.css" rel="stylesheet" type="text/css" />
 <script src="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/utils.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/report.js') }}"></script>
 {% endblock%}

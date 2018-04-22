@@ -155,10 +155,10 @@ class Student(User):
         return dict(id=self.id,
                     name=self.name,
                     dob=self.dob,
-                    category=self.category.serialize(),
+                    category=self.category_id,
                     student_id=self.student_id,
                     contact=self.contact,
-                    branch=self.branch.serialize(),
+                    branch=self.branch_id,
                     active=self.isActive,
                     )
 

@@ -1,8 +1,5 @@
-Vue.use(Toasted, {
-    iconPack : 'fontawesome'
-})
-
 var app = new Vue({
+    mixins: [utils],
     el: '#app',
     data: {
         token: Cookies.get('auth_token'),
@@ -20,7 +17,7 @@ var app = new Vue({
     },
     created(){
         console.log('created')
-        this.loadAll()
+        this.load(['students', 'branches', 'categories'])
     },
     updated(){
         console.log('updated')
@@ -34,73 +31,6 @@ var app = new Vue({
         })
     },
     methods: {
-        logout: function(){
-            Cookies.remove('auth_token')
-            window.location = '/'
-        },
-        getHeaders: function(){
-            return {headers: { Authorization: 'Basic ' +  this.token}}
-        },
-        loadAll(){
-            var vm = this
-            var branches = undefined
-            var categories = undefined
-            var students = undefined
-            var taskCount = 3
-            this.$http.get('/api/branches', this.getHeaders())
-            .then(response => {
-                console.log(response)
-                taskCount -= 1
-                if(response.body.status==='success'){
-                    branches = response.body.branches
-                    if(taskCount == 0){
-                        vm.categories = categories
-                        vm.branches = branches
-                        vm.students = students
-                    }
-                }
-            },
-            error => {
-                console.log(error)
-                taskCount -= 1
-            })
-
-            this.$http.get('/api/categories', this.getHeaders())
-            .then(response => {
-                console.log(response)
-                taskCount -= 1
-                if(response.body.status==='success'){
-                    categories = response.body.categories
-                    if(taskCount == 0){
-                        vm.categories = categories
-                        vm.branches = branches
-                        vm.students = students
-                    }
-                }
-            },
-            error => {
-                console.log(error)
-                taskCount -= 1
-            })
-            this.$http.get('/api/student', this.getHeaders())
-            .then(response => {
-                console.log(response)
-                taskCount -= 1
-                if(response.body.status==='Success'){
-                    students = response.body.students
-                    if(taskCount == 0){
-                        vm.categories = categories
-                        vm.branches = branches
-                        vm.students = students
-                    }
-                }
-            },
-            error => {
-                console.log(error)
-                taskCount -= 1
-            })
-
-        },
         toggleStudentSelection(student){
             var index = this.selectedStudents.indexOf(student)
             if(index ==-1){
