@@ -11,6 +11,8 @@ var app = new Vue({
 
         categoryFilter: [],
         branchFilter: [],
+        searchTxt: '',
+
         error: '',
         message: '',
 
@@ -135,7 +137,7 @@ var app = new Vue({
                     console.log(updatedStudent)
                     if(!updatedStudent) return
 
-                    var indexToreplace = -1
+                        var indexToreplace = -1
                     vm.students.forEach((tmpstd, index) => {
                         if(tmpstd.id == updatedStudent.id){
                             indexToreplace = index
@@ -164,7 +166,7 @@ var app = new Vue({
                     }
                 })
                 if(!stdToUpdate) return
-                this.isUpdate= true
+                    this.isUpdate= true
                 this.studentToUpdate = jQuery.extend({}, stdToUpdate)
                 $(this.$el).find('#addStudentForm :input[name="category"]').dropdown('set selected', stdToUpdate.category)
             },
@@ -209,5 +211,17 @@ var app = new Vue({
                 else
                     return ''
             },
+            filteredStudents(){
+                var vm = this
+                var lowerTxt = this.searchTxt.toLowerCase()
+                return this.students.filter(student => {
+                    return (vm.categoryFilter.length == 0 || vm.categoryFilter.indexOf(student.category) != -1) &&
+                    ( vm.branchFilter.length == 0 || vm.branchFilter.indexOf(student.branch) != -1) &&
+                    ( student.name.toLowerCase().indexOf(lowerTxt) != -1 ||
+                      this.getCategoryName(student.category).toLowerCase().indexOf(lowerTxt) != -1 ||
+                      this.getBranchName(student.branch).toLowerCase().indexOf(lowerTxt) != -1
+                    )
+                })
+            }
         },
     });

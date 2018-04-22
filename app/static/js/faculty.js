@@ -252,10 +252,6 @@ var app = new Vue({
                 res.message.push('Must contain atleast one digit')
                 res.result = false
             }
-            if (password.search('[!@#$%&*]') == -1){
-                res.message.push("Must contain atleast one special character out of '!','@','#','$','%','&','*'")
-                res.result = false
-            }
             return res
         }
     },
