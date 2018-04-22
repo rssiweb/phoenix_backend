@@ -14,6 +14,8 @@ var app = new Vue({
         loading: false,
         taskCount: 0,
         error: '',
+
+        initialized: false,
     },
     created(){
         console.log('created')
@@ -21,14 +23,18 @@ var app = new Vue({
     },
     updated(){
         console.log('updated')
-        var dom = $(this.$el)
-        dom.find('.dropdown').dropdown()
-        dom.find('#month').calendar({
-            type: 'month',
-            closable: true,
-            maxDate: new Date(),
-            onChange: this.setMonth,
-        })
+        if(!this.initialized && !this.loading){
+            console.log('initialized')
+            var dom = $(this.$el)
+            dom.find('.dropdown').dropdown()
+            dom.find('#month').calendar({
+                type: 'month',
+                closable: true,
+                maxDate: new Date(),
+                onChange: this.setMonth,
+            })
+            this.initialized = true
+        }
     },
     methods: {
         toggleStudentSelection(student){
@@ -49,44 +55,44 @@ var app = new Vue({
             var url = '/api/exportReport'
             var students = this.selectedStudents
             if (students.length == 0)
-                 students = this.filteredStudents
-            studentIds = []
-            students.forEach((student) => {
-                studentIds.push(student.id)
-            })
-            vm.month = vm.month || moment().format('MMMM YYYY')
-            var postData = {
-                month: vm.month,
-                students: studentIds,
-                categories: vm.selectedCategories,
-                branches: vm.selectedBranches,
-            }
-            console.log(postData)
-            var config = this.getHeaders()
-            config.responseType = 'blob'
-            this.$http.post(url, postData, config)
-            .then(response => {
-                this.loading = false
-                var blob = new Blob([response.data])
-                var link = document.createElement('a')
-                link.href = window.URL.createObjectURL(blob)
-                link.download = 'Report ' + vm.month + '.pdf'
-                link.click()
-            },
-            error => {
-                this.loading = false
-                this.error = 'Error occured'
-                console.log(error)
-            })
+               students = this.filteredStudents
+           studentIds = []
+           students.forEach((student) => {
+            studentIds.push(student.id)
+        })
+           vm.month = vm.month || moment().format('MMMM YYYY')
+           var postData = {
+            month: vm.month,
+            students: studentIds,
+            categories: vm.selectedCategories,
+            branches: vm.selectedBranches,
         }
-    },
-    computed: {
-        filteredStudents(){
-            var vm = this
-            return this.students.filter(student => {
-                return (vm.selectedCategories.length == 0 || vm.selectedCategories.indexOf(student.category.id) != -1) &&
-                       (vm.selectedBranches.length == 0 || vm.selectedBranches.indexOf(student.branch.id) != -1)
-            })
-        }
+        console.log(postData)
+        var config = this.getHeaders()
+        config.responseType = 'blob'
+        this.$http.post(url, postData, config)
+        .then(response => {
+            this.loading = false
+            var blob = new Blob([response.data])
+            var link = document.createElement('a')
+            link.href = window.URL.createObjectURL(blob)
+            link.download = 'Report ' + vm.month + '.pdf'
+            link.click()
+        },
+        error => {
+            this.loading = false
+            this.error = 'Error occured'
+            console.log(error)
+        })
     }
+},
+computed: {
+    filteredStudents(){
+        var vm = this
+        return this.students.filter(student => {
+            return (vm.selectedCategories.length == 0 || vm.selectedCategories.indexOf(student.category) != -1) &&
+            (vm.selectedBranches.length == 0 || vm.selectedBranches.indexOf(student.branch) != -1)
+        })
+    }
+}
 })
