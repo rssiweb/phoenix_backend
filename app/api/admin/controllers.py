@@ -302,7 +302,7 @@ def import_students():
         dob = datetime.strptime(getDob(row), '%d/%m/%Y').date()
         branch_name = getBranch(row)
         # if there is any thing in the status we assume the student to be inactive
-        active = not getStatus(row)
+        active = getStatus(row) != 'R'
 
         category = Category.query.filter_by(name=category_name).first()
         if not category:
