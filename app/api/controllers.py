@@ -23,7 +23,8 @@ def get_token():
                     'status': 'success',
                     'message': 'log in successful.',
                     'auth_token': faculty.encode_auth_token(email).decode(),
-                    'is_admin': faculty.admin
+                    'is_admin': faculty.admin,
+                    'name': faculty.name
                 }
                 print res
                 return jsonify(res), 202
@@ -71,7 +72,7 @@ def set_punch_in(attendance, inTime, studentid=None):
                             message='time is not valid {}'.format(inTime)
                             )), 200
 
-    attendance = Attendance(date=datetime.today(),
+    attendance = Attendance(date=datetime.today().date(),
                             student_id=studentid,
                             punch_in=inTime,
                             punch_in_by_id=request.user.id)

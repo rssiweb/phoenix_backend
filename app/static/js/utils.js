@@ -22,7 +22,20 @@ Vue.http.interceptors.push(function(request, next) {
 })
 })
 
+Vue.filter('capitalize', function (value) {
+  if (!value) return ''
+  value = value.toString()
+  return value.charAt(0).toUpperCase() + value.slice(1)
+})
+
 var utils = {
+    data: function(){
+        return {
+            token: Cookies.get('auth_token'),
+            is_admin: (Cookies.get('is_admin')=='true'),
+            name: Cookies.get('name')
+        }
+    },
     methods: {
         logout: function(){
             Cookies.remove('auth_token');
@@ -57,7 +70,7 @@ var utils = {
                 console.log('categories are not loaded')
             }  
         },
-        load(items){
+        load(items, callback){
             var possibleItems = ['branches', 'categories', 'faculties', 'students']
             var taskCount = 0
             var loadItems = {}
@@ -102,6 +115,7 @@ var utils = {
                         vm.faculties = faculties
                     }
                     console.log('done leading')
+                    if (callback) callback()
                 }
             }
 

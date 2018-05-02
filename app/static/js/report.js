@@ -2,8 +2,6 @@ var app = new Vue({
     mixins: [utils],
     el: '#app',
     data: {
-        token: Cookies.get('auth_token'),
-        is_admin: (Cookies.get('is_admin')=='true'),
         branches: [],
         categories: [],
         students: [],

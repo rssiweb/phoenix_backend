@@ -2,9 +2,8 @@ var app = new Vue({
     mixins: [utils],
     el: '#app',
     data: {
+        // name, token and is_admin from mixins
         heading:'Students Attendance',
-        token: Cookies.get('auth_token'),
-        is_admin: (Cookies.get('is_admin')=='true'),
         students: [],
         branches: [],
         categories: [],
@@ -22,8 +21,11 @@ var app = new Vue({
         editMode: false,
     },
     created: function(){
-        console.log('stating')
-        this.load(['students', 'branches', 'categories'])
+        console.log('starting')
+        var vm = this
+        this.load(['students', 'branches', 'categories'], function(){
+            vm.getAttendance()
+        })
     },
     updated: function(){
         $(this.$el).find('table').tablesort();

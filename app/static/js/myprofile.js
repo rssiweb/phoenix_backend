@@ -7,8 +7,6 @@ var app = new Vue({
     el: '#app',
     data: {
         landed: false,
-        token: Cookies.get('auth_token'),
-        is_admin: (Cookies.get('is_admin')=='true'),
         me: {},
         currentPassword: '',
         password: '',

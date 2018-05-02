@@ -19,8 +19,12 @@ var app = new Vue({
                 var values = {expires: 1}
                 Cookies.set('auth_token',response.body.auth_token, values);
                 Cookies.set('is_admin',response.body.is_admin, values);
+                Cookies.set('name',response.body.name, values);
+
+                Vue.use(CloudinaryPlugin, {})
+                
                 this.loading = true;
-                window.location = "/attendance";
+                window.location = "/me";
             },
             (error) => {
                 console.log(error);

@@ -7,9 +7,6 @@ var app = new Vue({
     el: '#app',
     data:{
         heading: 'Faculties',
-        
-        token: Cookies.get('auth_token'),
-        is_admin: (Cookies.get('is_admin')=='true'),
 
         error: '',
         message: '',
