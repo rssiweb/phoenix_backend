@@ -40,8 +40,6 @@ var app = new Vue({
     methods: {
         loadStudents: function(){
             this.loading = 'Loading students...'
-            var token = this.token;
-            console.log('token', token)
             this.$http.get('/api/student',this.getHeaders())
             .then(data => {
                 console.log(data)
@@ -51,22 +49,20 @@ var app = new Vue({
                         this.message = data.body.message
                     else
                         this.message = 'No students'
-                }else{
+                } else {
                     this.message = ''
                 }
                 console.log(this.message)
                 this.loading = ''
                 this.getAttendance()
-            },error => {
+            }, error => {
                 this.error = error.body.message
                 console.log(error)
                 this.loading = ''
             });
-
         },
         getAttendance: function(){
             this.loading = 'Loading attendance...'
-            var token = this.token
             var vm = this
             var url = '/api/attendance/'+this.attendanceDate.format('DDMMYYYY')
             this.$http.get(url, vm.getHeaders())

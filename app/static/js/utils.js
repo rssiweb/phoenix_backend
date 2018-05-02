@@ -13,9 +13,10 @@ Vue.http.interceptors.push(function(request, next) {
         this.$toasted.show(response.body.message, {
             theme: 'primary',
             className: "ui orange label",
-            position: "bottom-right", 
+            position: "bottom-right",
+            singleton: true,
             icon : 'check',
-            duration : 3000,
+            duration : 2000,
             onComplete: this.logout
         })
     }
