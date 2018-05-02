@@ -33,9 +33,9 @@
     </div>
 
         <div class="ui basic segment">
-            <button v-on:click="showImportModel" class="ui mini primary right floated button">Import Students</button>
-
             <div class="ui form">
+                <!-- if import button moved to be direct child of segment it wont receive the click action -->
+                <button @click.prevent="showImportModal" class="ui right floated mini primary button">Import Students</button>
                 <div class="fields">
                     <div class="field">
                         <label>Branch</label>
@@ -187,7 +187,7 @@
             </div>
         </div>
         <div class="actions">
-            <div class="ui button" v-on:click="hideImportModel">Close</div>
+            <div class="ui button" @click.prevent="hideImportModal">Close</div>
         </div>
     </div>
 </div>

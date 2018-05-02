@@ -182,12 +182,12 @@ var app = new Vue({
                 })
                 return data
             },
-            showImportModel(){
+            showImportModal(){
                 $('#importModal').modal('show')
             },
-            hideImportModel(){
+            hideImportModal(){
                 $('#importModal').modal('hide')
-                this.clearImportState();
+                this.clearImportState()
             },
             clearImportState(){
                 this.loadedStudents = []
