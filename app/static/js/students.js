@@ -28,7 +28,7 @@ var app = new Vue({
     },
     created: function(){
         console.log('created')
-        this.load(['students', 'branches', 'categories'])
+        this.load(['allStudents', 'branches', 'categories'])
     },
     updated: function(){
         console.log('updated')

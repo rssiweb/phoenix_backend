@@ -76,7 +76,10 @@
             <!-- clicking on a student will add its details to the below form and the add button will become update button -->
             <td>{{student.student_id}}</td>
             <td>{{getCategoryName(student.category)}}</td>
-            <td :data-sort-value="student.name.toLowerCase()"><a href="#" @click.prevent="updateStudent(student.id)">{{student.name}}</a></td>
+            <td :data-sort-value="student.name.toLowerCase()">
+                <a href="#" @click.prevent="updateStudent(student.id)">{{student.name}}</a>
+                <label class="ui mini orange label" v-if="!student.active">Inactive</label>
+            </td>
             <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>
             <td>{{student.contact}}</td>
         </tr>

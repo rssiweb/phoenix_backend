@@ -46,6 +46,14 @@ def get_token():
 @api.route('/student')
 @decorators.login_required
 def list_students():
+    students = [s.serialize() for s in Student.query.filter(Student.isActive!=False)]
+    data = dict(status='Success', students=students)
+    return jsonify(data), 200
+
+
+@api.route('/student/all')
+@decorators.login_required
+def list_allstudents():
     students = [s.serialize() for s in Student.query.all()]
     data = dict(status='Success', students=students)
     return jsonify(data), 200

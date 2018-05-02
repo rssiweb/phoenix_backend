@@ -291,6 +291,7 @@ def import_students():
     getDob = itemgetter(heading.index('date of birth'))
     getContact = itemgetter(heading.index('telephone number'))
     getBranch = itemgetter(heading.index('preferred branch'))
+    getStatus = itemgetter(heading.index('status'))
 
     added = []
     updated = []
@@ -300,6 +301,8 @@ def import_students():
         name, contact = getName(row), getContact(row)
         dob = datetime.strptime(getDob(row), '%d/%m/%Y').date()
         branch_name = getBranch(row)
+        # if there is any thing in the status we assume the student to be inactive
+        active = not getStatus(row)
 
         category = Category.query.filter_by(name=category_name).first()
         if not category:
@@ -314,13 +317,16 @@ def import_students():
                              student.dob == dob,
                              student.name == name,
                              student.contact == contact,
-                             student.branch == branch])
+                             student.branch == branch,
+                             student.isActive == active
+                             ])
             if not unchanged:
                 student.category = category
                 student.dob = dob
                 student.name = name
                 student.contact = contact
                 student.branch = branch
+                student.isActive = active
                 updated.append(student)
         else:
             student = Student(student_id=student_id,
@@ -328,7 +334,9 @@ def import_students():
                               dob=dob,
                               name=name,
                               contact=contact,
-                              branch=branch.name)
+                              branch=branch.name,
+                              isActive=active
+                              )
             db.session.add(student)
             added.append(student)
     db.session.commit()

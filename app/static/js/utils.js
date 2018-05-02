@@ -72,7 +72,7 @@ var utils = {
             }  
         },
         load(items, callback){
-            var possibleItems = ['branches', 'categories', 'faculties', 'students']
+            var possibleItems = ['branches', 'categories', 'faculties', 'students', 'allStudents']
             var taskCount = 0
             var loadItems = {}
             possibleItems.forEach(item => {
@@ -81,6 +81,12 @@ var utils = {
                     loadItems[item] = true
                 }
             })
+
+            if (loadItems.students && loadItems.allStudents){
+                console.log('warning: do not pass students and allStudents both')
+                loadItems.students = undefined
+                taskCount -= 1
+            }
 
             console.log('loading', taskCount, 'items', items, loadItems)
             var vm = this
@@ -184,8 +190,9 @@ var utils = {
                 })
             }
 
-            if(loadItems.students){
-                this.$http.get('/api/student')
+            if(loadItems.students || loadItems.allStudents){
+                var url = '/api/student' + (loadItems.allStudents ? '/all': '')
+                this.$http.get(url)
                 .then(response => {
                     taskCount -= 1
                     items.pop(items.indexOf('students'))
