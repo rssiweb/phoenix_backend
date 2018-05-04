@@ -119,8 +119,8 @@ class Student(User):
     branch = relationship('Branch', foreign_keys=[branch_id])
 
     def __init__(self, student_id, category, name,
-                 dob=None, contact=None, branch=None):
-        super(Student, self).__init__(name)
+                 dob=None, contact=None, branch=None, isActive=True):
+        super(Student, self).__init__(name, isActive)
         self.student_id = student_id
 
         if not category:
