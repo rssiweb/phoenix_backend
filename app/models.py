@@ -125,10 +125,10 @@ class Student(User):
 
         if not category:
             raise ValueError('Category (%s) cannot be blank' % category)
-        cat = Category.query.filter_by(id=category).first()
+        cat = Category.query.filter_by(name=category).first()
         if not cat:
             if category:
-                cat = Category.query.filter_by(name=category).first()
+                cat = Category.query.filter_by(id=int(category)).first()
             if not cat:
                 raise ValueError('Category %s not found' % category)
         self.category = cat
@@ -142,9 +142,9 @@ class Student(User):
         if not branch:
             raise ValueError('Branch %s cannot be blank' % branch)
 
-        br = Branch.query.filter_by(id=branch).first()
+        br = Branch.query.filter_by(name=branch).first()
         if not br:
-            br = Branch.query.filter_by(name=branch).first()
+            br = Branch.query.filter_by(id=(branch)).first()
             if not br:
                 raise ValueError('Branch %s not found' % branch)
         self.branch = br
