@@ -32,33 +32,45 @@
         <p><br/><br/><br/><br/></p>
     </div>
 
-        <div class="ui basic segment">
-            <div class="ui form">
-                <!-- if import button moved to be direct child of segment it wont receive the click action -->
-                <button @click.prevent="showImportModal" class="ui right floated mini primary button">Import Students</button>
-                <div class="fields">
-                    <div class="field">
-                        <label>Branch</label>
-                        <select multiple="" class="dropdown" v-model="branchFilter">
-                            <option value="">All</option>
-                            <option v-for="branch in branches" v-bind:value="branch.id">{{branch.name}}</option>
-                        </select>
+    <div class="ui basic segment">
+        <div class="ui form">
+            <!-- if import button moved to be direct child of segment it wont receive the click action -->
+            <button @click.prevent="showImportModal" class="ui right floated mini primary button">Import Students</button>
+            <div class="fields">
+                <div class="field">
+                    <label>Branch</label>
+                    <select multiple="" class="dropdown" v-model="branchFilter">
+                        <option value="">All</option>
+                        <option v-for="branch in branches" v-bind:value="branch.id">{{branch.name}}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Category</label>
+                    <select multiple="" class="dropdown" v-model="categoryFilter">
+                        <option value="">All</option>
+                        <option v-for="cat in categories" v-bind:value="cat.id">{{cat.name}}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Status</label>
+                    <select class="dropdown" v-model="statusFilter">
+                        <option value="">All</option>
+                        <option value="all">All</option>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Search</label>
+                    <div class="ui icon input">
+                        <i class="search icon"></i>
+                        <input class="prompt" type="text" placeholder="ID, Name or Email..." v-model="searchTxt">
                     </div>
-                    <div class="field">
-                        <label>Category</label>
-                        <select multiple="" class="dropdown" v-model="categoryFilter">
-                            <option value="">All</option>
-                            <option v-for="cat in categories" v-bind:value="cat.id">{{cat.name}}</option>
-                        </select>
-                    </div>
-
                 </div>
             </div>
-            <div class="ui icon input">
-                <i class="search icon"></i>
-                <input class="prompt" type="text" placeholder="Search ID, Name or Email..." v-model="searchTxt">
-            </div>
         </div>
+
+    </div>
     
     <table id="table" class="ui compact sortable striped table" v-show="!loading">
         <thead>
@@ -69,6 +81,7 @@
                 <th>Name</th>
                 <th>Age</th>
                 <th>Contact</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tr v-for="(student, index) in filteredStudents">
@@ -78,10 +91,10 @@
             <td>{{getCategoryName(student.category)}}</td>
             <td :data-sort-value="student.name.toLowerCase()">
                 <a href="#" @click.prevent="updateStudent(student.id)">{{student.name}}</a>
-                <label class="ui mini orange label" v-if="!student.active">Inactive</label>
             </td>
             <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>
             <td>{{student.contact}}</td>
+            <td>{{student.active?"Active":"Inactive"}}</label></td>
         </tr>
     </table>
     <br/>

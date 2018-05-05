@@ -9,6 +9,7 @@ var app = new Vue({
 
         categoryFilter: [],
         branchFilter: [],
+        statusFilter: 'all',
         searchTxt: '',
 
         error: '',
@@ -215,6 +216,7 @@ var app = new Vue({
                 return this.students.filter(student => {
                     return (vm.categoryFilter.length == 0 || vm.categoryFilter.indexOf(student.category) != -1) &&
                     ( vm.branchFilter.length == 0 || vm.branchFilter.indexOf(student.branch) != -1) &&
+                    ( vm.statusFilter == 'all' || vm.statusFilter == student.active+'') &&
                     ( student.name.toLowerCase().indexOf(lowerTxt) != -1 ||
                       this.getCategoryName(student.category).toLowerCase().indexOf(lowerTxt) != -1 ||
                       this.getBranchName(student.branch).toLowerCase().indexOf(lowerTxt) != -1
