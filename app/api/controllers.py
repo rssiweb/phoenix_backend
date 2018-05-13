@@ -4,6 +4,8 @@ from app.models import Faculty, Student, Attendance, Branch, Category
 from datetime import datetime
 from app.utils import decorators, parseDate, isValidPassword
 from app.utils import report
+from sqlalchemy import or_
+import calendar
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -42,11 +44,18 @@ def get_token():
     }
     return jsonify(res), 401
 
-
-@api.route('/student')
+@api.route('/student/<string:month>')
 @decorators.login_required
-def list_students():
-    students = [s.serialize() for s in Student.query.filter(Student.isActive!=False)]
+def list_students_month(month):
+    print month
+    endDate = datetime.strptime(month, '%B%Y')
+    print endDate
+    monthsLastDay = calendar.monthrange(endDate.year, endDate.month)[1]
+    endDate = endDate.replace(day=monthsLastDay)
+    print endDate
+    students = Student.query.filter(or_(Student.effective_end_date == None,
+                                        Student.effective_end_date >= endDate))
+    students = [s.serialize() for s in students]
     data = dict(status='Success', students=students)
     return jsonify(data), 200
 
@@ -55,6 +64,15 @@ def list_students():
 @decorators.login_required
 def list_allstudents():
     students = [s.serialize() for s in Student.query.all()]
+    data = dict(status='Success', students=students)
+    return jsonify(data), 200
+
+
+@api.route('/student')
+@decorators.login_required
+def list_students():
+    students = Student.query.filter(Student.isActive != False)
+    students = [s.serialize() for s in students]
     data = dict(status='Success', students=students)
     return jsonify(data), 200
 
@@ -226,14 +244,12 @@ def get_categories():
 @decorators.login_required
 def export_report():
     data = request.json or request.data or request.form
-    print data
     month = data.get('month')
     if not month:
         pass
     ids = data.get('students')
     categories = data.get('categories', [])
     branches = data.get('branches', [])
-    print ids, month
     students = db.session.query(Student)\
                          .join(Student.category)\
                          .filter(Student.id.in_(ids))\
@@ -252,3 +268,4 @@ def export_report():
 
     reportFileName = report.buildReport(students, month, categories, branches)
     return send_from_directory(directory='.', filename=reportFileName)
+

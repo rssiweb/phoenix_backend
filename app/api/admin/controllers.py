@@ -294,6 +294,7 @@ def import_students():
     getContact = itemgetter(heading.index('telephone number'))
     getBranch = itemgetter(heading.index('preferred branch'))
     getStatus = itemgetter(heading.index('status'))
+    getEndDate = itemgetter(heading.index('effective from'))
 
     added = []
     updated = []
@@ -305,6 +306,12 @@ def import_students():
         branch_name = getBranch(row)
         # if there is any thing in the status we assume the student to be inactive
         active = getStatus(row) != 'R'
+        effective_end_date = getEndDate(row)
+
+        if effective_end_date:
+            effective_end_date = datetime.strptime(effective_end_date, '%d/%m/%Y').date()
+        else:
+            effective_end_date = None
 
         category = Category.query.filter_by(name=category_name).first()
         if not category:
@@ -320,7 +327,8 @@ def import_students():
                              student.name == name,
                              student.contact == contact,
                              student.branch == branch,
-                             student.isActive == active
+                             student.isActive == active,
+                             student.effective_end_date == effective_end_date,
                              ])
             if not unchanged:
                 student.category = category
@@ -329,6 +337,7 @@ def import_students():
                 student.contact = contact
                 student.branch = branch
                 student.isActive = active
+                student.effective_end_date = effective_end_date
                 updated.append(student)
         else:
             student = Student(student_id=student_id,
@@ -337,7 +346,8 @@ def import_students():
                               name=name,
                               contact=contact,
                               branch=branch.name,
-                              isActive=active
+                              isActive=active,
+                              effective_end_date=effective_end_date,
                               )
             db.session.add(student)
             added.append(student)

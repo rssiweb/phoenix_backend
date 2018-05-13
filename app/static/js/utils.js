@@ -149,10 +149,14 @@ var utils = {
                         vm.error = errorMessage
                         vm.loading = undefined
                     }else{
-                        vm.categories = categories
-                        vm.branches = branches
-                        vm.students = students
-                        vm.faculties = faculties
+                        if(loadItems.categories)
+                            vm.categories = categories
+                        if(loadItems.branches)
+                            vm.branches = branches
+                        if(loadItems.students)
+                            vm.students = students
+                        if(loadItems.faculties)
+                            vm.faculties = faculties
                     }
                     console.log('done leading')
                     if (callback) callback()

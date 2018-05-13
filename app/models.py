@@ -118,8 +118,10 @@ class Student(User):
     branch_id = db.Column(db.Integer(), db.ForeignKey('branch.id'))
     branch = relationship('Branch', foreign_keys=[branch_id])
 
+    effective_end_date = db.Column(db.Date(), nullable=True, default=None)
+
     def __init__(self, student_id, category, name,
-                 dob=None, contact=None, branch=None, isActive=True):
+                 dob=None, contact=None, branch=None, isActive=True, effective_end_date=None):
         super(Student, self).__init__(name, isActive)
         self.student_id = student_id
 
@@ -148,6 +150,8 @@ class Student(User):
             if not br:
                 raise ValueError('Branch %s not found' % branch)
         self.branch = br
+
+        self.effective_end_date = effective_end_date
 
     def __repr__(self):
         class_type = type(self)
