@@ -31,12 +31,16 @@
         </div>
         <p><br/><br/><br/><br/></p>
     </div>
+    <div class="ui basic segment">
+        <button @click.prevent="showImportModal" class="ui small primary button">Import Students</button>
 
+        <button @click.prevent="updateStudent(-1)" class="ui small primary button">Add Student</button>
+    </div>
     <div class="ui basic segment">
         <div class="ui form">
             <!-- if import button moved to be direct child of segment it wont receive the click action -->
-            <button @click.prevent="showImportModal" class="ui right floated mini primary button">Import Students</button>
-            <div class="fields">
+            
+            <div class="ui stackab;e fields">
                 <div class="field">
                     <label>Branch</label>
                     <select multiple="" class="dropdown" v-model="branchFilter">
@@ -69,7 +73,6 @@
                 </div>
             </div>
         </div>
-
     </div>
     
     <table id="table" class="ui compact sortable striped table" v-show="!loading">
@@ -94,25 +97,32 @@
             </td>
             <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>
             <td>{{student.contact}}</td>
-            <td>{{student.active?"Active":"Inactive"}}</label></td>
+            <td>{{student.active?"Active":"Inactive"}}</td>
         </tr>
     </table>
-    <br/>
-    <div class="ui container">
-
-        <div class="ui sub header">
-            <h3>Add Student</h3>
-        </div>
-
-        <br/>
-
-        <div id="addStudentForm" class="ui form">
+</div>
+<div id="studentModal" class="ui modal">
+    <div class="header">
+        {{buttonText}} Student
+    </div>
+    <div class="content">
+        <div id="addStudentForm" class="ui equal width form">
             <div class="fields">
                 <input type="hidden" v-model="studentToUpdate.id"/>
                 <div class="required field" v-bind:class="{disabled:isUpdate}">
                     <label>Student ID</label>
                     <input type="text" name="id" placeholder="Student ID" v-model="studentToUpdate.student_id">
                 </div>
+                <div class="required field">
+                    <label>Name</label>
+                    <input type="text" name="name" placeholder="Name" v-model="studentToUpdate.name">
+                </div>
+                <div class="required field">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" placeholder="Date of Birth" v-model="studentToUpdate.dob">
+                </div>
+            </div>
+            <div class="fields">
                 <div class="required field">
                     <label>Category</label>
                     <select name="category" class="dropdown" v-model="studentToUpdate.category">
@@ -128,85 +138,81 @@
                     </select>
                 </div>
                 <div class="required field">
-                    <label>Name</label>
-                    <input type="text" name="name" placeholder="Name" v-model="studentToUpdate.name">
-                </div>
-                <div class="required field">
-                    <label>Date of Birth</label>
-                    <input type="date" name="dob" placeholder="Date of Birth" v-model="studentToUpdate.dob">
-                </div>
-                <div class="required field">
                     <label>Contact</label>
                     <input type="text" name="contact" placeholder="Contact Number" v-model="studentToUpdate.contact" maxlength="10">
                 </div>
             </div>
+            <div class="ui error message">
+                 <div class="header">Errors</div>
+            </div>
         </div>
-
-        <button class="ui positive button" v-on:click="addOrUpdateStudent" v-bind:class="{disabled:loading}">{{buttonText}}</button>
-        <!-- <button class="ui negative right floated button" v-on:click="deleteStudent(studentToUpdate)" v-if="isUpdate" v-bind:class="{disabled:loading}">Delete</button> -->
-        <button class="ui deny button" v-on:click="resetStudent" v-bind:class="{disabled:loading}">Clear</button>
-
-
     </div>
-
-    <div id="importModal" class="ui large modal">
-        <i class="close icon"></i>
-        <div class="header">
-            Import Students
-        </div>
-        <div class="scrolling content">
-            <div class="ui center align form">
-                <div class="inline fields">
-                    <div class="field">
-                        <input type="file" accept=".xlsx, .xls, .csv" class="ui input" @change="importFile = event.target.files[0]"/>
-                    </div>
-                    <div class="field">
-                        <button class="ui primary button" v-on:click="importStudents" v-bind:class="{disabled:!importFile}">Load</button>
-                    </div>
-                    <div class="field">
-                        <p>{{importSummary}}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="importing">
-                <div class="ui active inverted dimmer">
-                    <div class="ui text loader">Reading file...</div>
-                </div>
-                <p><br/><br/><br/></p>
-            </div>
-
-            <div v-if="imported">
-                <table class="ui compact striped table" v-if="loadedStudents.length > 0">
-                    <thead>
-                        <tr>
-                            <th>Student ID</th>
-                            <th>Category</th>
-                            <th>Name</th>
-                            <th>Age</th>
-                            <th>Contact</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="student in loadedStudents" v-bind:class="[student.added?'positive':'warning']">
-                            <td >{{student.student_id}}</td>
-                            <td>{{getCategoryName(student.category)}}</td>
-                            <td>{{student.name}}</td>
-                            <td>{{moment(student.dob).fromNow(true)}}</td>
-                            <td>{{student.contact || 'No contact info'}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="ui message" v-else>
-                    <p>No Students loaded</p>
-                </div>
-            </div>
-        </div>
-        <div class="actions">
-            <div class="ui button" @click.prevent="hideImportModal">Close</div>
-        </div>
+    <div class="actions">
+        <button class="ui positive button">{{buttonText}}</button>
+        <!-- <button class="ui negative right floated button" v-on:click="deleteStudent(studentToUpdate)" v-if="isUpdate" v-bind:class="{disabled:loading}">Delete</button> -->
+        <button class="ui neutral button" v-on:click.prevent="resetStudent" >Clear</button>
+        <button class="ui negative button">Close</button>
     </div>
 </div>
+
+<div id="importModal" class="ui large modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Import Students
+    </div>
+    <div class="scrolling content">
+        <div class="ui center align form">
+            <div class="inline fields">
+                <div class="field">
+                    <input type="file" accept=".xlsx, .xls, .csv" class="ui input" @change="importFile = event.target.files[0]"/>
+                </div>
+                <div class="field">
+                    <button class="ui primary button" v-on:click="importStudents" v-bind:class="{disabled:!importFile}">Load</button>
+                </div>
+                <div class="field">
+                    <p>{{importSummary}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="importing">
+            <div class="ui active inverted dimmer">
+                <div class="ui text loader">Reading file...</div>
+            </div>
+            <p><br/><br/><br/></p>
+        </div>
+
+        <div v-if="imported">
+            <table class="ui compact striped table" v-if="loadedStudents.length > 0">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Category</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Contact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="student in loadedStudents" v-bind:class="[student.added?'positive':'warning']">
+                        <td >{{student.student_id}}</td>
+                        <td>{{getCategoryName(student.category)}}</td>
+                        <td>{{student.name}}</td>
+                        <td>{{moment(student.dob).fromNow(true)}}</td>
+                        <td>{{student.contact || 'No contact info'}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="ui message" v-else>
+                <p>No Students loaded</p>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui button" @click.prevent="hideImportModal">Close</div>
+    </div>
+</div>
+
 {%endraw%}
 {% endblock %}
 

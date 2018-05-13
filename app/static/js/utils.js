@@ -25,7 +25,7 @@ Vue.http.interceptors.push(function(request, next) {
 
 Vue.filter('capitalize', function (value) {
   if (!value) return ''
-  value = value.toString()
+      value = value.toString()
   return value.charAt(0).toUpperCase() + value.slice(1)
 })
 
@@ -70,6 +70,39 @@ var utils = {
             }else{
                 console.log('categories are not loaded')
             }  
+        },
+        showToast: function(message, type, faicon){
+            // type info error warn
+            var color = ''
+            var icon = ''
+            if(type == 'error'){
+                color = 'red'
+                icon = 'close'
+            }
+            else if (type == 'warn'){
+                color = 'orange'
+                icon = 'exlaimation'
+            }
+            else if (type=='success'){
+                color = 'olive'
+                icon = 'check'
+            }
+            else if (type=='info'){
+                color = 'blue'
+                icon = 'info'
+            }
+            else{
+                console.log(type, 'is not a valid toast type')
+                return
+            }
+            this.$toasted.show(message, {
+                theme: 'primary',
+                className: "ui "+color+" label",
+                position: "bottom-right",
+                singleton: true,
+                icon : icon,
+                duration : 2000
+            })
         },
         load(items, callback){
             var possibleItems = ['branches', 'categories', 'faculties', 'students', 'allStudents']
@@ -124,121 +157,122 @@ var utils = {
                     console.log('done leading')
                     if (callback) callback()
                 }
-            }
+        }
 
-            var showError = function(){
-                updateLoadingMessage()
-                var errored = []
-                possibleItems.forEach(item => {
-                    if(errors[item]){
-                        errored.push(item)
-                    }
-                })
-                if (errored.length > 0){
-                    suffix = errored.join(', ')
-                    suffix = suffix.replace(/\b\w/g, l => l.toUpperCase())
-                    errorMessage = 'Error occured in loading ' + suffix + ' please reload the page'
+        var showError = function(){
+            updateLoadingMessage()
+            var errored = []
+            possibleItems.forEach(item => {
+                if(errors[item]){
+                    errored.push(item)
                 }
-                if(taskCount == 0){
-                    vm.error = errorMessage
-                    vm.loading = undefined
-                    console.log('done leading')
+            })
+            if (errored.length > 0){
+                suffix = errored.join(', ')
+                suffix = suffix.replace(/\b\w/g, l => l.toUpperCase())
+                errorMessage = 'Error occured in loading ' + suffix + ' please reload the page'
+            }
+            if(taskCount == 0){
+                vm.error = errorMessage
+                vm.loading = undefined
+                console.log('done leading')
+            }
+        }
+
+        var getErrorText = function(error){
+            if(error.body)
+                return error.body.message || error.statusText
+            return error.statusText
+        }
+
+        if(loadItems.branches){
+            this.$http.get('/api/branches')
+            .then(response => {
+                taskCount -= 1
+                items.pop(items.indexOf('branches'))
+                if(response.body.status === 'success'){
+                    branches = response.body.branches
                 }
-            }
+                setAllToVm()
+            },
+            error => {
+                console.log(error)
+                taskCount -= 1
+                items.pop(items.indexOf('branches'))
+                errors.branches = getErrorText(error)
+                showError()
+            })
+        }
 
-            var getErrorText = function(error){
-                if(error.body)
-                    return error.body.message || error.statusText
-                return error.statusText
-            }
+        if(loadItems.categories){
+            this.$http.get('/api/categories')
+            .then(response => {
+                taskCount -= 1
+                items.pop(items.indexOf('categories'))
+                if(response.body.status === 'success'){
+                    categories = response.body.categories
+                }
+                setAllToVm()
+            },
+            error => {
+                console.log(error)
+                taskCount -= 1
+                items.pop(items.indexOf('categories'))
+                errors.categories = getErrorText(error)
+                showError()
+            })
+        }
 
-            if(loadItems.branches){
-                this.$http.get('/api/branches')
-                .then(response => {
-                    taskCount -= 1
-                    items.pop(items.indexOf('branches'))
-                    if(response.body.status === 'success'){
-                        branches = response.body.branches
-                    }
-                    setAllToVm()
-                },
-                error => {
-                    console.log(error)
-                    taskCount -= 1
-                    items.pop(items.indexOf('branches'))
-                    errors.branches = getErrorText(error)
-                    showError()
-                })
-            }
+        if(loadItems.students || loadItems.allStudents){
+            var url = '/api/student' + (loadItems.allStudents ? '/all': '')
+            this.$http.get(url)
+            .then(response => {
+                taskCount -= 1
+                items.pop(items.indexOf('students'))
+                if(response.body.status === 'Success'){
+                    students = response.body.students
+                }
+                setAllToVm()
+            },
+            error => {
+                console.log(error)
+                taskCount -= 1
+                items.pop(items.indexOf('students'))
+                errors.students = getErrorText(error)
+                showError()
+            })
+        }
 
-            if(loadItems.categories){
-                this.$http.get('/api/categories')
-                .then(response => {
-                    taskCount -= 1
-                    items.pop(items.indexOf('categories'))
-                    if(response.body.status === 'success'){
-                        categories = response.body.categories
-                    }
-                    setAllToVm()
-                },
-                error => {
-                    console.log(error)
-                    taskCount -= 1
-                    items.pop(items.indexOf('categories'))
-                    errors.categories = getErrorText(error)
-                    showError()
-                })
-            }
-
-            if(loadItems.students || loadItems.allStudents){
-                var url = '/api/student' + (loadItems.allStudents ? '/all': '')
-                this.$http.get(url)
-                .then(response => {
-                    taskCount -= 1
-                    items.pop(items.indexOf('students'))
-                    if(response.body.status === 'Success'){
-                        students = response.body.students
-                    }
-                    setAllToVm()
-                },
-                error => {
-                    console.log(error)
-                    taskCount -= 1
-                    items.pop(items.indexOf('students'))
-                    errors.students = getErrorText(error)
-                    showError()
-                })
-            }
-
-            if(loadItems.faculties){
-                this.$http.get('/api/admin/faculties')
-                .then(response => {
-                    console.log(response)
-                    taskCount -= 1
-                    items.pop(items.indexOf('faculties'))
-                    if(response.body.status === 'Success'){
-                        faculties = response.body.faculties
-                    }
-                    setAllToVm()
-                },
-                error => {
-                    console.log(error)
-                    taskCount -= 1
-                    items.pop(items.indexOf('faculties'))
-                    errors.faculties = getErrorText(error)
-                    showError()
-                })
-            }
-        },
-        constructErrorMessage(errorType, errorData){
-            var readableFieldNameMap = {
-                dob: 'Date of Birth',
-                name: 'Name',
-                contact: 'Contact Number',
-                category: 'Category',
-                branch: 'Branch'
-            }
-            if(errorType === 'BLANK_VALUES_FOR_REQUIRED_FIELDS'){
+        if(loadItems.faculties){
+            this.$http.get('/api/admin/faculties')
+            .then(response => {
+                console.log(response)
+                taskCount -= 1
+                items.pop(items.indexOf('faculties'))
+                if(response.body.status === 'Success'){
+                    faculties = response.body.faculties
+                }
+                setAllToVm()
+            },
+            error => {
+                console.log(error)
+                taskCount -= 1
+                items.pop(items.indexOf('faculties'))
+                errors.faculties = getErrorText(error)
+                showError()
+            })
+        }
+    },
+    constructErrorMessage(errorType, errorData){
+        var readableFieldNameMap = {
+            dob: 'Date of Birth',
+            name: 'Name',
+            contact: 'Contact Number',
+            category: 'Category',
+            branch: 'Branch',
+            id: 'Student ID',
+        }
+        if(errorType === 'BLANK_VALUES_FOR_REQUIRED_FIELDS'){
                 // errorData is a list of values that are blank in a post/get request
                 var readableFieldNames = []
                 errorData.forEach((item, index) => {
@@ -253,6 +287,12 @@ var utils = {
                     console.log('received BLANK_VALUES_FOR_REQUIRED_FIELDS but with no field names')
                     return 'blank values for some fields'
                 }
+            }
+            else if (errorType === 'DUPLICATE_ID'){
+                console.log(errorData)
+                var field = readableFieldNameMap[errorData[0]]
+                var value = errorData[1]
+                return 'Duplicate value "'+value+'" for field '+field
             }
         }
     }

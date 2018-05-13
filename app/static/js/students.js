@@ -25,22 +25,52 @@ var app = new Vue({
         imported: false,
         importSummary: '',
 
+        studentModalError: '',
         initialized: false,
+        studentForm: {
+            fields:{
+                id     : 'empty',
+                name: 'empty',
+                contact: ['exactLength[10]', 'empty', 'integer'],
+                dob: 'empty',
+                branch: 'empty',
+                category: 'empty'
+            }
+        },
+        studentModal: {
+            closable: false,
+            onDeny    : function(){
+                return true
+            },
+            onApprove : function(){
+                return app.studentModalOnApprove()
+            }
+        },
     },
     created: function(){
         console.log('created')
         this.load(['allStudents', 'branches', 'categories'])
+
     },
     updated: function(){
         console.log('updated')
         if(!this.initialized && !this.loading){
+            var vm = this
             console.log('initialized')
             $(this.$el).find('table').tablesort()
             $(this.$el).find('.dropdown').dropdown()
             this.initialized = true
+            $(this.$el).find('#addStudentForm').form(this.studentForm)
+            $(this.$el).find('#studentModal').modal(this.studentModal)
         }
     },
     methods: {
+        studentModalOnApprove: function() {
+            console.log('studentModalOnApprove')
+            $('#addStudentForm').form('validate form')
+            this.addOrUpdateStudent()
+            return false
+        },
         importStudents: function(){
             this.importing = true;
             console.log('importing students from', this.importFile)
@@ -127,7 +157,12 @@ var app = new Vue({
                     console.log(response)
                     vm.loading = ''
                     if(response.body.status == 'fail'){
-                        vm.error = this.constructErrorMessage(response.body.statusText,response.body.statusData)
+                        if(response.body.statusText && response.body.statusData){
+                            var errorMessage = this.constructErrorMessage(response.body.statusText, response.body.statusData)
+                            if(errorMessage){
+                                $('#addStudentForm').form('add errors', [errorMessage])
+                            }
+                        }
                         return
                     }
                     // reset only if its success
@@ -135,8 +170,7 @@ var app = new Vue({
                     var updatedStudent = response.body.student
                     console.log(updatedStudent)
                     if(!updatedStudent) return
-
-                        var indexToreplace = -1
+                    var indexToreplace = -1
                     vm.students.forEach((tmpstd, index) => {
                         if(tmpstd.id == updatedStudent.id){
                             indexToreplace = index
@@ -148,6 +182,7 @@ var app = new Vue({
                         console.log('setted')
                     }else{
                         vm.students.push(updatedStudent)
+                        vm.showToast('Student added successfuly', 'success')
                     }
                     //get the new data from response and add him to the students list
                 }, error => {
@@ -157,6 +192,14 @@ var app = new Vue({
             },
             updateStudent (id) {
                 console.log(id)
+                $('#addStudentForm').form('reset')
+                $('#addStudentForm .message').empty()
+                if(id == -1){
+                    $('#addStudentForm :input[name="id"]').attr('disabled', false)
+                    this.resetStudent()
+                    $('#studentModal').modal('show')
+                    return
+                }
                 var stdToUpdate = null
                 this.students.forEach(function(student, index){
                     if(student.id == id){
@@ -167,13 +210,17 @@ var app = new Vue({
                 if(!stdToUpdate) return
                     this.isUpdate= true
                 this.studentToUpdate = jQuery.extend({}, stdToUpdate)
-                $(this.$el).find('#addStudentForm :input[name="category"]').dropdown('set selected', stdToUpdate.category)
+                $('#addStudentForm :input[name="category"]').dropdown('set selected', stdToUpdate.category)
+                $('#addStudentForm :input[name="branch"]').dropdown('set selected', stdToUpdate.branch)
+                $('#addStudentForm :input[name="id"]').attr('disabled', true)
+                $('#studentModal').modal('show')
             },
             resetStudent: function(){
                 // clear the drop down and reset the studentToUpdate
-                $(this.$el).find('#addStudentForm select').dropdown('clear')
+                $('#addStudentForm select').dropdown('clear')
                 this.studentToUpdate = {}
                 this.isUpdate = false
+                $('#addStudentForm').form('reset')
             },
             getJsonFromForm: function(formSelector){
                 data = {}
@@ -196,6 +243,19 @@ var app = new Vue({
                 this.imported = false
                 this.importSummary = ''
             },
+            // Form validation prompts
+            prmptStdId(newId){
+                console.log('validating...', newId)
+                if(!newId){
+                    return 'Student ID cannot be blank'
+                }
+                var found = 0
+                this.students.forEach((student, index) => {
+                    if (student.student_id === newId)
+                        found += 1
+                })
+                return found == 0 ? undefined : "Student ID already assigned, choose another!"
+            }
         },
         computed:{
             buttonText: function(){
@@ -220,7 +280,7 @@ var app = new Vue({
                     ( student.name.toLowerCase().indexOf(lowerTxt) != -1 ||
                       this.getCategoryName(student.category).toLowerCase().indexOf(lowerTxt) != -1 ||
                       this.getBranchName(student.branch).toLowerCase().indexOf(lowerTxt) != -1
-                    )
+                      )
                 })
             }
         },

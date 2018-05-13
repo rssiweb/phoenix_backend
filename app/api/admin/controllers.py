@@ -211,10 +211,15 @@ def add_update_student(action):
     category = Category.query.filter_by(id=category_id).first()
     branch = Branch.query.filter_by(id=branch).first()
     if action == 'add':
-        if not category:
+        if student is not None:
+            # res['message'] = 'Duplicate Student ID %s, consider changing Student ID'.format(student_id)
+            res['statusText'] = error.DUPLICATE_ID.text
+            res['statusData'] = error.DUPLICATE_ID.type(['id', student_id])
+            res_code = 201
+        elif not category:
             res['message'] = 'Category %s not found'.format(category)
             res_code = 201
-        if not branch:
+        elif not branch:
             res['message'] = 'Branch %s not found'.format(branch)
             res_code = 201
         else:
@@ -232,15 +237,12 @@ def add_update_student(action):
                 res['message'] = '{0} Successfully registered.'\
                                  .format(student.name)
                 res['status'] = True
+                res['student'] = student.serialize()
                 res_code = 201
             except Exception as e:
                 print e
                 res['message'] = 'Some error occurred. Please try again.'
     elif action == 'update':
-        if student:
-            res['message'] = 'Student ID {} alreay exists'.format(student_id)
-            res_code = 201
-    else:
         student.name = name
         student.dob = dob
         student.category = category
