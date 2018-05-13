@@ -153,7 +153,7 @@ var utils = {
                             vm.categories = categories
                         if(loadItems.branches)
                             vm.branches = branches
-                        if(loadItems.students)
+                        if(loadItems.students || loadItems.allStudents)
                             vm.students = students
                         if(loadItems.faculties)
                             vm.faculties = faculties
