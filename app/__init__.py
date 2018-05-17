@@ -25,12 +25,18 @@ def not_found(error):
     return jsonify(dict(error=str(error))), 404
 
 
-from app.api.controllers import api
-from app.api.admin.controllers import adminapi
+from app.api.common import commonapi
+from app.api.exam import examapi
+from app.api.admin import adminapi
+from app.api.student import studentapi
+from app.api.attendance import attendanceapi
 from app.ui.controllers import ui
 
-app.register_blueprint(api)
+app.register_blueprint(commonapi)
 app.register_blueprint(adminapi)
+app.register_blueprint(studentapi)
+app.register_blueprint(attendanceapi)
+app.register_blueprint(examapi)
 app.register_blueprint(ui)
 
 db.create_all()

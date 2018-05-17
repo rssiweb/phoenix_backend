@@ -8,12 +8,49 @@ var app = new Vue({
         selectedCategories: [],
         selectedBranches: [],
         selectedStudents: [],
-        month: moment().format('MMMM YYYY'),
+        month: moment().format('DD MMMM YYYY'),
         loading: false,
         taskCount: 0,
         error: '',
 
         initialized: false,
+
+        summaryMonthInitData: {
+            type: 'month',
+            closable: true,
+            maxDate: new Date(),
+            onChange: function(date, text, mode){
+                return app.setMonth(date, text, mode)
+            },
+        },
+        detailStartMonthInitData: {
+            type: 'date',
+            closable: true,
+            maxDate: new Date(),
+            onChange: function(date, text, mode){
+                $('#detailEndMonth').calendar('set startDate', date)
+                return app.setMonth(date, text, mode)
+            },
+        },
+        detailEndMonthInitData: {
+            type: 'date',
+            closable: true,
+            maxDate: new Date(),
+            onChange: function(date, text, mode){
+                return app.setEndMonth(date, text, mode)
+            },
+        },
+        summaryReportModalInit: {
+            onShow: function(){
+                $('#summaryMonth').calendar(app.summaryMonthInitData)
+            }
+        },
+        detailReportModalInit: {
+            onShow: function(){
+                $('#detailStartMonth').calendar(app.detailStartMonthInitData)
+                $('#detailEndMonth').calendar(app.detailEndMonthInitData)
+            }
+        }
     },
     created(){
         console.log('created')
@@ -24,26 +61,24 @@ var app = new Vue({
         if(!this.initialized && !this.loading){
             console.log('initialized')
             var dom = $(this.$el)
+            dom.find('table').tablesort()
             dom.find('.dropdown').dropdown()
-            dom.find('#month').calendar({
-                type: 'month',
-                closable: true,
-                maxDate: new Date(),
-                onChange: this.setMonth,
-            })
+            dom.find('#month').calendar(this.monthInitData)
+            dom.find('#summaryReportModal').modal(this.summaryReportModalInit)
+            dom.find('#detailReportModal').modal(this.detailReportModalInit)
             this.initialized = true
         }
     },
     watch: {
         month(){
-            console.log('fetch students', month)
+            console.log('fetch students', this.month)
             this.loadStudents()
         }
     },
     methods: {
         loadStudents(){
             var vm = this
-            this.$http.get('/api/student/'+this.month.replace(' ',''))
+            this.$http.get('/api/student/'+this.month.replace(/ /g,''))
             .then(response => {
                 console.log(response)
                 if (response.body.status=='Success'){
@@ -67,7 +102,11 @@ var app = new Vue({
             }
         },
         setMonth(date, text, mode){
-            this.month = moment(date).format('MMMM YYYY')
+            this.month = moment(date).format('DD MMMM YYYY')
+            console.log('setting month', this.month)
+        },
+        setEndMonth: function(date, text, mode){
+            console.log('end date set to', date)
         },
         exportReport(){
             this.loading = true
@@ -81,7 +120,7 @@ var app = new Vue({
             students.forEach((student) => {
                 studentIds.push(student.id)
             })
-            vm.month = vm.month || moment().format('MMMM YYYY')
+            vm.month = vm.month || moment().format('DD MMMM YYYY')
             var postData = {
                 month: vm.month,
                 students: studentIds,
@@ -105,6 +144,12 @@ var app = new Vue({
                 this.error = 'Error occured'
                 console.log(error)
             })
+        },
+        showSummaryModal: function(){
+            $('#summaryReportModal').modal('show')
+        },
+        showDetailModal: function(){
+            $('#detailReportModal').modal('show')
         }
     },
     computed: {

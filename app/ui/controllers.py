@@ -31,3 +31,8 @@ def me():
 @ui.route('/report')
 def report():
     return render_template('report.html', page=5)
+
+
+@ui.route('/exam')
+def exam():
+    return render_template('exam.html', page=6)

@@ -14,92 +14,182 @@
         </thead>
         <tbody>
             <tr>
-                <td>Monthly Report</td>
-                <td class="right aligned"><button class="ui mini primary button">Export</button></td>
+                <td>Summary Report</td>
+                <td class="right aligned"><button class="ui mini primary button" @click="showSummaryModal">Export</button></td>
+            </tr>
+            <tr>
+                <td>Detail Report</td>
+                <td class="right aligned"><button class="ui mini primary button" @click="showDetailModal">Export</button></td>
             </tr>
         </tbody>
     </table>
-    <div class="ui modal" id="monthlyModel">
-        <i class="close icon"></i>
-        <div class="header">Modal Title</div>
-        <div class="content">
-            <select class="dropdown multiple" type="text" name="branches" v-model="selectedBranches" multiple>
-                <option value="">All Branches</option>
-                <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
-            </select>
-            <select class="dropdown multiple" name="cats" v-model="selectedCategories" multiple>
-                <option value="">All Categories</option>
-                <option v-for="cat in categories" v-bind:value="cat.id">{{cat.name}}</option>
-            </select>
-        </div>
-        <div class="actions">
-            <button>Run</button>
-        </div>
-    </div>
-    <form class="ui form" id="reportForm" @submit.prevent="exportReport">
-        <div class="fields">
-            <div class="field">
-                <label>Select Type</label>
-                <select class="ui dropdown" type="text">
-                    <option value="monthly">Monthly</option>
-                    <option value="detailed" disabled="">Detailed</option>
-                </select>
-            </div>
+    <template v-if="false">
+        <form class="ui form" id="reportForm" @submit.prevent="exportReport">
+            <div class="fields">
+                <div class="field">
+                    <label>Select Type</label>
+                    <select class="ui dropdown" type="text">
+                        <option value="monthly">Monthly</option>
+                        <option value="detailed" disabled="">Detailed</option>
+                    </select>
+                </div>
 
-            <div class="field">
-                <label>Select Branch(s)</label>
-                <select class="dropdown multiple" type="text" name="branches" v-model="selectedBranches" multiple>
-                    <option value="">All Branches</option>
-                    <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
-                </select>
+                <div class="field">
+                    <label>Select Branch(s)</label>
+                    <select class="dropdown multiple" type="text" name="branches" v-model="selectedBranches" multiple>
+                        <option value="">All Branches</option>
+                        <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Select Category(s)</label>
+                    <select class="dropdown multiple" name="cats" v-model="selectedCategories" multiple>
+                        <option value="">All Categories</option>
+                        <option v-for="cat in categories" v-bind:value="cat.id">{{cat.name}}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Select Month</label>
+                    <div class="ui calendar" id="month">
+                        <input type="text" v-bind:placeholder="moment().format('MMMM YYYY')" name="month"/>
+                    </div>
+                </div>
             </div>
             <div class="field">
-                <label>Select Category(s)</label>
-                <select class="dropdown multiple" name="cats" v-model="selectedCategories" multiple>
-                    <option value="">All Categories</option>
-                    <option v-for="cat in categories" v-bind:value="cat.id">{{cat.name}}</option>
-                </select>
+                <button type="submit" class="ui mini primary button" :class="{disabled: (!selectedStudents.length && !filteredStudents.length) || loading, loading: loading}">Export Selected</button>
             </div>
-            <div class="field">
-                <label>Select Month</label>
-                <div class="ui calendar" id="month">
-                    <input type="text" v-bind:placeholder="moment().format('MMMM YYYY')" name="month"/>
+        </form>
+
+        <p>{{selectedStudents.length || filteredStudents.length}} students selected</p>
+        <div class="ui error message" v-if="error">{{error}}</div>
+
+        <button class="ui mini compact icon button disabled">Select All</button>
+        <button class="ui mini compact icon button disabled">Invert Selection</button>
+        <button class="ui mini compact icon button disabled">Clear Selection</button>
+
+        <table class="ui stripped selectable sortable table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Branch</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="student in filteredStudents" v-on:click="toggleStudentSelection(student)" :class="{positive: selectedStudents.indexOf(student) != -1 }">
+                    <td>{{getCategoryName(student.category)}}</td>
+                    <td>{{student.student_id}}</td>
+                    <td>{{student.name}}</td>
+                    <td>{{getBranchName(student.branch)}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+</div>
+
+<div class="ui small modal" id="summaryReportModal">
+    <div class="header">
+        Summary Report
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="equal width fields">
+                <div class="field">
+                    <label>Select Branch</label>
+                    <select class="dropdown multiple" type="text" name="branches" v-model="selectedBranches" multiple>
+                        <option value="">All Branches</option>
+                        <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Select Category</label>
+                    <select class="dropdown multiple" name="cats" v-model="selectedCategories" multiple>
+                        <option value="">All Categories</option>
+                        <option v-for="cat in categories" v-bind:value="cat.id">{{cat.name}}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Select Month</label>
+                    <div class="ui calendar" id="summaryMonth">
+                        <input type="text" v-bind:placeholder="moment().format('MMMM YYYY')" name="month"/>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="field">
-            <button type="submit" class="ui mini primary button" :class="{disabled: (!selectedStudents.length && !filteredStudents.length) || loading, loading: loading}">Export Selected</button>
-        </div>
-    </form>
-
-    <p>{{selectedStudents.length || filteredStudents.length}} students selected</p>
-    <div class="ui error message" v-if="error">{{error}}</div>
-
-    <button class="ui mini compact icon button disabled">Select All</button>
-    <button class="ui mini compact icon button disabled">Invert Selection</button>
-    <button class="ui mini compact icon button disabled">Clear Selection</button>
-
-    <table class="ui stripped selectable sortable table">
-        <thead>
-            <tr>
-                <th>Category</th>
-                <th>Student ID</th>
-                <th>Name</th>
-                <th>Branch</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="student in filteredStudents" v-on:click="toggleStudentSelection(student)" :class="{positive: selectedStudents.indexOf(student) != -1 }">
-                <td>{{getCategoryName(student.category)}}</td>
-                <td>{{student.student_id}}</td>
-                <td>{{student.name}}</td>
-                <td>{{getBranchName(student.branch)}}</td>
-            </tr>
-        </tbody>
-    </table>
-
+        <p>{{selectedStudents.length || filteredStudents.length}} students selected</p>
+    </div>
+    <div class="actions">
+        <button class="ui positive button" @click.prevent="exportReport">Run</button>
+        <button class="ui negative button">Cancel</button>
+    </div>
 </div>
 
+<!-- Detail Report Modal -->
+<div class="ui large modal" id="detailReportModal">
+    <div class="header">
+        Detail Report
+    </div>
+    <div class=" scrolling content">
+        <div class="ui form">
+            <div class="equal width fields">
+                <div class="field">
+                    <label>Select Branch</label>
+                    <select class="dropdown multiple" type="text" name="branches" v-model="selectedBranches" multiple>
+                        <option value="">All Branches</option>
+                        <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Select Category</label>
+                    <select class="dropdown multiple" name="cats" v-model="selectedCategories" multiple>
+                        <option value="">All Categories</option>
+                        <option v-for="cat in categories" v-bind:value="cat.id">{{cat.name}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="equal width fields">
+                <div class="field">
+                    <label>Start Date</label>
+                    <div class="ui calendar" id="detailStartMonth">
+                        <input type="text" v-bind:placeholder="moment().format('MMMM YYYY')" name="month"/>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>End Date</label>
+                    <div class="ui calendar" id="detailEndMonth">
+                        <input type="text" v-bind:placeholder="moment().format('MMMM YYYY')" name="month"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p>{{selectedStudents.length || filteredStudents.length}} students selected</p>
+        <table class="ui stripped selectable sortable table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Branch</th>
+                    <th>State</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="student in filteredStudents" v-on:click="toggleStudentSelection(student)" :class="{positive: selectedStudents.indexOf(student) != -1 }">
+                    <td>{{getCategoryName(student.category)}}</td>
+                    <td>{{student.student_id}}</td>
+                    <td>{{student.name}}</td>
+                    <td>{{getBranchName(student.branch)}}</td>
+                    <td>{{student.active ? "Active": "Inactive"}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="actions">
+        <button class="ui positive button" @click.prevent="exportReport">Run</button>
+        <button class="ui negative button">Cancel</button>
+    </div>
+</div>
 {% endraw %}
 {% endblock %}
 

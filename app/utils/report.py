@@ -73,14 +73,14 @@ def draw_header(header2, month, categories, branches):
     time = datetime.now(pytz.utc)
     time = time.astimezone(pytz.timezone('Asia/Kolkata'))
     draw.text((4300, 110), time.strftime('%I:%M:%S %p'), font=font)
-    # Month 6020 110
+    # Month at 6020,110
     draw.text((6020, 110), month.strftime('%B'), font=font)
-    # YEAR 6020 290
+    # YEAR at 6020,290
     draw.text((6020, 290), month.strftime('%Y'), font=font)
 
 
 def buildReport(students, month, categories, branches):
-    month = datetime.strptime(month, '%B %Y')
+    month = datetime.strptime(month, '%d %B %Y')
     header1, header2, row, footer = map(Image.open, ['./monthly_report/header1.jpg','./monthly_report/header2.jpg','./monthly_report/row.jpg','./monthly_report/footer.jpg'])
 
     max_width = max([item.size[0] for item in (header1, header2, row, footer)])
