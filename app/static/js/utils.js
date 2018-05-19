@@ -97,7 +97,7 @@ var utils = {
             }
             this.$toasted.show(message, {
                 theme: 'primary',
-                className: "ui "+color+" label",
+                className: "ui " + color + " label",
                 position: "bottom-right",
                 singleton: true,
                 icon : icon,

@@ -80,14 +80,19 @@ def draw_header(header2, month, categories, branches):
 
 
 def buildReport(students, month, categories, branches):
+    no_rows = 24
     month = datetime.strptime(month, '%d %B %Y')
-    header1, header2, row, footer = map(Image.open, ['./monthly_report/header1.jpg','./monthly_report/header2.jpg','./monthly_report/row.jpg','./monthly_report/footer.jpg'])
+    header1, header2, row, footer = map(Image.open, ['./monthly_report/header1.jpg',
+                                                     './monthly_report/header2.jpg',
+                                                     './monthly_report/row.jpg',
+                                                     './monthly_report/footer.jpg'
+                                                     ])
 
     max_width = max([item.size[0] for item in (header1, header2, row, footer)])
 
     total_height = sum([item.size[1] for item in (header1, header2, row, footer)])
 
-    total_height += (len(students) - 1) * row.size[1]
+    total_height += (no_rows - 1) * row.size[1]  # (len(students) - 1) * row.size[1]
 
     att_sheet = Image.new('RGB', (max_width, total_height))
 
@@ -96,9 +101,11 @@ def buildReport(students, month, categories, branches):
     att_sheet.paste(header2, (0, header1.size[1]))
 
     y_offset = header1.size[1] + header2.size[1]
-    for index, student in enumerate(students):
+    for index in xrange(no_rows):
         tmp_row = copy.deepcopy(row)
-        draw_row(index + 1, ImageDraw.Draw(tmp_row), student, month)
+        if index < len(students):
+            student = students[index]
+            draw_row(index + 1, ImageDraw.Draw(tmp_row), student, month)
         att_sheet.paste(tmp_row, (0, y_offset))
         y_offset += row.size[1]
     att_sheet.paste(footer, (0, y_offset))
