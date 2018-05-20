@@ -13,6 +13,7 @@ api = Blueprint('admin_student_api', __name__, url_prefix='/api/admin/student')
 @api.route('/<string:action>', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
+@decorators.addLag
 def add_update_student(action):
     res = dict(status='fail')
     res_code = 200
@@ -106,10 +107,10 @@ def import_students():
     # TODO: check type of file
     heading = [title.strip().lower() for title in csvreader.next()]
     required_headers = ('name of the student', 'category', 'student id',
-                        'date of birth', 'telephone number', 'preferred branch')
+                        'date of birth', 'telephone number', 'preferred branch', 'effective from')
     missing_headers = set(required_headers) - set(heading)
     if missing_headers:
-        res['message'] = 'Missing %s required column(s)' % ', '.join(missing_headers)
+        res['message'] = 'Missing "%s" required column(s)' % '", "'.join(missing_headers)
         return jsonify(res), 200
 
     getName = itemgetter(heading.index('name of the student'))

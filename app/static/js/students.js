@@ -80,10 +80,11 @@ var app = new Vue({
                 var url = '/api/admin/student/import'
                 var postData = new FormData()
                 postData.append('studentsListFile',this.importFile)
-                vm.$http.post(url, postData, this.getHeaders())
+                vm.$http.post(url, postData)
                 .then(response => {
                     console.log(response)
                     if(response.body.status=='success'){
+                        //for showing summary of import
                         response.body.updated.forEach((std, index)=>{
                             std.updated=true
                             vm.loadedStudents.push(std)
@@ -95,9 +96,11 @@ var app = new Vue({
                         vm.importSummary = response.body.added.length+' students Added, '+response.body.updated.length+' updated'
                         setTimeout(function(){
                             $('#importModal').modal('refresh')
+                            // refresh the modal to set it in center
                         }, 200)
                         if(response.body.added.length > 0 || response.body.updated.length > 0)
                             vm.loadStudents();
+                            // reload the student in actual list
                     }else{
                         vm.importSummary = response.body.message
                     }
@@ -184,6 +187,7 @@ var app = new Vue({
                         vm.students.push(updatedStudent)
                         vm.showToast('Student added successfuly', 'success')
                     }
+                    $('#studentModal').modal('hide')
                     //get the new data from response and add him to the students list
                 }, error => {
                     console.log(error)

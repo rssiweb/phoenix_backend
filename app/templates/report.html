@@ -15,11 +15,11 @@
         <tbody>
             <tr>
                 <td>Summary Report</td>
-                <td class="right aligned"><button class="ui mini primary button" @click="showSummaryModal">Export</button></td>
+                <td class="right aligned"><button class="ui mini primary button" @click="showSummaryModal" :class="{loading: loading, disabled: loading}">Export</button></td>
             </tr>
             <tr>
                 <td>Detail Report</td>
-                <td class="right aligned"><button class="ui mini primary button" @click="showDetailModal">Export</button></td>
+                <td class="right aligned"><button class="ui mini primary button" @click="showDetailModal" :class="{loading: loading, disabled: loading}">Export</button></td>
             </tr>
         </tbody>
     </table>

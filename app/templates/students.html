@@ -148,7 +148,7 @@
         </div>
     </div>
     <div class="actions">
-        <button class="ui positive button">{{buttonText}}</button>
+        <button class="ui positive button" :class="{disabled: loading, loading: loading}">{{buttonText}}</button>
         <!-- <button class="ui negative right floated button" v-on:click="deleteStudent(studentToUpdate)" v-if="isUpdate" v-bind:class="{disabled:loading}">Delete</button> -->
         <button class="ui neutral button" v-on:click.prevent="resetStudent" >Clear</button>
         <button class="ui negative button">Close</button>
