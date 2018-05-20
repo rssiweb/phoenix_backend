@@ -5,10 +5,10 @@ from datetime import datetime
 from app.utils import decorators
 from sqlalchemy import or_
 
-studentapi = Blueprint('studentapi', __name__, url_prefix='/api/student')
+api = Blueprint('student_api', __name__, url_prefix='/api/student')
 
 
-@studentapi.route('/<string:month>')
+@api.route('/<string:month>')
 @decorators.login_required
 def list_students_month(month):
     print month
@@ -24,7 +24,7 @@ def list_students_month(month):
     return jsonify(data), 200
 
 
-@studentapi.route('/all')
+@api.route('/all')
 @decorators.login_required
 def list_allstudents():
     students = [s.serialize() for s in Student.query.all()]
@@ -32,7 +32,7 @@ def list_allstudents():
     return jsonify(data), 200
 
 
-@studentapi.route('/')
+@api.route('/')
 @decorators.login_required
 def list_students():
     students = Student.query.filter(Student.isActive != False)

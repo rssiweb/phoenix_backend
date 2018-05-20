@@ -1,0 +1,91 @@
+{% extends 'lbase.html' %}
+
+{% block bodywh %}
+{% raw %}
+<div class="ui basic segment" >
+    <div v-if="!landed">
+        <div class="ui active inverted dimmer">
+            <div class="ui medium text loader">Loading...</div>
+        </div>
+    </div>
+    <div style="display: none;" id="afterLanding">
+        <div class="ui grid">
+            <div class="four wide column">
+                <div class="ui basic segment">
+                    <h3>Categories</h3>
+                    <button class="ui mini primary button" @click="showModal('catModal')" :class="{loading: categoryLoading, disabled: categoryLoading}">Create</button>
+                    <div class="ui bulleted list">
+                        <div class="ui item" v-for="cat in categories">
+                            <div class="content">
+                                <div class="header">{{cat.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="four wide column">
+                <div class="ui basic segment">
+                    <h3>Branches</h3>
+                    <button class="ui mini primary  button" @click="showModal('branchModal')" :class="{loading: branchLoading, disabled: branchLoading}">Create</button>
+                    <div class="ui bulleted list">
+                        <div class="item" v-for="branch in branches">
+                            <div class="content">
+                                <div class="header">
+                                    {{branch.name}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ui mini modal" id="catModal">
+    <div class="header">
+        Create New Category
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <input type="hidden" name="what" value="category"/>
+            <div class="field">
+                <label>Name of Category</label>
+                <input type="text" name="name"/>
+            </div>
+            <div class="ui error message"></div>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="ui positive button">Create</button>
+        <button class="ui negative button">Cancel</button>
+    </div>
+</div>
+
+<div class="ui mini modal" id="branchModal">
+    <div class="header">
+        Create New Branch
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <input type="hidden" name="what" value="branch"/>
+            <div class="field">
+                <label>Name of Branch</label>
+                <input type="text" name="name"/>
+            </div>
+            <div class="ui error message"></div>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="ui positive button">Create</button>
+        <button class="ui negative button">Cancel</button>
+    </div>
+</div>
+
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/admin_actions.js') }}"></script>
+{% endblock%}

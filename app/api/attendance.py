@@ -4,10 +4,10 @@ from app.models import Attendance, Faculty, Student
 from datetime import datetime
 from app.utils import decorators, parseDate
 
-attendanceapi = Blueprint('attendanceapi', __name__, url_prefix='/api/attendance')
+api = Blueprint('attendance_api', __name__, url_prefix='/api/attendance')
 
 
-@attendanceapi.route('/<string:date>', methods=['GET'])
+@api.route('/<string:date>', methods=['GET'])
 @decorators.login_required
 def get_attendance(date):
     date = datetime.strptime(date, '%d%m%Y').date()
@@ -81,7 +81,7 @@ def set_comment(attendance, comment):
                             )), 200
 
 
-@attendanceapi.route('/<int:studentid>/<string:what>', methods=['POST'])
+@api.route('/<int:studentid>/<string:what>', methods=['POST'])
 @decorators.login_required
 def set_attendance(studentid, what):
     res = dict(status='fail')

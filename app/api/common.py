@@ -4,10 +4,10 @@ from app.models import Faculty, Student, Branch, Category
 from app.utils import decorators, isValidPassword
 from app.utils import report
 
-commonapi = Blueprint('commonapi', __name__, url_prefix='/api')
+api = Blueprint('common_api', __name__, url_prefix='/api')
 
 
-@commonapi.route('/get_token', methods=['POST'])
+@api.route('/get_token', methods=['POST'])
 def get_token():
     # get the post data
     data = request.json or request.data or request.form
@@ -42,7 +42,7 @@ def get_token():
     return jsonify(res), 401
 
 
-@commonapi.route('/myprofile', methods=['GET'])
+@api.route('/myprofile', methods=['GET'])
 @decorators.login_required
 def get_profile():
     res = {}
@@ -50,7 +50,7 @@ def get_profile():
     return jsonify(res), 200
 
 
-@commonapi.route('/changepassword', methods=['POST'])
+@api.route('/changepassword', methods=['POST'])
 @decorators.login_required
 def reset_password():
     data = request.json or request.data or request.form
@@ -73,7 +73,7 @@ def reset_password():
     return jsonify(data), 200
 
 
-@commonapi.route('/branches', methods=['GET'])
+@api.route('/branches', methods=['GET'])
 @decorators.login_required
 def get_branches():
     data = dict(branches=[branch.serialize() for branch in Branch.query.all()],
@@ -81,7 +81,7 @@ def get_branches():
     return jsonify(data), 200
 
 
-@commonapi.route('/categories', methods=['GET'])
+@api.route('/categories', methods=['GET'])
 @decorators.login_required
 def get_categories():
     data = dict(categories=[cat.serialize() for cat in Category.query.all()],
@@ -89,7 +89,7 @@ def get_categories():
     return jsonify(data), 200
 
 
-@commonapi.route('/exportReport', methods=['POST'])
+@api.route('/exportReport', methods=['POST'])
 @decorators.login_required
 def export_report():
     data = request.json or request.data or request.form

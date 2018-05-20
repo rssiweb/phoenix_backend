@@ -6,9 +6,9 @@ from app.utils import decorators, parseDate, isValidPassword
 from app.utils import report
 from sqlalchemy import or_
 
-examapi = Blueprint('examapi', __name__, url_prefix='/api/exam')
+api = Blueprint('exama_pi', __name__, url_prefix='/api/exam')
 
 
-@examapi.route('/', methods=['GET'])
+@api.route('/', methods=['GET'])
 def donothing():
     return 'haha'
