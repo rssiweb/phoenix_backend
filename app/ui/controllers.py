@@ -35,7 +35,7 @@ def report():
 
 @ui.route('/exam')
 def exam():
-    return render_template('exam.html', page=6)
+    return render_template('exam_center.html', page=6)
 
 
 @ui.route('/adminactions')

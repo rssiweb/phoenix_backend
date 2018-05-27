@@ -302,9 +302,11 @@ class Test(Base):
     date = db.Column(db.Date(), nullable=False)
     max_marks = db.Column(db.Integer, nullable=False)
     cat_sub_id = db.Column(db.Integer, db.ForeignKey('association.id'))
+    evaluator_id = db.Column(db.Integer(), db.ForeignKey('faculty.id'))
 
     cat_sub_association = relationship("Association")
     exam = relationship("Exam", back_populates="tests")
+    evaluator = relationship("Faculty")
 
     __table_args__ = (db.UniqueConstraint('name', 'exam_id', name='testcode_in_exam_uc'),)
 
@@ -331,6 +333,7 @@ class Test(Base):
                     state=self.state,
                     subject=self.cat_sub_association.subject.id,
                     category=self.cat_sub_association.category.id,
+                    evaluator=self.evaluator_id,
                     )
 
 

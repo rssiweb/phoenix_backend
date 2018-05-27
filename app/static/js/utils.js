@@ -263,7 +263,7 @@ var utils = {
             }
 
             if(loadItems.faculties){
-                this.$http.get('/api/admin/faculties')
+                this.$http.get('/api/admin/faculty')
                 .then(response => {
                     console.log(response)
                     taskCount -= 1
@@ -366,6 +366,16 @@ var utils = {
             this.subjects.forEach((sub, index)=>{
                 if(sub.id === id){
                     name = sub.name
+                }
+            })
+            return name
+        },
+        getFacultyName: function(facid){
+            var name = ''
+            facid = parseInt(facid)
+            this.faculties.forEach((fac, index)=>{
+                if(fac.id === facid){
+                    name = fac.name
                 }
             })
             return name

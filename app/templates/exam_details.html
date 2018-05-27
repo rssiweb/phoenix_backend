@@ -27,6 +27,7 @@
                     <th>Max Marks</th>
                     <th>Category</th>
                     <th>Subject</th>
+                    <th>Evaluator</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,6 +37,7 @@
                     <td>{{test.max_marks}}</td>
                     <td>{{getCategoryName(test.category)}}</td>
                     <td>{{getSubjectName(test.subject)}}</td>
+                    <td>{{test.evaluator?getFacultyName(test.evaluator):'Admin'}}</td>
                 </tr>
             </tbody>
         </table>
@@ -59,8 +61,6 @@
                     <label>Max Marks</label>
                     <input type="number" name="maxMarks" placeholder="60"/>
                 </div>
-            </div>
-            <div class="fields">
                 <div class="required field">
                     <label>Test Date</label>
                     <div class="ui calendar">
@@ -70,6 +70,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="fields">
                 <div class="required field">
                     <label>Category</label>
                     <div class="ui selection dropdown">
@@ -83,13 +85,23 @@
                 </div>
                 <div class="required field">
                     <label>Subject</label>
-                    <!-- FIXME: the subjects are not changing after user changes the category -->
                     <div class="ui selection dropdown" id="sub-dropdown">
                         <input type="hidden" name="subject"/>
                         <i class="dropdown icon"></i>
                         <div class="default text">Select Subject</div>
                         <div class="menu">
                             <div class="item" :data-value="sub" v-for="sub in catSubjects">{{getSubjectName(sub)}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Evaluator</label>
+                    <div class="ui selection dropdown" id="sub-dropdown">
+                        <input type="hidden" name="evaluator"/>
+                        <i class="dropdown icon"></i>
+                        <div class="default text">Select Faculty</div>
+                        <div class="menu">
+                            <div class="item" :data-value="fac.id" v-for="fac in faculties">{{fac.name}}</div>
                         </div>
                     </div>
                 </div>

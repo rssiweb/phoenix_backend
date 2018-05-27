@@ -1,6 +1,6 @@
 from flask import request, Blueprint
 from app import db, jsonify
-from app.models import Test, Exam, Subject, Category, Association
+from app.models import Test, Exam, Subject, Category, Association, Faculty
 from app.utils import decorators
 from app.utils.constants import StatusErrors as error
 from datetime import datetime
@@ -38,8 +38,12 @@ def add():
     subject_id = data.get('subject')
     category_id = data.get('category')
     date = data.get('date')
+    evaluator_id = data.get('evaluator')
 
-    for key in ['subject', 'category', 'examId', 'maxMarks']:
+    keys = ['subject', 'category', 'examId', 'maxMarks']
+    if evaluator_id is not None:
+        keys.append('evaluator')
+    for key in keys:
         if not data.get(key).isdigit():
             res['statusText'] = error.INVALID_VALUE_TYPE.text
             res['statusData'] = error.INVALID_VALUE_TYPE.type(['number', key])
@@ -60,11 +64,20 @@ def add():
     category_id = int(category_id)
     exam_id = int(exam_id)
     max_marks = float(max_marks)
+    if evaluator_id is not None:
+        evaluator_id = int(evaluator_id)
 
     exam = Exam.query.get(exam_id)
     subject = Subject.query.get(subject_id)
     category = Category.query.get(category_id)
-    for obj, modalName in zip([exam, subject, category], ['Exam', 'Subject', 'Category']):
+    objs = [exam, subject, category]
+    names = ['Exam', 'Subject', 'Category']
+    evaluator = None
+    if evaluator_id is not None:
+        evaluator = Faculty.query.get(evaluator_id)
+        objs.append(evaluator)
+        names.append('Evaluator')
+    for obj, modalName in zip(objs, names):
         if not obj:
             res['statusText'] = error.CUSTOM_ERROR.text
             res['statusData'] = error.CUSTOM_ERROR.type('Cannot create Test for non-existing %s' % modalName)
@@ -82,6 +95,8 @@ def add():
         res['statusData'] = error.CUSTOM_ERROR.type(msg)
 
     test = Test(name=name, max_marks=max_marks, exam_id=exam_id, cat_sub_id=cat_sub_association.id, test_date=date)
+    if (evaluator is not None):
+        test.evaluator_id = evaluator.id
     db.session.add(test)
     db.session.commit()
     res['status'] = 'success'
@@ -124,8 +139,12 @@ def update(testid):
     subject_id = data.get('subject')
     category_id = data.get('category')
     date = data.get('date')
+    evaluator_id = data.get('evaluator')
 
-    for key in ['subject', 'category', 'examId', 'maxMarks']:
+    keys = ['subject', 'category', 'examId', 'maxMarks']
+    if evaluator_id is not None:
+        keys.append('evaluator')
+    for key in keys:
         if not data.get(key).isdigit():
             res['statusText'] = error.INVALID_VALUE_TYPE.text
             res['statusData'] = error.INVALID_VALUE_TYPE.type(['number', key])
@@ -145,10 +164,18 @@ def update(testid):
     subject_id = int(subject_id)
     category_id = int(category_id)
     max_marks = float(max_marks)
+    if evaluator_id is not None:
+        evaluator_id = int(evaluator_id)
 
     subject = Subject.query.get(subject_id)
     category = Category.query.get(category_id)
-    for obj, modalName in zip([subject, category], ['Subject', 'Category']):
+    objs, names = [subject, category], ['Subject', 'Category']
+    evaluator = None
+    if evaluator_id is not None:
+        evaluator = Faculty.query.get(evaluator_id)
+        objs.append(evaluator)
+        names.append('Evaluator')
+    for obj, modalName in zip(objs, names):
         if not obj:
             res['statusText'] = error.CUSTOM_ERROR.text
             res['statusData'] = error.CUSTOM_ERROR.type('Cannot create Test for non-existing %s' % modalName)
@@ -164,6 +191,8 @@ def update(testid):
     test.max_marks = max_marks
     test.cat_sub_id = cat_sub_association.id
     test.date = date
+    if evaluator is not None:
+        test.evaluator = evaluator
     db.session.add(test)
     db.session.commit()
     res['status'] = 'success'

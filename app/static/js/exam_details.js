@@ -6,6 +6,7 @@ var app = new Vue({
 
         examid: examid,
 
+        faculties: [],
         branches: [],
         categories: [],
         subjects: [],
@@ -80,7 +81,7 @@ var app = new Vue({
         },
     },
     created: function(){
-        this.load(['branches', 'categories', 'subjects'], this.afterInit)
+        this.load(['branches', 'categories', 'subjects', 'faculties'], this.afterInit)
     },
     updated: function(){
         // initializing dropdowns and calendar here because when user
