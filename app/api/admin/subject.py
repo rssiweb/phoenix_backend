@@ -1,10 +1,10 @@
 from flask import request, Blueprint
-from app import db, jsonify
-from app.models import Branch
+from app import jsonify, db
+from app.models import Subject
 from app.utils import decorators
 from app.utils.constants import StatusErrors as errs
 
-api = Blueprint('admin_branch_api', __name__, url_prefix='/api/admin/branch')
+api = Blueprint('admin_subject_api', __name__, url_prefix='/api/admin/subject')
 
 
 @api.route('/add', methods=['POST'])
@@ -15,45 +15,43 @@ def add():
     data = request.json or request.data or request.form
     res_code = 200
     res = dict(status='fail')
-    branch_name = data.get('name')
-    print branch_name
-    if not branch_name:
-        res['error'] = 'cannot create branch with Empty name'
+    name = data.get('name')
+    if not name:
+        res['error'] = 'cannot create Subject with empty name'
         return jsonify(res), res_code
-    branch = Branch.query.filter_by(name=branch_name).first()
-    print branch
-    if branch:
-        res['error'] = 'Branch with this name already present'
+    subject = Subject.query.filter_by(name=name).first()
+    if subject:
+        res['error'] = 'Subject with this name already present'
         return jsonify(res), res_code
-    branch = Branch(name=branch_name)
-    db.session.add(branch)
+    subject = Subject(name=name)
+    db.session.add(subject)
     db.session.commit()
     res['status'] = 'success'
-    res['branch'] = branch.serialize()
+    res['subject'] = subject.serialize()
     return jsonify(res), res_code
 
 
-@api.route('/update/<int:branchid>', methods=['POST'])
+@api.route('/update/<int:subjectid>', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
 @decorators.addLag
-def update(branchid):
+def update(subjectid):
     data = request.json or request.data or request.form
     res_code = 200
     res = dict(status='fail')
-    branch_name = data.get('name')
-    if not branch_name:
+    subject_name = data.get('name')
+    if not subject_name:
         res['statusText'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
         res['statusData'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.type(['name'])
         return jsonify(res), res_code
-    branch = Branch.query.filter_by(id=branchid).first()
-    if not branch:
+    subject = Subject.query.filter_by(id=subjectid).first()
+    if not subject:
         res['statusText'] = errs.CUSTOM_ERROR.text
-        res['statusData'] = errs.CUSTOM_ERROR.type('No such Branch')
+        res['statusData'] = errs.CUSTOM_ERROR.type('No such Subject')
         return jsonify(res), res_code
-    branch.name = branch_name
-    db.session.add(branch)
+    subject.name = subject_name
+    db.session.add(subject)
     db.session.commit()
     res['status'] = 'success'
-    res['branch'] = branch.serialize()
+    res['subject'] = subject.serialize()
     return jsonify(res), res_code

@@ -1,6 +1,6 @@
 import jwt
 from app import db, app, bcrypt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import UniqueConstraint
 
@@ -174,6 +174,8 @@ class Category(Base):
     __tablename__ = 'category'
     name = db.Column(db.String(100), nullable=False, unique=True)
 
+    subjects = relationship("Association", back_populates="category")
+
     def __init__(self, name):
         self.name = name
 
@@ -181,7 +183,11 @@ class Category(Base):
         return '%s(%r)' % (type(self), self.name)
 
     def serialize(self):
-        return dict(name=self.name, id=self.id)
+        subject_ids = [association.subject.id for association in self.subjects]
+        return dict(name=self.name,
+                    id=self.id,
+                    subjects=subject_ids,
+                    )
 
 
 class Branch(Base):
@@ -256,3 +262,103 @@ class Attendance(Base):
                     punchInBy=self.punch_in_by.serialize() if self.punch_in_by else {},
                     punchOut=self.punch_out,
                     punchOutBy=self.punch_out_by.serialize() if self.punch_out_by else {})
+
+
+class Exam(Base):
+    __tablename__ = 'exam'
+
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    start_date = db.Column(db.Date(), nullable=True)
+    end_date = db.Column(db.Date(), nullable=True)
+    state = db.Column(db.String(100), nullable=True)
+
+    tests = relationship("Test", back_populates="exam", cascade="all, delete, delete-orphan")
+
+    def __init__(self, name, start_date=None, end_date=None, state=None):
+        self.name = name
+        if start_date:
+            start_date = datetime.strptime(start_date, '%d/%m/%Y')
+        if end_date:
+            end_date = datetime.strptime(end_date, '%d/%m/%Y')
+        if state:
+            self.state = state
+
+    def serialize(self):
+        return dict(id=self.id,
+                    name=self.name,
+                    start_date=self.start_date,
+                    end_date=self.end_date,
+                    state=self.state,
+                    tests=[test.serialize() for test in self.tests]
+                    )
+
+
+class Test(Base):
+    __tablename__ = 'test'
+
+    name = db.Column(db.String(100), nullable=False)
+    exam_id = db.Column(db.Integer, db.ForeignKey('exam.id'))
+    state = db.Column(db.String(100), nullable=True)
+    date = db.Column(db.Date(), nullable=False)
+    max_marks = db.Column(db.Integer, nullable=False)
+    cat_sub_id = db.Column(db.Integer, db.ForeignKey('association.id'))
+
+    cat_sub_association = relationship("Association")
+    exam = relationship("Exam", back_populates="tests")
+
+    __table_args__ = (db.UniqueConstraint('name', 'exam_id', name='testcode_in_exam_uc'),)
+
+    def __init__(self, name, max_marks, exam_id, cat_sub_id, test_date, state=None):
+        self.name = name
+        self.exam_id = int(exam_id)
+        self.max_marks = float(max_marks)
+        cat_sub_association = Association.query.filter_by(id=int(cat_sub_id)).first()
+        if cat_sub_association:
+            self.cat_sub_association = cat_sub_association
+        if isinstance(test_date, str):
+            test_date = datetime.strptime(test_date, '%d/%m/%Y')
+        if isinstance(test_date, datetime) or isinstance(test_date, date):
+            self.date = test_date
+        if state:
+            self.state = state
+
+    def serialize(self):
+        return dict(id=self.id,
+                    name=self.name,
+                    max_marks=self.max_marks,
+                    exam_id=self.exam_id,
+                    date=self.date.strftime('%d/%m/%Y'),
+                    state=self.state,
+                    subject=self.cat_sub_association.subject.id,
+                    category=self.cat_sub_association.category.id,
+                    )
+
+
+class Subject(Base):
+    __tablename__ = 'subject'
+
+    name = db.Column(db.String(100), nullable=False, unique=True)
+
+    categories = relationship("Association", back_populates="subject")
+
+    def __init__(self, name):
+        if not name:
+            raise Exception('Subject Cannot have empty name')
+        self.name = name
+
+    def serialize(self):
+        return dict(id=self.id,
+                    name=self.name,
+                    )
+
+
+class Association(Base):
+    __tablename__ = 'association'
+
+    left_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    right_id = db.Column(db.Integer, db.ForeignKey('subject.id'))
+
+    category = relationship("Category")
+    subject = relationship("Subject")
+
+    __table_args__ = (db.UniqueConstraint('left_id', 'right_id', name='category_student_uc'),)

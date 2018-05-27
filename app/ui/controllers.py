@@ -41,3 +41,8 @@ def exam():
 @ui.route('/adminactions')
 def admin_actions():
     return render_template('admin_actions.html', page=7)
+
+
+@ui.route('/exams_details/<int:examid>')
+def admin_exam_Details(examid):
+    return render_template('exam_details.html', page=7, examid=examid)

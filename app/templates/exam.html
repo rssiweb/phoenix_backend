@@ -4,14 +4,31 @@
 {% raw %}
 
 <div class="ui basic segment" >
-  <div v-if="!landed">
-    <div class="ui active inverted dimmer">
-      <div class="ui medium text loader">loading page...</div>
+    <div v-if="!landed">
+        <div class="ui active inverted dimmer">
+            <div class="ui medium text loader">loading page...</div>
+        </div>
     </div>
-  </div>
-  <div style="display: none;" id="afterLanding">
-    <h1>{{heading}}</h1>
-  </div>
+    <div style="display: none;" id="afterLanding">
+        <h1>{{heading}}</h1>
+        <div class="ui form">
+            <div class="fields">
+                <div class="required field">
+                    <label>Category</label>
+                    <select name="category" class="ui dropdown">
+                        <option value="{{cat.id}}" v-for="cat in categories">{{cat.name}}</option>
+                    </select>
+                </div>
+                <div class="required field">
+                    <label>Subject</label>
+                    <select name="subject" class="ui dropdown">
+                        <option value="{{sub.id}}" v-for="sub in subjects">{{sub.name}}</option>
+                    </select>
+                </div>
+            </div>
+            <button class="ui mini primary button">Show Students</button>
+        </div>
+    </div>
 </div>
 
 {% endraw %}

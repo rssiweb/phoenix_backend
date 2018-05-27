@@ -13,7 +13,6 @@ api = Blueprint('admin_student_api', __name__, url_prefix='/api/admin/student')
 @api.route('/<string:action>', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
-@decorators.addLag
 def add_update_student(action):
     res = dict(status='fail')
     res_code = 200

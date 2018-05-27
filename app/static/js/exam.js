@@ -12,6 +12,7 @@ var app = new Vue({
         students: [],
         branches: [],
         categories: [],
+        subjects: [{id:1, name:'English'}, {id:2, name:'Hindi'}, {id:3, name:'Maths'}],
 
         error: '',
         message: '',
@@ -24,11 +25,12 @@ var app = new Vue({
         console.log('updated')
         var dom = $(this.$el)
         dom.find('#afterLanding').show()
+        dom.find('.ui.dropdown').dropdown()
         this.landed = true
     },
     methods: {
         after: function(){
-            this.heading = 'Under Construction'
+            this.heading = 'Exam Center'
         }
     }
 })
