@@ -153,9 +153,11 @@ var app = new Vue({
             formValues.category = test.category
             formValues.id = test.id
             formValues.maxMarks = test.max_marks
+            formValues.evaluator = test.evaluator
             formValues.date = moment(test.date,['DD/MM/YYYY']).format('MMM DD, YYYY')
             $('#testModal').find('.form').form('set values', formValues)
             $('#testModal .form #sub-dropdown').dropdown('set value',formValues.subject)
+            $('#testModal .form #fac-dropdown').dropdown('set value',formValues.evaluator)
             $('#testModal').find('.form').find("input[name='name']").attr('disabled', true)
             $('#testModal').modal('show')
         },
