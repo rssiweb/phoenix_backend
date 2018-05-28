@@ -27,6 +27,8 @@ def not_found(error):
 
 from app.api.common import api as commonapi
 from app.api.student import api as studentapi
+from app.api.category import api as categoryapi
+from app.api.branch import api as branchapi
 from app.api.attendance import api as attendanceapi
 from app.api.subject import api as subjectapi
 from app.api.exam import api as examapi
@@ -43,10 +45,10 @@ from app.api.admin.test import api as admin_testapi
 
 from app.ui.controllers import ui
 
-for api in [commonapi, studentapi, attendanceapi, examapi,
-            subjectapi, testapi, admin_attendanceapi, admin_branchapi,
+for api in [commonapi, studentapi, categoryapi, branchapi, attendanceapi,
+            examapi, subjectapi, testapi, admin_attendanceapi, admin_branchapi,
             admin_catapi, admin_facapi, admin_stdapi, admin_subapi,
             admin_examapi, admin_testapi, ui]:
     app.register_blueprint(api)
 
-db.create_all()
+# db.create_all()

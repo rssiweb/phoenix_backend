@@ -23,31 +23,18 @@ var app = new Vue({
         searchTxt: '',
     },
     created: function(){
-        this.loadFaculties()
+        this.loadv2([
+            {name:'Faculties',
+             url:'/api/admin/faculty/'+this.branchId+'/list',
+             variableName: 'faculties',
+             dataInReponse: 'faculties'},
+             ])
     },
     updated: function(){
         $(this.$el).find('table').tablesort()
         $(this.$el).find('.dropdown').dropdown()
     },
     methods: {
-        loadFaculties(){
-            var url = '/api/admin/faculty'
-            var vm = this
-            this.$http.get(url,this.getHeaders())
-            .then((response) => {
-                console.log(response)
-                if(response.body.status=='success'){
-                    vm.faculties = response.body.faculties
-                }else{
-                    vm.message = response.body.message
-                }
-                vm.loading = ''
-            }, (error) => {
-                console.log(error)
-                vm.loading = ''
-                vm.error = error.body.message || error.statusText
-            })
-        },
         showResetDialog(faculty) {
             this.facultyToReset = faculty
             $('#resetModal').modal('show')

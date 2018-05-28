@@ -2,6 +2,7 @@ from flask import request, Blueprint
 from app import jsonify, db
 from app.models import Exam
 from app.utils import decorators
+from app.utils.constants import StatusErrors as errors
 
 api = Blueprint('admin_exam_api', __name__, url_prefix='/api/admin/exam')
 
@@ -14,14 +15,19 @@ def add():
     res_code = 200
     res = dict(status='fail')
     name = data.get('name')
-    if not name:
-        res['error'] = 'cannot create Exam with empty name'
-        return jsonify(res), res_code
-    exam = Exam.query.filter_by(name=name).first()
+    branch_id = data.get('branch_id')
+    for key in ('name', 'branch_id'):
+        val = data.get(key)
+        if not val:
+            res['statusText'] = errors.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
+            res['statusData'] = errors.BLANK_VALUES_FOR_REQUIRED_FIELDS.type([key])
+            return jsonify(res), res_code
+    exam = Exam.query.filter_by(branch_id=branch_id, name=name).first()
     if exam:
-        res['error'] = 'Exam with this name already present'
+        res['statusText'] = errors.CUSTOM_ERROR.text
+        res['statusData'] = errors.CUSTOM_ERROR.type('Exam with name "%s" already exists' % exam.name)
         return jsonify(res), res_code
-    exam = Exam(name=name)
+    exam = Exam(name=name, branch_id=branch_id)
     db.session.add(exam)
     db.session.commit()
     res['status'] = 'success'

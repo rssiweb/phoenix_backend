@@ -73,22 +73,6 @@ def reset_password():
     return jsonify(data), 200
 
 
-@api.route('/branches', methods=['GET'])
-@decorators.login_required
-def get_branches():
-    data = dict(branches=[branch.serialize() for branch in Branch.query.all()],
-                status='success')
-    return jsonify(data), 200
-
-
-@api.route('/categories', methods=['GET'])
-@decorators.login_required
-def get_categories():
-    data = dict(categories=[cat.serialize() for cat in Category.query.all()],
-                status='success')
-    return jsonify(data), 200
-
-
 @api.route('/exportReport', methods=['POST'])
 @decorators.login_required
 def export_report():

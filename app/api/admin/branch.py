@@ -16,12 +16,10 @@ def add():
     res_code = 200
     res = dict(status='fail')
     branch_name = data.get('name')
-    print branch_name
     if not branch_name:
         res['error'] = 'cannot create branch with Empty name'
         return jsonify(res), res_code
     branch = Branch.query.filter_by(name=branch_name).first()
-    print branch
     if branch:
         res['error'] = 'Branch with this name already present'
         return jsonify(res), res_code

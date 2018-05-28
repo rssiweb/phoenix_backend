@@ -38,8 +38,9 @@ class Faculty(User):
     admin = db.Column(db.Boolean(), default=False)
     gender = db.Column(db.Enum('male', 'female', 'others', name='gender'),
                        nullable=True)
+    branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)
 
-    def __init__(self, facultyId, name, email, password, gender):
+    def __init__(self, facultyId, name, email, password, gender, branch_id):
         super(Faculty, self).__init__(name)
         self.facultyId = facultyId
         self.email = email
@@ -49,6 +50,12 @@ class Faculty(User):
             self.gender = gender
         else:
             raise ValueError('Invalid gender value "%s"' % gender)
+
+        branch_id = int(branch_id)
+        branch = Branch.query.get(branch_id)
+        if not branch:
+            raise ValueError('No Branch with id "%s" found' % branch_id)
+        self.branch_id = branch.id
 
     def set_password(self, newPassword):
         self.password = bcrypt.generate_password_hash(
@@ -173,11 +180,19 @@ class Category(Base):
 
     __tablename__ = 'category'
     name = db.Column(db.String(100), nullable=False, unique=True)
+    branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)
 
     subjects = relationship("Association", back_populates="category")
 
-    def __init__(self, name):
+    def __init__(self, name, branch_id):
+        if not name:
+            raise ValueError('Blank Category name')
         self.name = name
+        branch_id = int(branch_id)
+        branch = Branch.query.get(branch_id)
+        if not branch:
+            raise ValueError('No Branch with id "%s" found' % branch_id)
+        self.branch_id = branch.id
 
     def __repr__(self):
         return '%s(%r)' % (type(self), self.name)
@@ -187,7 +202,7 @@ class Category(Base):
         return dict(name=self.name,
                     id=self.id,
                     subjects=subject_ids,
-                    )
+                    branch_id=self.branch_id)
 
 
 class Branch(Base):
@@ -271,10 +286,11 @@ class Exam(Base):
     start_date = db.Column(db.Date(), nullable=True)
     end_date = db.Column(db.Date(), nullable=True)
     state = db.Column(db.String(100), nullable=True)
+    branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)
 
     tests = relationship("Test", back_populates="exam", cascade="all, delete, delete-orphan")
 
-    def __init__(self, name, start_date=None, end_date=None, state=None):
+    def __init__(self, name, branch_id, start_date=None, end_date=None, state=None):
         self.name = name
         if start_date:
             start_date = datetime.strptime(start_date, '%d/%m/%Y')
@@ -282,6 +298,12 @@ class Exam(Base):
             end_date = datetime.strptime(end_date, '%d/%m/%Y')
         if state:
             self.state = state
+
+        branch_id = int(branch_id)
+        branch = Branch.query.get(branch_id)
+        if not branch:
+            raise ValueError('No Branch with id "%s" found' % branch_id)
+        self.branch_id = branch.id
 
     def serialize(self):
         return dict(id=self.id,
@@ -341,18 +363,25 @@ class Subject(Base):
     __tablename__ = 'subject'
 
     name = db.Column(db.String(100), nullable=False, unique=True)
+    branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)
 
     categories = relationship("Association", back_populates="subject")
 
-    def __init__(self, name):
+    def __init__(self, name, branch_id):
         if not name:
             raise Exception('Subject Cannot have empty name')
         self.name = name
 
+        branch_id = int(branch_id)
+        branch = Branch.query.get(branch_id)
+        if not branch:
+            raise ValueError('No Branch with id "%s" found' % branch_id)
+        self.branch_id = branch.id
+
     def serialize(self):
         return dict(id=self.id,
                     name=self.name,
-                    )
+                    branch_id=self.branch_id)
 
 
 class Association(Base):
@@ -365,3 +394,65 @@ class Association(Base):
     subject = relationship("Subject")
 
     __table_args__ = (db.UniqueConstraint('left_id', 'right_id', name='category_student_uc'),)
+
+
+class Grade(Base):
+
+    lower = db.Column(db.Integer, nullable=False)
+    upper = db.Column(db.Integer, nullable=False)
+    grade = db.Column(db.String(5), nullable=False)
+    comment = db.Column(db.String(50), nullable=True)
+
+    branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=False)
+
+    __table_args__ = (db.UniqueConstraint('lower', 'upper', name='lower_upper_uc'),
+                      db.UniqueConstraint('branch_id', 'grade', name='branch_grade_uc'))
+
+    def __init__(self, lower, upper, grade, branch_id, comment=None):
+        if lower is not None:
+            self.lower = int(lower)
+        if upper is not None:
+            self.upper = int(upper)
+        if grade and isinstance(grade, str):
+            self.grade = grade
+        if comment and isinstance(comment, str):
+            self.comment = comment
+
+        branch_id = int(branch_id)
+        branch = Branch.query.get(branch_id)
+        if not branch:
+            raise ValueError('No Branch with id "%s" found' % branch_id)
+        self.branch_id = branch.id
+
+    def serialize(self):
+        return dict(id=self.id,
+                    lower=self.lower,
+                    upper=self.upper,
+                    grade=self.grade,
+                    branch_id=self.branch_id,
+                    comment=self.comment
+                    )
+
+
+class Marks(Base):
+
+    marks = db.Column(db.Integer, nullable=False)
+    comments = db.Column(db.String(50), nullable=True)
+
+    test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+
+    __table_args__ = (db.UniqueConstraint('test_id', 'student_id', name='student_test_uc'),)
+
+    def __init__(self, test_id, student_id, marks, comments=None):
+        self.test_id = int(test_id)
+        self.student_id = int(student_id)
+        self.marks = float(marks)
+        self.comments = comments
+
+    def serialize(self):
+        return dict(id=self.id,
+                    test_id=self.test_id,
+                    student_id=self.student_id,
+                    marks=self.marks,
+                    comments=self.comments)

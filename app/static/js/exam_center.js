@@ -10,6 +10,7 @@ var app = new Vue({
         categories: [],
         exams: [],
         subjects: [],
+        marks: [],
 
         tests: [],
 
@@ -20,7 +21,24 @@ var app = new Vue({
         loading: 'Loading ...',
     },
     created: function(){
-        this.load(['students', 'branches', 'categories', 'exams', 'subjects'], this.after)
+        this.loadv2([
+            {name:'Students',
+             url:'/api/student/1/list',
+             variableName: 'students',
+             dataInReponse: 'students'},
+            {name:'Categories',
+             url:'/api/category/1/list',
+             variableName: 'categories',
+             dataInReponse: 'categories'},
+            {name:'Exams',
+             url:'/api/exam/1/list',
+             variableName: 'exams',
+             dataInReponse: 'exams'},
+            {name:'Subjects',
+             url:'/api/subject/1/list',
+             variableName: 'subjects',
+             dataInReponse: 'subjects'}
+             ], this.after)
     },
     updated: function(){
         console.log('updated')

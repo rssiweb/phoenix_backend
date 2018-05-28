@@ -10,21 +10,24 @@ api = Blueprint('admin_category_api', __name__, url_prefix='/api/admin/category'
 @api.route('/add', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
-@decorators.addLag
 def add():
     data = request.json or request.data or request.form
     res_code = 200
     res = dict(status='fail')
     catName = data.get('name')
     subjects = data.get('subjects')
-    if not catName:
-        res['error'] = 'Empty Category name'
-        return jsonify(res), res_code
+    branch_id = data.get('branch_id')
+    for key in ('name', 'branch_id'):
+        val = data.get(key)
+        if not val:
+            res['statusText'] = errors.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
+            res['statusData'] = errors.BLANK_VALUES_FOR_REQUIRED_FIELDS.type([key])
+            return jsonify(res), res_code
     cat = Category.query.filter_by(name=catName).first()
     if cat:
         res['error'] = 'Category with this name already present'
         return jsonify(res), res_code
-    cat = Category(name=catName)
+    cat = Category(name=catName, branch_id=branch_id)
     for subid in subjects:
         a = Association()
         sub = Subject.query.filter_by(id=int(subid)).first()
@@ -42,7 +45,6 @@ def add():
 @api.route('/update/<int:catid>', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
-@decorators.addLag
 def update(catid):
     # cannot update subjects because user might remove the subject from category,
     # in such cases an existing test for that cat-sub would become invalid

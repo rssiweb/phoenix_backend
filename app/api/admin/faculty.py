@@ -6,11 +6,20 @@ from app.utils import decorators, validEmail, isValidPassword
 api = Blueprint('admin_faculty_api', __name__, url_prefix='/api/admin/faculty')
 
 
-@api.route('/')
+@api.route('/list')
 @decorators.login_required
 @decorators.only_admins
-def list_faculties():
+def list():
     faculties = [f.serialize() for f in Faculty.query.all()]
+    data = dict(status='success', faculties=faculties)
+    return jsonify(data), 200
+
+
+@api.route('/<int:branchid>/list')
+@decorators.login_required
+@decorators.only_admins
+def list_by_branch(branchid):
+    faculties = [f.serialize() for f in Faculty.query.filter_by(branch_id=branchid)]
     data = dict(status='success', faculties=faculties)
     return jsonify(data), 200
 
@@ -63,11 +72,11 @@ def update_faculty():
 @api.route('/add', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
-def add_faculty():
+def add():
     res = dict(status='fail')
     res_code = 200
 
-    required_fields = ('facultyId', 'email', 'password', 'name', 'gender')
+    required_fields = ('facultyId', 'email', 'password', 'name', 'gender', 'branch_id')
 
     data = request.json or request.data or request.form
     if not data:
@@ -86,6 +95,7 @@ def add_faculty():
     password = data.get('password')
     gender = data.get('gender')
     facultyId = data.get('facultyId')
+    branchId = data.get('branch_id')
     blank_values = [key for key in required_fields
                     if not data.get(key, '').strip()]
     if blank_values:
@@ -104,7 +114,8 @@ def add_faculty():
                 name=name,
                 email=email,
                 password=password,
-                gender=gender)
+                gender=gender,
+                branch_id=branchId)
             # insert the user
             db.session.add(faculty)
             db.session.commit()

@@ -3,68 +3,40 @@
 {% block bodywh %}
 {% raw %}
 <div class="ui basic segment" >
+    <div class="ui container" v-if="error">
+        <div class="ui negative message">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ error }}
+            </div>
+        </div>
+    </div>
+
+    <div class="ui container" v-if="message">
+        <div class="ui info message">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ message }}
+            </div>
+        </div>
+    </div>
     <div v-if="!landed">
         <div class="ui active inverted dimmer">
-            <div class="ui medium text loader">Loading...</div>
+            <div class="ui medium text loader">{{loading}}</div>
         </div>
     </div>
     <div style="display: none;" id="afterLanding">
+        <div v-show="error" class="ui error message">{{error}}</div>
         <div class="ui grid">
-            <div class="four wide column">
-                <div class="ui basic segment">
-                    <h3>Categories</h3>
-                    <button class="ui mini primary button" @click="showCreateCategory" :class="{loading: categoryLoading, disabled: categoryLoading}">Create</button>
-                    <div class="ui middle aligned selection very relaxed list">
-                        <div class="item" v-for="cat in categories" @click="showUpdateCategory(cat)">
-                            <div class="content">
-                                <div class="header">{{cat.name}}</div>
-                                <div class="description">
-                                    {{getSubjectNames(cat.subjects)}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="four wide column">
                 <div class="ui basic segment">
                     <h3>Branches</h3>
                     <button class="ui mini primary  button" @click="showCreateBranch" :class="{loading: branchLoading, disabled: branchLoading}">Create</button>
                     <div class="ui middle aligned selection relaxed list">
-                        <div class="item" v-for="branch in branches" @click="showUpdateBranch(branch)">
+                        <a class="item" v-for="branch in branches" :href="'/branch_details/'+branch.id">
                             <div class="content">
                                 <div class="header">
                                     {{branch.name}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="four wide column">
-                <div class="ui basic segment">
-                    <h3>Subjects</h3>
-                    <button class="ui mini primary  button" @click="showCreateSubject" :class="{loading: subjectLoading, disabled: subjectLoading}">Create</button>
-                    <div class="ui middle aligned selection relaxed list">
-                        <div class="item" v-for="sub in subjects" @click="showUpdateSubject(sub)">
-                            <div class="content">
-                                <div class="header">
-                                    {{sub.name}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="four wide column">
-                <div class="ui basic segment">
-                    <h3>Examinations</h3>
-                    <button class="ui mini primary  button" @click="showCreateExam" :class="{loading: examLoading, disabled: examLoading}">Create</button>
-                    <div class="ui middle aligned selection relaxed list">
-                        <a class="item" :href="'/exams_details/'+exam.id" v-for="exam in exams">
-                            <div class="content">
-                                <div class="header">
-                                    {{exam.name}}
                                 </div>
                             </div>
                         </a>
@@ -75,35 +47,6 @@
     </div>
 </div>
 
-<div class="ui mini modal" id="catModal">
-    <div class="header">
-        {{updateAction? "Update": "Create New"}} Category
-    </div>
-    <div class="content">
-        <div class="ui form">
-            <input type="hidden" name="what" value="category"/>
-            <input type="hidden" name="id" value=""/>
-            <div class="required field">
-                <label>Name of Category</label>
-                <input type="text" name="name" placeholder="Category Name" />
-            </div>
-            <div class="grouped fields">
-                <label>Select Subjects</label>
-                <div class="field" v-for="sub in subjects">
-                    <div class="ui checkbox">
-                        <input name="subjects[]" type="checkbox" tabindex="0" class="hidden" :value="sub.id">
-                        <label>{{sub.name}}</label>
-                    </div>
-                </div>
-            </div>
-            <div class="ui error message"></div>
-        </div>
-    </div>
-    <div class="actions">
-        <button class="ui positive button">{{updateAction? "Update": "Create"}}</button>
-        <button class="ui negative button">Cancel</button>
-    </div>
-</div>
 
 <div class="ui mini modal" id="branchModal">
     <div class="header">
@@ -116,48 +59,6 @@
             <div class="required field">
                 <label>Name of Branch</label>
                 <input type="text" name="name" placeholder="Branch Name"/>
-            </div>
-            <div class="ui error message"></div>
-        </div>
-    </div>
-    <div class="actions">
-        <button class="ui positive button">{{updateAction? "Update": "Create"}}</button>
-        <button class="ui negative button">Cancel</button>
-    </div>
-</div>
-
-<div class="ui mini modal" id="subjectModal">
-    <div class="header">
-        {{updateAction? "Update": "Create New"}} Subject
-    </div>
-    <div class="content">
-        <div class="ui form">
-            <input type="hidden" name="what" value="subject" />
-            <input type="hidden" name="id"/>
-            <div class="required field">
-                <label>Name of Subject</label>
-                <input type="text" name="name" placeholder="Subject Name"/>
-            </div>
-            <div class="ui error message"></div>
-        </div>
-    </div>
-    <div class="actions">
-        <button class="ui positive button">{{updateAction? "Update": "Create"}}</button>
-        <button class="ui negative button">Cancel</button>
-    </div>
-</div>
-
-<div class="ui mini modal" id="examModal">
-    <div class="header">
-        {{updateAction? "Update": "Create New"}} Exam
-    </div>
-    <div class="content">
-        <div class="ui form">
-            <input type="hidden" name="what" value="exam"/>
-            <input type="hidden" name="id"/>
-            <div class="required field">
-                <label>Name of Exam</label>
-                <input type="text" name="name" placeholder="Mid-Term Exam 2018" />
             </div>
             <div class="ui error message"></div>
         </div>

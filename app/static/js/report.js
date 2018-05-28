@@ -54,7 +54,20 @@ var app = new Vue({
     },
     created(){
         console.log('created')
-        this.load(['branches', 'categories'],this.loadStudents)
+        this.loadv2([
+            {name:'Categories',
+             url:'/api/category/1/list',
+             variableName: 'categories',
+             dataInReponse: 'categories'},
+            {name:'Branches',
+             url:'/api/branch/list',
+             variableName: 'branches',
+             dataInReponse: 'branches'},
+            {name:'Students',
+             url: '/api/student/' + this.month.replace(/ /g,'') + '/all',
+             variableName: 'students',
+             dataInReponse: 'students'},
+             ])
     },
     updated(){
         console.log('updated')
@@ -72,27 +85,15 @@ var app = new Vue({
     watch: {
         month(){
             console.log('fetch students', this.month)
-            this.loadStudents()
+            this.loadv2([
+                {name:'Students',
+                 url: '/api/student/' + this.month.replace(/ /g,'') + '/all',
+                 variableName: 'students',
+                 dataInReponse: 'students'},
+                ])
         }
     },
     methods: {
-        loadStudents(){
-            var vm = this
-            this.$http.get('/api/student/'+this.month.replace(/ /g,''))
-            .then(response => {
-                console.log(response)
-                if (response.body.status=='Success'){
-                    vm.students = response.body.students
-                }
-                else{
-                    vm.showToast('Error loading students! Reload page', 'error')
-                }
-            }
-            , error => {
-                console.log(error)
-                vm.showToast('Error loading students! Reload page', 'error')
-            })
-        },
         toggleStudentSelection(student){
             var index = this.selectedStudents.indexOf(student)
             if(index ==-1){

@@ -6,10 +6,10 @@ from app.utils import decorators
 api = Blueprint('test_api', __name__, url_prefix='/api/test')
 
 
-@api.route('/list', methods=['GET'])
+@api.route('/<int:examid>/list', methods=['GET'])
 @decorators.login_required
-def list():
-    tests = [t.serialize() for t in Test.query.all()]
+def get_by_exam(examid):
+    tests = [t.serialize() for t in Test.query.filter_by(exam_id=examid)]
     data = dict(status='success', tests=tests)
     return jsonify(data), 200
 

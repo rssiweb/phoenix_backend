@@ -43,6 +43,11 @@ def admin_actions():
     return render_template('admin_actions.html', page=7)
 
 
-@ui.route('/exams_details/<int:examid>')
-def admin_exam_Details(examid):
-    return render_template('exam_details.html', page=7, examid=examid)
+@ui.route('/branch_details/<int:branchid>')
+def admin_branch_details(branchid):
+    return render_template('branch_details.html', page=7, branchid=branchid)
+
+
+@ui.route('/exams_details/<int:branchid>/<int:examid>')
+def admin_exam_details(branchid, examid):
+    return render_template('exam_details.html', page=7, examid=examid, branchid=branchid)

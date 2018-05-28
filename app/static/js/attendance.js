@@ -23,9 +23,23 @@ var app = new Vue({
     created: function(){
         console.log('starting')
         var vm = this
-        this.load(['students', 'branches', 'categories'], function(){
-            vm.getAttendance()
-        })
+        this.loadv2([
+            {name:'Students',
+             url:'/api/student/1/list',
+             variableName: 'students',
+             dataInReponse: 'students'},
+            {name:'Categories',
+             url:'/api/category/1/list',
+             variableName: 'categories',
+             dataInReponse: 'categories'},
+            {name:'Branches',
+             url:'/api/branch/list',
+             variableName: 'branches',
+             dataInReponse: 'branches'}
+             ],
+            function(){
+                vm.getAttendance()
+            })
     },
     updated: function(){
         $(this.$el).find('table').tablesort();
@@ -38,29 +52,6 @@ var app = new Vue({
         });
     },
     methods: {
-        loadStudents: function(){
-            this.loading = 'Loading students...'
-            this.$http.get('/api/student',this.getHeaders())
-            .then(data => {
-                console.log(data)
-                this.students = data.body.students
-                if(this.students.length == 0){
-                    if(data.body.message)
-                        this.message = data.body.message
-                    else
-                        this.message = 'No students'
-                } else {
-                    this.message = ''
-                }
-                console.log(this.message)
-                this.loading = ''
-                this.getAttendance()
-            }, error => {
-                this.error = error.body.message
-                console.log(error)
-                this.loading = ''
-            });
-        },
         getAttendance: function(){
             this.loading = 'Loading attendance...'
             var vm = this

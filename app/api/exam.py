@@ -23,3 +23,12 @@ def get_exam(examid):
     else:
         data = dict(status='fail', message='No such Exam found')
     return jsonify(data), 200
+
+
+@api.route('/<int:branchid>/list', methods=['GET'])
+@decorators.login_required
+def get_all_by_branch(branchid):
+    exams = Exam.query.filter_by(branch_id=branchid).all()
+    exams = [e.serialize() for e in exams]
+    data = dict(status='success', exams=exams)
+    return jsonify(data), 200

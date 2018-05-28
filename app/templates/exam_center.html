@@ -4,9 +4,26 @@
 {% raw %}
 
 <div class="ui basic segment" >
+    <div class="ui container" v-if="error">
+        <div class="ui negative message">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ error }}
+            </div>
+        </div>
+    </div>
+
+    <div class="ui container" v-if="message">
+        <div class="ui info message">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ message }}
+            </div>
+        </div>
+    </div>
     <div v-if="!landed">
         <div class="ui active inverted dimmer">
-            <div class="ui medium text loader">loading page...</div>
+            <div class="ui medium text loader">{{loading}}</div>
         </div>
     </div>
     <div style="display: none;" id="afterLanding">
@@ -38,19 +55,33 @@
             </div>
         </div>
         <div class="ui basic segment">
-            <table class="ui table" v-if="filteredStudents.length">
+            <table class="ui compact table" v-if="filteredStudents.length">
                 <thead>
                     <tr>
+                        <th>Student ID</th>
                         <th>Name</th>
-                        <th>Category</th>
-                        <th>Age</th>
+                        <th>Mark</th>
+                        <th>Percentage & Grade</th>
+                        <th>Comments</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="std in filteredStudents">
+                        <td>{{std.student_id}}</td>
                         <td>{{std.name}}</td>
-                        <td>{{std.category}}</td>
-                        <td>{{std.dob}}</td>
+                        <td>
+                            <div class="ui input">
+                                <input type="number" name="marks" value="60" step="0.5" placeholder="Marks Scored">
+                            </div>
+                        </td>
+                        <td>
+                            {{60}}% B
+                        </td>
+                        <td>
+                            <div class="ui input">
+                                <input type="text" name="comment" value="" placeholder="Comment">
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>

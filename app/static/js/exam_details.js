@@ -4,7 +4,8 @@ var app = new Vue({
     data: {
         landed: false,
 
-        examid: examid,
+        examId: examid,
+        branchId: branchid,
 
         faculties: [],
         branches: [],
@@ -81,7 +82,29 @@ var app = new Vue({
         },
     },
     created: function(){
-        this.load(['branches', 'categories', 'subjects', 'faculties'], this.afterInit)
+        this.loadv2([
+            {name:'Categories',
+             url:'/api/category/'+this.branchId+'/list',
+             variableName: 'categories',
+             dataInReponse: 'categories'},
+            {name:'Exams',
+             url:'/api/exam/'+this.branchId+'/list',
+             variableName: 'exams',
+             dataInReponse: 'exams'},
+            {name:'Subjects',
+             url:'/api/subject/'+this.branchId+'/list',
+             variableName: 'subjects',
+             dataInReponse: 'subjects'},
+             {name:'Faculties',
+             url:'/api/admin/faculty/' + this.branchId + '/list',
+             variableName: 'faculties',
+             dataInReponse: 'faculties'},
+             {name:'Exam',
+             url:'/api/exam/' + this.examId,
+             variableName: 'exam',
+             dataInReponse: 'exam'}
+             ], this.afterInit)
+        // this.load(['branches', 'categories', 'subjects', 'faculties'], this.afterInit)
     },
     updated: function(){
         // initializing dropdowns and calendar here because when user
@@ -95,7 +118,9 @@ var app = new Vue({
     },
     methods: {
         afterInit: function(){
-            this.loadExam(examid)
+            this.tests = this.exam.tests
+            this.exam.tests = undefined
+            this.showUi()
         },
         showUi: function(){
             var dom = $(this.$el)
@@ -113,28 +138,6 @@ var app = new Vue({
                     test=t
             })
             return test
-        },
-        loadExam: function(id){
-            var vm = this
-            this.$http.get('/api/exam/'+id).
-            then(response => {
-                console.log(response)
-                if(response.body.status==='success'){
-                    vm.exam = response.body.exam
-                    vm.tests = response.body.exam.tests
-                    vm.exam.tests = undefined
-                }else{
-                    var msg = response.body.message || 'Cannot load exam!'
-                    vm.showToast(msg,'warn','info')
-                }
-                vm.showUi()
-            },
-            error => {
-                console.log(error)
-                var msg = response.statusText
-                vm.showToast(msg,'warn','info')
-                vm.showUi()
-            })
         },
         showCreateTest: function(){
             this.updateAction = false

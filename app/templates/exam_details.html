@@ -5,14 +5,14 @@
 <div class="ui basic segment" >
     <div v-if="!landed">
         <div class="ui active inverted dimmer">
-            <div class="ui medium text loader">Loading...</div>
+            <div class="ui medium text loader">{{loading}}</div>
         </div>
     </div>
     <div style="display: none;" id="afterLanding">
         <div class="ui header">
 
             <h2>
-                <a href="/adminactions"><i class="angle left icon"></i></a> 
+                <a :href="'/branch_details/'+branchid"><i class="angle left icon"></i></a> 
                 {{exam.name}}
                 <button class="ui right floated red mini button" @click="showDeleteExam">Delete Exam</button>
             </h2>
@@ -133,6 +133,7 @@
 {% block script %}
 <script type="text/javascript">
     var examid = {{examid}}
+    var branchid = {{branchid}}
 </script>
 <link href="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.css" rel="stylesheet" type="text/css" />
 <script src="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.js"></script>

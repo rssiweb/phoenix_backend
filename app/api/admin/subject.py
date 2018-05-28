@@ -16,14 +16,18 @@ def add():
     res_code = 200
     res = dict(status='fail')
     name = data.get('name')
-    if not name:
-        res['error'] = 'cannot create Subject with empty name'
-        return jsonify(res), res_code
+    branch_id = data.get('branch_id')
+    for key in ('name', 'branch_id'):
+        val = data.get(key)
+        if not val:
+            res['statusText'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
+            res['statusData'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.type([key])
+            return jsonify(res), res_code
     subject = Subject.query.filter_by(name=name).first()
     if subject:
         res['error'] = 'Subject with this name already present'
         return jsonify(res), res_code
-    subject = Subject(name=name)
+    subject = Subject(name=name, branch_id=branch_id)
     db.session.add(subject)
     db.session.commit()
     res['status'] = 'success'

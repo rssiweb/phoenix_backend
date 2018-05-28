@@ -49,8 +49,20 @@ var app = new Vue({
     },
     created: function(){
         console.log('created')
-        this.load(['allStudents', 'branches', 'categories'])
-
+        this.loadv2([
+            {name:'Students',
+             url:'/api/student/list',
+             variableName: 'students',
+             dataInReponse: 'students'},
+            {name:'Categories',
+             url:'/api/category/1/list',
+             variableName: 'categories',
+             dataInReponse: 'categories'},
+            {name:'Branches',
+             url:'/api/branch/list',
+             variableName: 'branches',
+             dataInReponse: 'branches'}
+             ])
     },
     updated: function(){
         console.log('updated')
