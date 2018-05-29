@@ -140,18 +140,19 @@ var app = new Vue({
 
             this.landed = true
         },
-        createCategory: function(catData){
+        createCategory: function(category){
             var vm = this
             this.categoryLoading = true
             var subjects = []
-            if (catData.subjects){
-                catData.subjects.filter((sub)=>{
+            if (category.subjects.length > 0){
+                subjects = category.subjects.filter((sub)=>{
                     return sub && sub !== ""
                 })
             }
-            var name = catData.name
-            var postData = {name:name, subjects:subjects, branch_id:this.branchId}
+            var name = category.name
+            var postData = {name:name, subjects: subjects, branch_id:this.branchId}
             var url = '/api/admin/category/add'
+            vm.showToast('Adding '+category.name, 'info', 'hourglass-o', true)
             this.$http.post(url, postData).
             then(response => {
                 if(response.body.status === 'success'){
@@ -177,6 +178,7 @@ var app = new Vue({
             var postData = {name:category.name, id:category.id}
             var url = '/api/admin/category/update/' + category.id
 
+            vm.showToast('Updating '+category.name, 'info', 'hourglass-o', true)
             this.$http.post(url, postData).
             then(response => {
                 if(response.body.status === 'success'){    
@@ -207,52 +209,23 @@ var app = new Vue({
                 vm.showToast(msg, 'warn', 'close')
             })
         },
-        createBranch: function(branch){
-            var vm = this
-            this.branchLoading = true
-            var postData = {name:branch.name, branch_id:this.branchId}
-            this.$http.post('/api/admin/branch/add', postData).
-            then(response => {
-                console.log(response)
-                if(response.body.status === 'success'){
-                    vm.showToast('Branch added', 'success', 'check')
-                    vm.branches.push(response.body.branch)
-                }else{
-                    var message = response.body.error || response.body.message 
-                    vm.showToast(message, 'warn', 'close')
-                }
-                vm.branchLoading = false
-            },
-            error => {
-                console.log(error)
-                vm.branchLoading = false
-                var msg = error.statusText || 'Something bad happened! Try again'
-                vm.showToast(msg, 'warn', 'close')
-            })
-        },
         updateBranch(branch){
-            console.log(branch)
             branch.id = parseInt(branch.id)
             var vm = this
             this.branchLoading = true
             var postData = {name:branch.name}
+            vm.showToast('Updating '+branch.name, 'info', 'hourglass-o', true)
             this.$http.post('/api/admin/branch/update/'+branch.id, postData).
             then(response => {
                 console.log(response)
                 if(response.body.status === 'success'){
                     var updatedBranch = response.body.branch
-                    var index = -1
-                    vm.branches.forEach((branch, i) => {
-                        if(branch.id === updatedBranch.id){
-                            index = i
-                        }
-                    })
-                    if(index != -1){
-                        vm.$set(vm.branches, index, updatedBranch)
+                    if(branch.id === updatedBranch.id){
+                        vm.branch = updatedBranch
                     }
                     vm.showToast('Successfully updated '+updatedBranch.name, 'success', 'check')
                 }else{
-                    var message = response.body.error || response.body.message 
+                    var message = response.body.error || response.body.message
                     vm.showToast(message, 'warn', 'close')
                 }
                 vm.branchLoading = false
@@ -268,6 +241,7 @@ var app = new Vue({
             var vm = this
             vm.subjectLoading = true
             var postData = {name:subject.name, branch_id:this.branchId}
+            vm.showToast('Adding '+subject.name, 'info', 'hourglass-o', true)
             this.$http.post('/api/admin/subject/add', postData)
             .then(response => {
                 if(response.body.status === 'success'){
@@ -291,6 +265,7 @@ var app = new Vue({
             var vm = this
             vm.subjectLoading = true
             var postData = {name:subject.name}
+            vm.showToast('Updating '+subject.name, 'info', 'hourglass-o', true)
             this.$http.post('/api/admin/subject/update/'+subject.id, postData)
             .then(response => {
                 if(response.body.status === 'success'){
@@ -321,6 +296,7 @@ var app = new Vue({
             var vm = this
             vm.examLoading = true
             var postData = {name:exam.name, branch_id:this.branchId}
+            vm.showToast('Adding '+exam.name, 'info', 'hourglass-o', true)
             this.$http.post('/api/admin/exam/add', postData)
             .then(response => {
                 console.log(response)
@@ -363,17 +339,10 @@ var app = new Vue({
                 vm.showToast('Click on invalid category', 'warn', 'info')
             }
         },
-        showCreateBranch: function(){
-            this.updateAction = false
-            var form = $('#branchModal').find('.form')
-            var formData = {what:'branch'}
-            form.form('set values', formData)
-            this.showModal('branchModal')
-        },
-        showUpdateBranch: function(branch){
+        showUpdateBranch: function(){
             this.updateAction = true
             var form = $('#branchModal').find('.form')
-            var formData = Object.assign({}, branch)
+            var formData = Object.assign({}, this.branch)
             formData.what = 'branch'
             form.form('set values', formData)
             this.showModal('branchModal')

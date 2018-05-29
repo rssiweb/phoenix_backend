@@ -83,6 +83,7 @@ var app = new Vue({
             var vm = this
             this.branchLoading = true
             var postData = {name:branch.name}
+            vm.showToast('Adding '+branch.name, 'info', 'hourglass-o', true)
             this.$http.post('/api/admin/branch/add', postData).
             then(response => {
                 console.log(response)
@@ -102,41 +103,6 @@ var app = new Vue({
                 vm.showToast(msg, 'warn', 'close')
             })
         },
-        updateBranch(branch){
-            console.log(branch)
-            branch.id = parseInt(branch.id)
-            var vm = this
-            this.branchLoading = true
-            var postData = {name:branch.name}
-            this.$http.post('/api/admin/branch/update/'+branch.id, postData).
-            then(response => {
-                console.log(response)
-                if(response.body.status === 'success'){
-                    var updatedBranch = response.body.branch
-                    var index = -1
-                    vm.branches.forEach((branch, i) => {
-                        if(branch.id === updatedBranch.id){
-                            index = i
-                        }
-                    })
-                    if(index != -1){
-                        vm.$set(vm.branches, index, updatedBranch)
-                    }
-                    vm.showToast('Successfully updated '+updatedBranch.name, 'success', 'check')
-                }else{
-                    var message = response.body.error || response.body.message 
-                    vm.showToast(message, 'warn', 'close')
-                }
-                vm.branchLoading = false
-            },
-            error => {
-                console.log(error)
-                vm.branchLoading = false
-                var msg = error.statusText || 'Something bad happened! Try again'
-                vm.showToast(msg, 'warn', 'close')
-            })
-        },
-
         showCreateBranch: function(){
             this.updateAction = false
             var form = $('#branchModal').find('.form')
@@ -144,13 +110,5 @@ var app = new Vue({
             form.form('set values', formData)
             this.showModal('branchModal')
         },
-        showUpdateBranch: function(branch){
-            this.updateAction = true
-            var form = $('#branchModal').find('.form')
-            var formData = Object.assign({}, branch)
-            formData.what = 'branch'
-            form.form('set values', formData)
-            this.showModal('branchModal')
-        }
     }
 });

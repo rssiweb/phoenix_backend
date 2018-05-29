@@ -5,6 +5,14 @@ import time
 import jwt
 
 
+def addLag(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        time.sleep(1)
+        return func(*args, **kwargs)
+    return decorated
+
+
 def only_admins(func):
     @wraps(func)
     def decorated(*args, **kwargs):
@@ -46,12 +54,4 @@ def login_required(func):
             msg = 'No authorization token provided'
             status = 401
         return jsonify(dict(status=status, message=msg)), status
-    return decorated
-
-
-def addLag(func):
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        time.sleep(1)
-        return func(*args, **kwargs)
     return decorated

@@ -4,51 +4,69 @@
 {% raw %}
 
 <div class="ui basic segment" >
-    <div class="ui container" v-if="error">
-        <div class="ui negative message">
-            <i class="close icon"></i>
-            <div class="header">
-                {{ error }}
-            </div>
-        </div>
-    </div>
-
-    <div class="ui container" v-if="message">
-        <div class="ui info message">
-            <i class="close icon"></i>
-            <div class="header">
-                {{ message }}
-            </div>
-        </div>
-    </div>
     <div v-if="!landed">
         <div class="ui active inverted dimmer">
             <div class="ui medium text loader">{{loading}}</div>
         </div>
     </div>
     <div style="display: none;" id="afterLanding">
-        <h1>{{heading}}</h1>
-        <div class="ui form" id="testCodeForm">
-            <div class="fields">
-                <div class="required field">
-                    <label>Exams</label>
+        <div class="ui container" v-if="error">
+            <div class="ui negative message">
+                <i class="close icon"></i>
+                <div class="header">
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <div class="ui container" v-if="message">
+            <div class="ui info message">
+                <i class="close icon"></i>
+                <div class="header">
+                    {{ message }}
+                </div>
+            </div>
+        </div>
+        <div class="ui large header">
+            {{heading}}
+        </div>
+        <div class="ui basic segment">
+            <div class="ui form" id="branchForm">
+                <div class="ui field">
+                    <label>Branch</label>
                     <div class="ui selection dropdown">
-                        <input type="hidden" name="exam" v-on:change="onExamChange"/>
+                        <input type="hidden" name="branch" v-on:change="onBranchChange"/>
                         <i class="dropdown icon"></i>
-                        <div class="default text">Select Exam</div>
+                        <div class="default text">Select Branch</div>
                         <div class="menu">
-                            <div class="item" :data-value="exam.id" v-for="exam in exams">{{exam.name}}</div>
+                            <div class="item" :data-value="branch.id" v-for="branch in branches">{{branch.name}}</div>
                         </div>
                     </div>
                 </div>
-                <div class="required field">
-                    <label>Test Code</label>
-                    <div class="ui selection dropdown"> 
-                        <input type="hidden" name="test" v-on:change="onTestChange"/>
-                        <i class="dropdown icon"></i>
-                        <div class="default text">Select Test Code</div>
-                        <div class="menu">
-                            <div class="item" :data-value="test.id" v-for="test in tests">{{test.name}}</div>
+            </div>
+            <br/>
+            <div class="ui form" id="testCodeForm" v-show="branch.id">
+                <div class="fields">
+                    <div class="required field">
+                        <label>Exams</label>
+                        <div class="ui selection dropdown">
+                            <input type="hidden" name="exam" v-on:change="onExamChange"/>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Exam</div>
+                            <div class="menu">
+                                <div class="item" :data-value="exam.id" v-for="exam in exams">{{exam.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="required field">
+                        <label>Test Code</label>
+                        <div class="ui selection dropdown"> 
+                            <input type="hidden" name="test" v-on:change="onTestChange"/>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Test Code</div>
+                            <div class="menu">
+                                <div class="item" :data-value="test.id" v-for="test in tests">{{test.name}}</div>
+                            </div>
                         </div>
                     </div>
                 </div>

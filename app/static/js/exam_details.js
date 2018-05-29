@@ -6,12 +6,13 @@ var app = new Vue({
 
         examId: examid,
         branchId: branchid,
+        branch: {},
 
         faculties: [],
-        branches: [],
         categories: [],
         subjects: [],
         tests: [],
+
         exam: {},
         catSubjects: [],
         
@@ -83,6 +84,10 @@ var app = new Vue({
     },
     created: function(){
         this.loadv2([
+            {name:'Branch',
+             url:'/api/branch/'+this.branchId,
+             variableName: 'branch',
+             dataInReponse: 'branch'},
             {name:'Categories',
              url:'/api/category/'+this.branchId+'/list',
              variableName: 'categories',
@@ -104,7 +109,6 @@ var app = new Vue({
              variableName: 'exam',
              dataInReponse: 'exam'}
              ], this.afterInit)
-        // this.load(['branches', 'categories', 'subjects', 'faculties'], this.afterInit)
     },
     updated: function(){
         // initializing dropdowns and calendar here because when user
@@ -114,7 +118,6 @@ var app = new Vue({
         // $('#examModal .form').form(app.initExamForm)
     },
     computed:{
-
     },
     methods: {
         afterInit: function(){

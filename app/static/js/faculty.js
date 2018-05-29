@@ -25,7 +25,7 @@ var app = new Vue({
     created: function(){
         this.loadv2([
             {name:'Faculties',
-             url:'/api/admin/faculty/'+this.branchId+'/list',
+             url:'/api/admin/faculty/list',
              variableName: 'faculties',
              dataInReponse: 'faculties'},
              ])

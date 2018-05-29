@@ -10,16 +10,20 @@
     </div>
     <div style="display: none;" id="afterLanding">
         <div class="ui header">
-
-            <h2>
-                <a href="/adminactions"><i class="angle left icon"></i></a> 
-                {{branch.name}}
-            </h2>
+            <div class="ui massive breadcrumb">
+                <a class="section" href="/adminactions">Branches</a>
+                <i class="right chevron icon divider"></i>
+                <div class="active section">{{branch.name}}</div>
+            </div>
         </div>
-        <div class="ui grid">
-            <div class="four wide column">
+        <div class="ui basic segment">
+        <button @click="showUpdateBranch" :class="{disabled:branchLoading, loading:branchLoading}" class="ui mini compact primary button">Update Branch</button>
+        </div>
+        <div class="ui three column grid">
+            <div class="column">
                 <div class="ui basic segment">
-                    <h3>Categories</h3>
+                    <div class="ui big header">Categories</div>
+
                     <button class="ui mini primary button" @click="showCreateCategory" :class="{loading: categoryLoading, disabled: categoryLoading}">Create</button>
                     <div class="ui middle aligned selection very relaxed list">
                         <div class="item" v-for="cat in categories" @click="showUpdateCategory(cat)">
@@ -33,10 +37,11 @@
                     </div>
                 </div>
             </div>
-            <div class="four wide column">
+            <div class="column">
                 <div class="ui basic segment">
-                    <h3>Subjects</h3>
-                    <button class="ui mini primary  button" @click="showCreateSubject" :class="{loading: subjectLoading, disabled: subjectLoading}">Create</button>
+                    <div class="ui medium header">Subjects</div>
+                    
+                    <button class="ui mini primary button" @click="showCreateSubject" :class="{loading: subjectLoading, disabled: subjectLoading}">Create</button>
                     <div class="ui middle aligned selection relaxed list">
                         <div class="item" v-for="sub in subjects" @click="showUpdateSubject(sub)">
                             <div class="content">
@@ -48,10 +53,11 @@
                     </div>
                 </div>
             </div>
-            <div class="four wide column">
+            <div class="column">
                 <div class="ui basic segment">
-                    <h3>Examinations</h3>
-                    <button class="ui mini primary  button" @click="showCreateExam" :class="{loading: examLoading, disabled: examLoading}">Create</button>
+                    <div class="ui medium header">Examinations</div>
+
+                    <button class="ui mini primary button" @click="showCreateExam" :class="{loading: examLoading, disabled: examLoading}">Create</button>
                     <div class="ui middle aligned selection relaxed list">
                         <a class="item" :href="'/exams_details/'+branch.id+'/'+exam.id" v-for="exam in exams">
                             <div class="content">

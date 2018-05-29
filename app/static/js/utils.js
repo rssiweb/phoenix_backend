@@ -102,6 +102,7 @@ var utils = {
             if(faicon){
                 icon = faicon
             }
+            this.$toasted.clear()
             this.$toasted.show(message, {
                 theme: 'primary',
                 className: "ui " + color + " label",

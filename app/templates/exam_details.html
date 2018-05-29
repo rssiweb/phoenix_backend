@@ -10,13 +10,17 @@
     </div>
     <div style="display: none;" id="afterLanding">
         <div class="ui header">
-
-            <h2>
-                <a :href="'/branch_details/'+branchid"><i class="angle left icon"></i></a> 
-                {{exam.name}}
-                <button class="ui right floated red mini button" @click="showDeleteExam">Delete Exam</button>
-            </h2>
-            <button class="ui right aligned mini compact primary button" @click="showCreateTest">Add test</button>
+            <div class="ui massive breadcrumb">
+                <a class="section" href="/adminactions">Branches</a>
+                <i class="right chevron icon divider"></i>
+                <a class="section" :href="'/branch_details/'+branchId">{{branch.name}}</a>
+                <i class="right chevron icon divider"></i>
+                <div class="active section">{{exam.name}}</div>
+            </div>
+        </div>
+        <div class="ui header">
+            <button class="ui right floated red mini compact button" @click="showDeleteExam">Delete Exam</button>
+            <button class="ui right mini compact primary button" @click="showCreateTest">Add test</button>
         </div>
         <h3>Tests</h3>
         <table class="ui compact selectable sortable table" v-if="tests.length" >
@@ -50,7 +54,7 @@
     <div class="header">{{updateAction ? "Update" : "Add"}} Test</div>
     <div class="content">
         <div class="ui equal width form" >
-            <input type="hidden" name="examId" :value="examid">
+            <input type="hidden" name="examId" :value="examId">
             <input type="hidden" name="id">
             <div class="fields">
                 <div class="required field" :class="{disabled: updateAction}" >

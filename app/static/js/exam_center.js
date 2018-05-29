@@ -4,7 +4,7 @@ var app = new Vue({
     data:{
         heading: 'Exam Center',
         landed: false,
-        
+
         students: [],
         branches: [],
         categories: [],
@@ -14,6 +14,7 @@ var app = new Vue({
 
         tests: [],
 
+        branch: {},
         studentCatFilter: '',
 
         error: '',
@@ -22,23 +23,13 @@ var app = new Vue({
     },
     created: function(){
         this.loadv2([
-            {name:'Students',
-             url:'/api/student/1/list',
-             variableName: 'students',
-             dataInReponse: 'students'},
-            {name:'Categories',
-             url:'/api/category/1/list',
-             variableName: 'categories',
-             dataInReponse: 'categories'},
-            {name:'Exams',
-             url:'/api/exam/1/list',
-             variableName: 'exams',
-             dataInReponse: 'exams'},
-            {name:'Subjects',
-             url:'/api/subject/1/list',
-             variableName: 'subjects',
-             dataInReponse: 'subjects'}
-             ], this.after)
+        {
+            name:'Branches',
+            url:'/api/branch/list',
+            variableName: 'branches',
+            dataInReponse: 'branches'
+        }
+        ], this.after)
     },
     updated: function(){
         console.log('updated')
@@ -47,16 +38,63 @@ var app = new Vue({
         dom.find('.ui.dropdown').dropdown()
         this.landed = true
     },
+    watch: {
+        branch: function(){
+            this.loadv2([
+            {
+                name:'Students',
+                url:'/api/student/'+this.branch.id+'/list',
+                variableName: 'students',
+                dataInReponse: 'students'
+            },
+            {
+                name:'Categories',
+                url:'/api/category/'+this.branch.id+'/list',
+                variableName: 'categories',
+                dataInReponse: 'categories'
+            },
+            {
+                name:'Exams',
+                url:'/api/exam/'+this.branch.id+'/list',
+                variableName: 'exams',
+                dataInReponse: 'exams'
+            },
+            {
+                name:'Subjects',
+                url:'/api/subject/'+this.branch.id+'/list',
+                variableName: 'subjects',
+                dataInReponse: 'subjects'
+            },
+            ])
+        }
+    },
     computed: {
         filteredStudents: function(){
             return this.students.filter((std) => {
                 return std.category === this.studentCatFilter
             })
-        }
+        },
     },
     methods: {
         after: function(){
             this.heading = 'Exam Center'
+            this.branches.forEach(branch=>{
+                if(branch.id===this.branchId)
+                    this.branch = branch
+            })
+        },
+        onBranchChange: function(){
+            var data = $('#branchForm').form('get values')
+            var selectedBranchId = parseInt(data.branch)
+            var index = -1
+            this.branches.forEach((branch, i) => {
+                if(branch.id === selectedBranchId){
+                    index = i
+                }
+            })
+            if(index != -1){
+                this.branch = this.branches[index]
+            }
         },
         onExamChange: function(){
             var data = $('#testCodeForm').form('get values')
@@ -68,13 +106,7 @@ var app = new Vue({
                 }
             })
             if(index != -1){
-                
                 this.tests = this.exams[index].tests
-                // if(!testToAdd)
-                //     return
-                // testsToAdd.forEach((test, i) => {
-                //     this.tests.push(test)
-                // })
             }
         },
         onTestChange: function(){

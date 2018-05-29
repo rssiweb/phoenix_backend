@@ -41,7 +41,7 @@ def add():
     evaluator_id = data.get('evaluator')
 
     keys = ['subject', 'category', 'examId', 'maxMarks']
-    if evaluator_id is not None:
+    if evaluator_id:
         keys.append('evaluator')
     for key in keys:
         if not data.get(key).isdigit():
@@ -64,7 +64,7 @@ def add():
     category_id = int(category_id)
     exam_id = int(exam_id)
     max_marks = float(max_marks)
-    if evaluator_id is not None:
+    if evaluator_id:
         evaluator_id = int(evaluator_id)
 
     exam = Exam.query.get(exam_id)
@@ -73,7 +73,7 @@ def add():
     objs = [exam, subject, category]
     names = ['Exam', 'Subject', 'Category']
     evaluator = None
-    if evaluator_id is not None:
+    if evaluator_id:
         evaluator = Faculty.query.get(evaluator_id)
         objs.append(evaluator)
         names.append('Evaluator')
