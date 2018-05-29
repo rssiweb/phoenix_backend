@@ -51,4 +51,4 @@ for api in [commonapi, studentapi, categoryapi, branchapi, attendanceapi,
             admin_examapi, admin_testapi, ui]:
     app.register_blueprint(api)
 
-# db.create_all()
+db.create_all()
