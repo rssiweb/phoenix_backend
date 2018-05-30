@@ -45,7 +45,7 @@
                 </div>
             </div>
             <br/>
-            <div class="ui form" id="testCodeForm" v-show="branch.id">
+            <div class="ui form" id="testCodeForm" v-show="branch.id" :class="{loading: examLoading}">
                 <div class="fields">
                     <div class="required field">
                         <label>Exams</label>
@@ -73,13 +73,15 @@
             </div>
         </div>
         <div class="ui basic segment">
-            <table class="ui compact table" v-if="filteredStudents.length">
+            <table class="ui compact table" :class="{loading: marksLoading}" v-if="filteredStudents.length">
                 <thead>
                     <tr>
                         <th>Student ID</th>
                         <th>Name</th>
-                        <th>Mark</th>
-                        <th>Percentage & Grade</th>
+                        <th>Max Marks</th>
+                        <th>Marks Obtained</th>
+                        <th>Percentage</th>
+                        <th>Grade</th>
                         <th>Comments</th>
                     </tr>
                 </thead>
@@ -87,17 +89,19 @@
                     <tr v-for="std in filteredStudents">
                         <td>{{std.student_id}}</td>
                         <td>{{std.name}}</td>
+                        <td>{{selectedTest.max_marks}}</td>
                         <td>
                             <div class="ui input">
-                                <input type="number" name="marks" value="60" step="0.5" placeholder="Marks Scored">
+                                <input type="number" name="marks" v-on:change="setObtainedMarks(std.id, $event)" step="0.5" placeholder="Marks Scored" :disabled="!is_admin && selectedTest.evaluator != me.id" min="0" :max="selectedTest.max_marks">
                             </div>
                         </td>
                         <td>
-                            {{60}}% B
+                            {{60}}%
                         </td>
+                        <td>B+</td>
                         <td>
                             <div class="ui input">
-                                <input type="text" name="comment" value="" placeholder="Comment">
+                                <input type="text" name="comment" value="" placeholder="Comment" :disabled="!is_admin && selectedTest.evaluator != me.id">
                             </div>
                         </td>
                     </tr>

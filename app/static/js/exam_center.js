@@ -11,11 +11,16 @@ var app = new Vue({
         exams: [],
         subjects: [],
         marks: [],
-
         tests: [],
-
+        marks: [],
         branch: {},
+        me: {},
+
+        selectedTestId: -1,
         studentCatFilter: '',
+
+        examLoading: false,
+        marksLoading: false,
 
         error: '',
         message: '',
@@ -28,6 +33,12 @@ var app = new Vue({
             url:'/api/branch/list',
             variableName: 'branches',
             dataInReponse: 'branches'
+        },
+        {
+            name: 'Me',
+            url: '/api/myprofile',
+            variableName: 'me',
+            dataInReponse: 'me'
         }
         ], this.after)
     },
@@ -40,32 +51,48 @@ var app = new Vue({
     },
     watch: {
         branch: function(){
-            this.loadv2([
-            {
-                name:'Students',
-                url:'/api/student/'+this.branch.id+'/list',
-                variableName: 'students',
-                dataInReponse: 'students'
-            },
-            {
-                name:'Categories',
-                url:'/api/category/'+this.branch.id+'/list',
-                variableName: 'categories',
-                dataInReponse: 'categories'
-            },
-            {
-                name:'Exams',
-                url:'/api/exam/'+this.branch.id+'/list',
-                variableName: 'exams',
-                dataInReponse: 'exams'
-            },
-            {
-                name:'Subjects',
-                url:'/api/subject/'+this.branch.id+'/list',
-                variableName: 'subjects',
-                dataInReponse: 'subjects'
-            },
-            ])
+            if(this.branch.id){
+                this.examLoading = true
+                this.loadv2([
+                {
+                    name:'Students',
+                    url:'/api/student/'+this.branch.id+'/list',
+                    variableName: 'students',
+                    dataInReponse: 'students'
+                },
+                {
+                    name:'Categories',
+                    url:'/api/category/'+this.branch.id+'/list',
+                    variableName: 'categories',
+                    dataInReponse: 'categories'
+                },
+                {
+                    name:'Exams',
+                    url:'/api/exam/'+this.branch.id+'/list',
+                    variableName: 'exams',
+                    dataInReponse: 'exams'
+                },
+                {
+                    name:'Subjects',
+                    url:'/api/subject/'+this.branch.id+'/list',
+                    variableName: 'subjects',
+                    dataInReponse: 'subjects'
+                }
+                ],this.afterExamLoaded)
+            }
+        },
+        selectedTestId: function(){
+            if(this.branch.id){
+                this.marksLoading = true
+                this.loadv2([
+                {
+                    name:'Marks',
+                    url:'/api/marks/'+this.selectedTestId,
+                    variableName: 'marks',
+                    dataInReponse: 'marks',
+                    default: []
+                },], this.afterMarksLoad)
+            }
         }
     },
     computed: {
@@ -74,6 +101,14 @@ var app = new Vue({
                 return std.category === this.studentCatFilter
             })
         },
+        selectedTest: function(){
+            var test = undefined
+            this.tests.forEach(t => {
+                if(t.id === this.selectedTestId)
+                    test = t
+            })
+            return test
+        }
     },
     methods: {
         after: function(){
@@ -82,6 +117,12 @@ var app = new Vue({
                 if(branch.id===this.branchId)
                     this.branch = branch
             })
+        },
+        afterExamLoaded: function(){
+            this.examLoading = false
+        },
+        afterMarksLoad: function(){
+            this.marksLoading = false
         },
         onBranchChange: function(){
             var data = $('#branchForm').form('get values')
@@ -111,16 +152,19 @@ var app = new Vue({
         },
         onTestChange: function(){
             var data = $('#testCodeForm').form('get values')
-            var selectedTestId = parseInt(data.test)
+            this.selectedTestId = parseInt(data.test)
             var test = undefined
             this.tests.forEach((t, i)=>{
-                if(t.id===selectedTestId){
+                if(t.id === this.selectedTestId){
                     test = t
                 }
             })
             if(!test)
                 return
             this.studentCatFilter = test.category
+        },
+        setObtainedMarks: function(std_id, event){
+            console.log('setObtainedMarks', std_id, event.target.value)
         }
     }
 })

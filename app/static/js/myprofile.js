@@ -33,7 +33,6 @@ var app = new Vue({
         getProfile(){
             var vm = this
             this.$http.get('/api/myprofile',this.getHeaders())
-
             .then(response => {
                 console.log(response)
                 vm.me = response.body.me

@@ -45,7 +45,7 @@ def get_token():
 @api.route('/myprofile', methods=['GET'])
 @decorators.login_required
 def get_profile():
-    res = {}
+    res = dict(status='success')
     res['me'] = request.user.serialize()
     return jsonify(res), 200
 
