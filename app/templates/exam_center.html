@@ -73,12 +73,12 @@
             </div>
         </div>
         <div class="ui basic segment">
+            <p v-if="selectedTest">Max Marks: {{selectedTest.max_marks}}</p>
             <table class="ui compact table" :class="{loading: marksLoading}" v-if="filteredStudents.length">
                 <thead>
                     <tr>
                         <th>Student ID</th>
                         <th>Name</th>
-                        <th>Max Marks</th>
                         <th>Marks Obtained</th>
                         <th>Percentage</th>
                         <th>Grade</th>
@@ -89,19 +89,20 @@
                     <tr v-for="std in filteredStudents">
                         <td>{{std.student_id}}</td>
                         <td>{{std.name}}</td>
-                        <td>{{selectedTest.max_marks}}</td>
                         <td>
-                            <div class="ui input">
-                                <input type="number" name="marks" v-on:change="setObtainedMarks(std.id, $event)" step="0.5" placeholder="Marks Scored" :disabled="!is_admin && selectedTest.evaluator != me.id" min="0" :max="selectedTest.max_marks">
+                            <div class="ui icon input" :class="[result[std.id] && result[std.id].marksSaving ? 'loading disabled' : '']">
+                                <input type="number" name="marks" v-on:change="setObtainedMarks(std.id, $event)" step="0.5" placeholder="Marks Scored" :disabled="!is_admin && selectedTest.evaluator != me.id" min="0" :max="selectedTest.max_marks" :value="getMarks(std.id)">
+                                <i class="ui icon"></i>
                             </div>
                         </td>
                         <td>
-                            {{60}}%
+                            {{getPercentage(std.id)}}
                         </td>
-                        <td>B+</td>
+                        <td>{{getGrade(std.id).grade}}</td>
                         <td>
-                            <div class="ui input">
-                                <input type="text" name="comment" value="" placeholder="Comment" :disabled="!is_admin && selectedTest.evaluator != me.id">
+                            <div class="ui icon input" :class="[result[std.id] && result[std.id].commentSaving ? 'loading disabled' : '']">
+                                <input type="text" name="comment" value="" placeholder="Comment" :disabled="!is_admin && selectedTest.evaluator != me.id" :value="getComment(std.id)"/ v-on:change="setComments(std.id, $event)" :value="result[std.id].comment">
+                                <i class="ui icon"></i>
                             </div>
                         </td>
                     </tr>

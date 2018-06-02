@@ -34,6 +34,7 @@ from app.api.subject import api as subjectapi
 from app.api.exam import api as examapi
 from app.api.test import api as testapi
 from app.api.marks import api as marksapi
+from app.api.grade import api as gradeapi
 
 from app.api.admin.attendance import api as admin_attendanceapi
 from app.api.admin.branch import api as admin_branchapi
@@ -43,13 +44,17 @@ from app.api.admin.student import api as admin_stdapi
 from app.api.admin.subject import api as admin_subapi
 from app.api.admin.exam import api as admin_examapi
 from app.api.admin.test import api as admin_testapi
+from app.api.admin.grade import api as admin_gradeapi
 
 from app.ui.controllers import ui
 
 for api in [commonapi, studentapi, categoryapi, branchapi, attendanceapi,
-            examapi, subjectapi, testapi, marksapi, admin_attendanceapi,
-            admin_branchapi, admin_catapi, admin_facapi, admin_stdapi,
-            admin_subapi, admin_examapi, admin_testapi, ui]:
+            examapi, subjectapi, testapi, marksapi, gradeapi,
+
+            admin_attendanceapi, admin_branchapi, admin_catapi, admin_facapi,
+            admin_stdapi, admin_subapi, admin_examapi, admin_testapi, admin_gradeapi,
+
+            ui]:
     app.register_blueprint(api)
 
 db.create_all()

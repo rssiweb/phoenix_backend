@@ -283,7 +283,7 @@ class Exam(Base):
     __tablename__ = 'exam'
 
     name = db.Column(db.String(100), nullable=False, unique=True)
-    start_date = db.Column(db.Date(), nullable=True)
+    start_date = db.Column(db.Date(), nullable=True, default=datetime.utcnow)
     end_date = db.Column(db.Date(), nullable=True)
     state = db.Column(db.String(100), nullable=True)
     branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)
@@ -293,9 +293,9 @@ class Exam(Base):
     def __init__(self, name, branch_id, start_date=None, end_date=None, state=None):
         self.name = name
         if start_date:
-            start_date = datetime.strptime(start_date, '%d/%m/%Y')
+            self.start_date = datetime.strptime(start_date, '%d/%m/%Y')
         if end_date:
-            end_date = datetime.strptime(end_date, '%d/%m/%Y')
+            self.end_date = datetime.strptime(end_date, '%d/%m/%Y')
         if state:
             self.state = state
 
@@ -413,9 +413,9 @@ class Grade(Base):
             self.lower = int(lower)
         if upper is not None:
             self.upper = int(upper)
-        if grade and isinstance(grade, str):
+        if grade and isinstance(grade, basestring):
             self.grade = grade
-        if comment and isinstance(comment, str):
+        if comment and isinstance(comment, basestring):
             self.comment = comment
 
         branch_id = int(branch_id)
@@ -426,8 +426,8 @@ class Grade(Base):
 
     def serialize(self):
         return dict(id=self.id,
-                    lower=self.lower,
-                    upper=self.upper,
+                    min=self.lower,
+                    max=self.upper,
                     grade=self.grade,
                     branch_id=self.branch_id,
                     comment=self.comment
@@ -448,7 +448,8 @@ class Marks(Base):
         self.test_id = int(test_id)
         self.student_id = int(student_id)
         self.marks = float(marks)
-        self.comments = comments
+        if comments:
+            self.comments = str(comments)
 
     def serialize(self):
         return dict(id=self.id,

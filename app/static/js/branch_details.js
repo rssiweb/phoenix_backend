@@ -11,7 +11,7 @@ var app = new Vue({
         categories: [],
         subjects: [],
         exams: [],
-
+        grades: [],
 
 
         newExam: {
@@ -24,6 +24,7 @@ var app = new Vue({
         branchLoading: '',
         categoryLoading: '',
         examLoading: '',
+        gradeLoading: '',
 
         updateAction: false,
 
@@ -76,6 +77,13 @@ var app = new Vue({
                         app.createExam(data)
                     }
                 }
+                else if (data.what === 'grade'){
+                    if(app.updateAction){
+                        app.updateGrade(data)
+                    }else{
+                        app.createGrade(data)
+                    }
+                }
                 else{
                     // to stop dialog closing
                     return false
@@ -113,6 +121,13 @@ var app = new Vue({
             variableName: 'branch',
             dataInReponse: 'branch',
             default: {}
+        },
+        {
+            name:'Grades',
+            url:'/api/grade/' + this.branchId+ '/list',
+            variableName: 'grades',
+            dataInReponse: 'grades',
+            default: []
         }
         ], this.afterLoading)
     },
@@ -135,10 +150,17 @@ var app = new Vue({
             dom.find('#subjectModal').modal(this.initBasicModal)
             dom.find('#catModal').modal(this.initBasicModal)
             dom.find('#examModal').modal(this.initBasicModal)
+            dom.find('#gradeModal').modal(this.initBasicModal)
             
             dom.find('.ui.form').form(this.bothForms)
 
             this.landed = true
+            this.grades.sort(function(a,b){
+                return b.min - a.min
+            })
+            this.exams.sort(function(a,b){
+                return b.start_date - a.start_date
+            })
         },
         createCategory: function(category){
             var vm = this
@@ -315,6 +337,55 @@ var app = new Vue({
                 vm.showToast(msg, 'warn', 'close')
             })  
         },
+        createGrade: function(grade){
+            var vm = this
+            vm.gradeLoading = true
+            var url =  '/api/admin/grade/add/' + this.branchId
+            vm.$http.post(url, grade)
+            .then(response => {
+                if(response.body.status === 'success'){
+                    vm.grades.push(response.body.grade)
+                    var msg = 'Grade added Successfully'
+                    vm.showToast(msg, 'success', 'check')
+                } else {
+                    var msg = response.body.statusText || 'Unexpected error occurred'
+                    vm.showToast(msg, 'warn', 'close')
+                }
+                vm.gradeLoading = false
+            },
+            error => {
+                var msg = response.statusText || 'Unexpected error occurred'
+                vm.showToast(msg, 'warn', 'close')
+                vm.gradeLoading = false
+            })
+        },
+        updateGrade: function(grade){
+            var vm = this
+            vm.gradeLoading = true
+            var url = '/api/admin/grade/update/' + this.branchId + '/' + grade.id
+            vm.$http.post(url, grade)
+            .then(response => {
+                if(response.body.status === 'success'){
+                    var updatedGrade = response.body.grade
+                    vm.grades.forEach((grade, index) => {
+                        if (updatedGrade.id === grade.id){
+                            vm.$set(vm.grades, index, updatedGrade)
+                        }
+                    })
+                    var msg = 'Grade updated Successfully'
+                    vm.showToast(msg, 'success', 'check')
+                } else {
+                    var msg = response.body.statusText || 'Unexpected error occurred'
+                    vm.showToast(msg, 'warn', 'close')
+                }
+                vm.gradeLoading = false
+            },
+            error => {
+                var msg = response.statusText || 'Unexpected error occurred'
+                vm.showToast(msg, 'warn', 'close')
+                vm.gradeLoading = false
+            })
+        },
         showCreateCategory: function(){
             this.updateAction = false
             var form = $('#catModal .form')
@@ -365,6 +436,21 @@ var app = new Vue({
         showCreateExam: function(){
             this.updateAction = false
             this.showModal('examModal')
+        },
+        showCreateGrade: function(){
+            this.updateAction = false
+            var form = $('#gradeModal').find('.form')
+            var formData = {what:'grade', min:undefined, max: undefined, comment:undefined, grade:undefined}
+            form.form('set values', formData)
+            this.showModal('gradeModal')
+        },
+        showUpdateGrade: function(grade){
+            this.updateAction = true
+            var form = $('#gradeModal').find('.form')
+            var formData = Object.assign({}, grade)
+            formData.what = 'grade'
+            form.form('set values', formData)
+            this.showModal('gradeModal')
         },
         getSubjectNames: function(ids){
             var vm = this

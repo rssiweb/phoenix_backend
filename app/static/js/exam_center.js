@@ -13,6 +13,8 @@ var app = new Vue({
         marks: [],
         tests: [],
         marks: [],
+        result: {},
+        gradeRules: [],
         branch: {},
         me: {},
 
@@ -77,6 +79,12 @@ var app = new Vue({
                     url:'/api/subject/'+this.branch.id+'/list',
                     variableName: 'subjects',
                     dataInReponse: 'subjects'
+                },
+                {
+                    name:'Grades',
+                    url:'/api/grade/'+this.branch.id+'/list',
+                    variableName: 'gradeRules',
+                    dataInReponse: 'grades'
                 }
                 ],this.afterExamLoaded)
             }
@@ -123,6 +131,10 @@ var app = new Vue({
         },
         afterMarksLoad: function(){
             this.marksLoading = false
+            this.marks.forEach(mark=>{
+                var data  = {marks: mark.marks, comment: mark.comments, marksSaving: false, commentSaving:false}
+                this.$set(this.result, mark.student_id, data)
+            })
         },
         onBranchChange: function(){
             var data = $('#branchForm').form('get values')
@@ -147,7 +159,10 @@ var app = new Vue({
                 }
             })
             if(index != -1){
-                this.tests = this.exams[index].tests
+                var allTests = this.exams[index].tests
+                this.tests = allTests.filter(test => {
+                    return test.evaluator === this.me.id
+                })
             }
         },
         onTestChange: function(){
@@ -159,12 +174,117 @@ var app = new Vue({
                     test = t
                 }
             })
-            if(!test)
+            if(!test){
                 return
+            }
             this.studentCatFilter = test.category
         },
         setObtainedMarks: function(std_id, event){
+            var vm = this
             console.log('setObtainedMarks', std_id, event.target.value)
+            var setCommentAlso = false
+            var data = this.result[std_id]
+            if(!data){
+                data = {}
+                setCommentAlso = true
+            }
+            var marks = event.target.value
+            if(marks > this.selectedTest.max_marks){
+                return
+            }
+
+            data['marks'] = marks
+            data['marksSaving'] = true
+
+            if(setCommentAlso){
+                var grade = this.gradeFor(this.percentOf(event.target.value))
+                data['comment'] = grade.comment
+                data['commentSaving'] = true
+            }
+            this.$set(this.result, std_id, data)
+            // http call delay
+            var url = '/api/marks/set/' + this.selectedTest.id + '/' + std_id
+            this.$http.post(url, data)
+            .then(response => {
+                console.log(response)
+                var data = vm.result[std_id]
+                data.marksSaving = false
+                data.commentSaving = false
+                vm.$set(vm.result, std_id, data)
+            },
+            error => {
+                console.log(error)
+                var data = vm.result[std_id]
+                data.marksSaving = false
+                data.commentSaving = false
+                vm.$set(vm.result, std_id, data)
+            })
+        },
+        setComments: function(std_id, event){
+            var vm = this
+            console.log('setComments', std_id, event.target.value)
+            var data = this.result[std_id] || {}
+            data['comment'] = event.target.value
+            data['commentSaving'] = true
+
+            this.$set(this.result, std_id, data)
+            var url = '/api/marks/set/' + this.selectedTest.id + '/' + std_id
+            this.$http.post(url, data)
+            .then(response => {
+                console.log(response)
+                var data = vm.result[std_id]
+                data.commentSaving = false
+                vm.$set(vm.result, std_id, data)
+            },
+            error => {
+                console.log(error)
+                var data = vm.result[std_id]
+                data.commentSaving = false
+                vm.$set(vm.result, std_id, data)
+            })
+        },
+        gradeFor: function(percent){
+            percent = Math.round(percent)
+            var grade = {}
+            this.gradeRules.forEach(gRule=>{
+                if(gRule.min <= percent && gRule.max >= percent)
+                    grade = gRule
+            })
+            return grade
+        },
+        getGrade: function(id){
+            var percent = this.getPercentage(id)
+            return this.gradeFor(percent)
+        },
+        percentOf: function(mo){
+            var mo = parseInt(mo)
+            var mm = this.selectedTest.max_marks
+            if(mm)
+                mm = parseInt(mm) || 0
+            var percentage = 0
+            if (mm > 0)
+                percentage = (mo / mm * 100).toFixed(2)
+            return percentage
+        },
+        getPercentage: function(id){
+            var data = this.result[id]
+            if(!data)
+                return undefined
+            var mo = data.marks
+            if(!mo)
+                return undefined
+            return this.percentOf(mo)
+        },
+        getComment: function(id){
+            // intentially leaving for undefined
+            var data = this.result[id]
+            if(data)
+                return data.comment
+        },
+        getMarks: function(id){
+          var data = this.result[id]
+            if(data)
+                return data.marks
         }
     }
 })

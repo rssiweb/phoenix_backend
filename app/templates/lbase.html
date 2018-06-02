@@ -17,9 +17,9 @@
         </div>
         <a class="item {%if page == 2%}active{%endif%}" href="/students" v-if="is_admin">Students</a>
         <a class="item {%if page == 3%}active{%endif%}" href="/faculties" v-if="is_admin">Faculties</a>
-        <a class="item {%if page == 4%}active{%endif%}" href="/me" >My Profile</a>
-        <a class="item {%if page == 6%}active{%endif%}" href="/exam" >Exam Center</a>
-        <a class="item {%if page == 7%}active{%endif%}" href="/adminactions" v-if="is_admin">Admin Actions</a>
+        <a class="item {%if page == 4%}active{%endif%}" href="/me" >Profile</a>
+        <a class="item {%if page == 6%}active{%endif%}" href="/exam" >Exam</a>
+        <a class="item {%if page == 7%}active{%endif%}" href="/adminactions" v-if="is_admin">Admin</a>
         <div class="right menu">
             {%raw%}
             <div class="header item" v-if="name">
