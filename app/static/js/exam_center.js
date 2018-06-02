@@ -161,7 +161,7 @@ var app = new Vue({
             if(index != -1){
                 var allTests = this.exams[index].tests
                 this.tests = allTests.filter(test => {
-                    return test.evaluator === this.me.id
+                    return this.me.admin || test.evaluator === this.me.id
                 })
             }
         },
