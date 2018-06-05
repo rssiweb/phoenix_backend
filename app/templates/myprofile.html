@@ -38,7 +38,7 @@
     </div>
 
     <h3>Change Password</h3>
-    <form class="ui form" id="passwordForm" @submit.prevent="changePassword" v-if="false">
+    <form class="ui form" id="passwordForm" @submit.prevent="changePassword">
       <div class="fields">
         <div class="field " :class="{error: currentPassword && currentPassword.length <= 0}" >
           <label>Current Password</label>
