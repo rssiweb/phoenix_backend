@@ -51,7 +51,7 @@ var app = new Vue({
         console.log('created')
         this.loadv2([
             {name:'Students',
-             url:'/api/student/list',
+             url:'/api/student/all',
              variableName: 'students',
              dataInReponse: 'students'},
             {name:'Categories',
