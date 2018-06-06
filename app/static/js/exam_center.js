@@ -178,6 +178,7 @@ var app = new Vue({
                 return
             }
             this.studentCatFilter = test.category
+            this.result = {}
         },
         setObtainedMarks: function(std_id, event){
             var vm = this
