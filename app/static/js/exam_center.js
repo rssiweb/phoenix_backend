@@ -190,11 +190,9 @@ var app = new Vue({
         setObtainedMarks: function(std_id, event){
             var vm = this
             console.log('setObtainedMarks', std_id, event.target.value)
-            var setCommentAlso = false
             var data = this.result[std_id]
             if(!data){
                 data = {}
-                setCommentAlso = true
             }
             var marks = event.target.value
             if(marks > this.selectedTest.max_marks){
@@ -203,14 +201,12 @@ var app = new Vue({
 
             data['marks'] = marks
             data['marksSaving'] = true
-
-            if(setCommentAlso){
-                var grade = this.gradeFor(this.percentOf(event.target.value))
-                data['comment'] = grade.comment
-                data['commentSaving'] = true
-            }
+    
+            var grade = this.gradeFor(this.percentOf(event.target.value))
+            data['comment'] = grade.comment
+            data['commentSaving'] = true
+        
             this.$set(this.result, std_id, data)
-            // http call delay
             var url = '/api/marks/set/' + this.selectedTest.id + '/' + std_id
             this.$http.post(url, data)
             .then(response => {
