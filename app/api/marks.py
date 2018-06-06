@@ -33,6 +33,10 @@ def set_marks(testid, studentid):
         res['statusText'] = errs.CUSTOM_ERROR.text
         res['statusData'] = errs.CUSTOM_ERROR.type('No such Test')
         return jsonify(res), 200
+    if not request.user or (not request.user.admin and request.user.id != test.evaluator_id):
+        res['statusText'] = errs.CUSTOM_ERROR.text
+        res['statusData'] = errs.CUSTOM_ERROR.type('You are not authrized.')
+        return jsonify(res), 200
     student = Student.query.get(studentid)
     if not student:
         res['statusText'] = errs.CUSTOM_ERROR.text
@@ -64,4 +68,24 @@ def set_marks(testid, studentid):
     db.session.commit()
     res['status'] = 'success'
     res['message'] = 'Marks and Comments saved'
+    return jsonify(res), 200
+
+
+@api.route('/delete/<int:testid>', methods=['GET'])
+@decorators.login_required
+def delete_marks(testid):
+    res = dict(status='fail')
+    test = Test.query.get(testid)
+    if not test:
+        res['statusText'] = errs.CUSTOM_ERROR.text
+        res['statusData'] = errs.CUSTOM_ERROR.type('No such Test')
+        return jsonify(res), 200
+    if not request.user or (not request.user.admin and request.user.id != test.evaluator_id):
+        res['statusText'] = errs.CUSTOM_ERROR.text
+        res['statusData'] = errs.CUSTOM_ERROR.type('You are not authrized.')
+        return jsonify(res), 200
+    Marks.query.filter_by(test_id=test.id).delete()
+    db.session.commit()
+    res['status'] = 'success'
+    res['message'] = 'All Marks deleted'
     return jsonify(res), 200

@@ -23,10 +23,28 @@ var app = new Vue({
 
         examLoading: false,
         marksLoading: false,
+        deleteLoading: false,
 
         error: '',
         message: '',
         loading: 'Loading ...',
+        cnfModal: {
+            heading: '',
+            content: '',
+            yes: 'Yes',
+            no: 'No',
+            action: '',
+            data: {},
+        },
+        cnfModalInit: {
+            onShow: function(){},
+            onApprove: function(){
+                if (app.cnfModal.action === 'DELETE_MARKS'){
+                    // data is test id in this case
+                    app.deleteMarks(app.cnfModal.data)
+                }
+            },
+        },
     },
     created: function(){
         this.loadv2([
@@ -125,6 +143,8 @@ var app = new Vue({
                 if(branch.id===this.branchId)
                     this.branch = branch
             })
+            var dom = $(this.$el)
+            dom.find('#cnfModal').modal(this.cnfModalInit)
         },
         afterExamLoaded: function(){
             this.examLoading = false
@@ -137,7 +157,7 @@ var app = new Vue({
             })
         },
         onBranchChange: function(){
-            var data = $('#branchForm').form('get values')
+            var data = $('#testForm').form('get values')
             var selectedBranchId = parseInt(data.branch)
             var index = -1
             this.branches.forEach((branch, i) => {
@@ -150,7 +170,7 @@ var app = new Vue({
             }
         },
         onExamChange: function(){
-            var data = $('#testCodeForm').form('get values')
+            var data = $('#testForm').form('get values')
             var selectedExamId = parseInt(data.exam)
             var index = -1
             this.exams.forEach((exam, i) => {
@@ -170,7 +190,7 @@ var app = new Vue({
             }
         },
         onTestChange: function(){
-            var data = $('#testCodeForm').form('get values')
+            var data = $('#testForm').form('get values')
             if(!data.test) {
                 return
             }
@@ -289,6 +309,40 @@ var app = new Vue({
           var data = this.result[id]
             if(data)
                 return data.marks
+        },
+        showDeleteMarks: function(){
+            var test = this.selectedTest
+            if(!test)
+                return
+            this.cnfModal.heading = 'Confirm Delete'
+            this.cnfModal.content = 'Are you sure you want to delete ALL marks for "'+this.selectedTest.name+'"? you won\'t be able to undo this.'
+            this.cnfModal.action = 'DELETE_MARKS'
+            this.cnfModal.data = test
+            this.showModal('cnfModal')
+        },
+        deleteMarks: function(test){
+            var vm = this
+            console.log('I will delete ALL marks of ',test.name)
+            this.deleteLoading = true
+            this.$http.get('/api/marks/delete/' + test.id)
+            .then(response=>{
+                console.log(response)
+                if(response.body.status === 'success'){
+                    vm.result = {}
+                    var msg = response.body.message || 'Successfuly deleted marks.'
+                    vm.showToast(msg, 'success', 'check')
+                }else{
+                    var msg = response.body.message || 'Something unexpected happened, try again!'
+                    vm.showToast(msg, 'warn', 'info')
+                }
+                this.deleteLoading = false
+            },
+            error => {
+                console.log(error)
+                var msg = 'Something unexpected happened, try again!' || error.statusText 
+                vm.showToast(msg, 'warn', 'info')
+                this.deleteLoading = false
+            })
         }
     }
 })
