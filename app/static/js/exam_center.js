@@ -152,7 +152,7 @@ var app = new Vue({
         afterMarksLoad: function(){
             this.marksLoading = false
             this.marks.forEach(mark=>{
-                var data  = {marks: mark.marks, comment: mark.comments, marksSaving: false, commentSaving:false}
+                var data  = {marks: mark.marks, comments: mark.comments, marksSaving: false, commentSaving:false}
                 this.$set(this.result, mark.student_id, data)
             })
         },
@@ -216,32 +216,55 @@ var app = new Vue({
             }
             var marks = event.target.value
             if(marks > this.selectedTest.max_marks){
+                vm.highlightRowFor(std_id, 'negative')
+                var data = this.result[std_id]
+                if(!data){
+                    return
+                }
+                var marks = data.marks || ''
+                // reset the value to original value after a delay
+                setTimeout(function(){
+                    $('table tr[data-id="'+std_id+'"] input[name="marks"]').val(marks)
+                }, 200)
                 return
             }
 
             data['marks'] = marks
             data['marksSaving'] = true
-    
+
             var grade = this.gradeFor(this.percentOf(event.target.value))
             data['comment'] = grade.comment
             data['commentSaving'] = true
-        
+
             this.$set(this.result, std_id, data)
             var url = '/api/marks/set/' + this.selectedTest.id + '/' + std_id
             this.$http.post(url, data)
             .then(response => {
                 console.log(response)
-                var data = vm.result[std_id]
-                data.marksSaving = false
-                data.commentSaving = false
-                vm.$set(vm.result, std_id, data)
+                if(response.body.status === 'success'){
+                    var data = response.body.marks
+                    data.marksSaving = false
+                    data.commentSaving = false
+                    vm.$set(vm.result, std_id, data)
+                    vm.highlightRowFor(data.student_id, 'positive')
+                }
+                else{
+                    // required to update the loading state in UI
+                    var data = vm.result[std_id]
+                    data.marksSaving = false
+                    data.commentSaving = false
+                    vm.$set(vm.result, std_id, data)
+                    vm.highlightRowFor(data.student_id, 'negative')
+                }
             },
             error => {
                 console.log(error)
+                // required to update the loading state in UI
                 var data = vm.result[std_id]
                 data.marksSaving = false
                 data.commentSaving = false
                 vm.$set(vm.result, std_id, data)
+                vm.highlightRowFor(data.student_id, 'negative')
             })
         },
         setComments: function(std_id, event){
@@ -256,15 +279,28 @@ var app = new Vue({
             this.$http.post(url, data)
             .then(response => {
                 console.log(response)
-                var data = vm.result[std_id]
-                data.commentSaving = false
-                vm.$set(vm.result, std_id, data)
+                if(response.body.status === 'success'){
+                    var data = response.body.marks
+                    data.commentSaving = false
+                    vm.$set(vm.result, std_id, data)
+                    vm.highlightRowFor(data.student_id, 'positive')
+                }
+                else{
+                    // required to update the loading state in UI
+                    var data = vm.result[std_id]
+                    data.marksSaving = false
+                    data.commentSaving = false
+                    vm.$set(vm.result, std_id, data)
+                    vm.highlightRowFor(data.student_id, 'negative')
+                }
             },
             error => {
                 console.log(error)
+                // required to update the loading state in UI
                 var data = vm.result[std_id]
                 data.commentSaving = false
                 vm.$set(vm.result, std_id, data)
+                vm.highlightRowFor(data.student_id, 'negative')
             })
         },
         gradeFor: function(percent){
@@ -299,50 +335,57 @@ var app = new Vue({
                 return undefined
             return this.percentOf(mo)
         },
-        getComment: function(id){
+        getComments: function(id){
             // intentially leaving for undefined
             var data = this.result[id]
             if(data)
-                return data.comment
+                return data.comments
         },
         getMarks: function(id){
           var data = this.result[id]
-            if(data)
-                return data.marks
-        },
-        showDeleteMarks: function(){
-            var test = this.selectedTest
-            if(!test)
-                return
-            this.cnfModal.heading = 'Confirm Delete'
-            this.cnfModal.content = 'Are you sure you want to delete ALL marks for "'+this.selectedTest.name+'"? you won\'t be able to undo this.'
-            this.cnfModal.action = 'DELETE_MARKS'
-            this.cnfModal.data = test
-            this.showModal('cnfModal')
-        },
-        deleteMarks: function(test){
-            var vm = this
-            console.log('I will delete ALL marks of ',test.name)
-            this.deleteLoading = true
-            this.$http.get('/api/marks/delete/' + test.id)
-            .then(response=>{
-                console.log(response)
-                if(response.body.status === 'success'){
-                    vm.result = {}
-                    var msg = response.body.message || 'Successfuly deleted marks.'
-                    vm.showToast(msg, 'success', 'check')
-                }else{
-                    var msg = response.body.message || 'Something unexpected happened, try again!'
-                    vm.showToast(msg, 'warn', 'info')
-                }
-                this.deleteLoading = false
-            },
-            error => {
-                console.log(error)
-                var msg = 'Something unexpected happened, try again!' || error.statusText 
+          if(data)
+            return data.marks
+    },
+    showDeleteMarks: function(){
+        var test = this.selectedTest
+        if(!test)
+            return
+        this.cnfModal.heading = 'Confirm Delete'
+        this.cnfModal.content = 'Are you sure you want to delete ALL marks for "'+this.selectedTest.name+'"? you won\'t be able to undo this.'
+        this.cnfModal.action = 'DELETE_MARKS'
+        this.cnfModal.data = test
+        this.showModal('cnfModal')
+    },
+    deleteMarks: function(test){
+        var vm = this
+        console.log('I will delete ALL marks of ',test.name)
+        this.deleteLoading = true
+        this.$http.get('/api/marks/delete/' + test.id)
+        .then(response=>{
+            console.log(response)
+            if(response.body.status === 'success'){
+                vm.result = {}
+                var msg = response.body.message || 'Successfuly deleted marks.'
+                vm.showToast(msg, 'success', 'check')
+            }else{
+                var msg = response.body.message || 'Something unexpected happened, try again!'
                 vm.showToast(msg, 'warn', 'info')
-                this.deleteLoading = false
-            })
-        }
+            }
+            this.deleteLoading = false
+        },
+        error => {
+            console.log(error)
+            var msg = 'Something unexpected happened, try again!' || error.statusText 
+            vm.showToast(msg, 'warn', 'info')
+            this.deleteLoading = false
+        })
+    },
+    highlightRowFor: function(dataid, color, secs){
+        secs = parseInt(secs) || 1000
+        $('table tr[data-id="' + dataid + '"]').addClass(color)
+        setTimeout(function(){
+            $('table tr[data-id="' + dataid + '"]').removeClass(color)
+        }, secs)
     }
+}
 })

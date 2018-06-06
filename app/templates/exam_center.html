@@ -87,7 +87,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="std in filteredStudents">
+                            <tr v-for="std in filteredStudents" :data-id="std.id">
                                 <td>{{std.student_id}}</td>
                                 <td>{{std.name}}</td>
                                 <td>
@@ -102,7 +102,7 @@
                                 <td>{{getGrade(std.id).grade}}</td>
                                 <td>
                                     <div class="ui icon input" :class="[result[std.id] && result[std.id].commentSaving ? 'loading disabled' : '']">
-                                        <input type="text" name="comment" value="" placeholder="Comment" :disabled="!is_admin && selectedTest.evaluator != me.id" :value="getComment(std.id)"/ v-on:change="setComments(std.id, $event)" :value="result[std.id].comment">
+                                        <input type="text" name="comment" placeholder="Comment" :disabled="!is_admin && selectedTest.evaluator != me.id" :value="getComments(std.id)" v-on:change="setComments(std.id, $event)" >
                                         <i class="ui icon"></i>
                                     </div>
                                 </td>

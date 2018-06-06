@@ -436,7 +436,7 @@ class Grade(Base):
 
 class Marks(Base):
 
-    marks = db.Column(db.Integer, nullable=False)
+    marks = db.Column(db.Float, nullable=False)
     comments = db.Column(db.String(50), nullable=True)
 
     test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)

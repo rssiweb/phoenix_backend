@@ -67,6 +67,7 @@ def set_marks(testid, studentid):
     db.session.add(marks)
     db.session.commit()
     res['status'] = 'success'
+    res['marks'] = marks.serialize()
     res['message'] = 'Marks and Comments saved'
     return jsonify(res), 200
 
