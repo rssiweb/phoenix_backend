@@ -90,7 +90,7 @@ var app = new Vue({
             }
         },
         selectedTestId: function(){
-            if(this.branch.id){
+            if(this.branch.id && this.selectedTestId){
                 this.marksLoading = true
                 this.loadv2([
                 {
@@ -159,6 +159,10 @@ var app = new Vue({
                 }
             })
             if(index != -1){
+                $('#testDropdown').dropdown('clear')
+                this.tests = []
+                this.result = {}
+                this.studentCatFilter = ''
                 var allTests = this.exams[index].tests
                 this.tests = allTests.filter(test => {
                     return this.me.admin || test.evaluator === this.me.id
@@ -167,6 +171,9 @@ var app = new Vue({
         },
         onTestChange: function(){
             var data = $('#testCodeForm').form('get values')
+            if(!data.test) {
+                return
+            }
             this.selectedTestId = parseInt(data.test)
             var test = undefined
             this.tests.forEach((t, i)=>{
