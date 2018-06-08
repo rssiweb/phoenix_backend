@@ -216,11 +216,8 @@ var app = new Vue({
             }
             var marks = event.target.value
             if(marks > this.selectedTest.max_marks){
-                vm.highlightRowFor(std_id, 'negative')
-                var data = this.result[std_id]
-                if(!data){
-                    return
-                }
+                vm.highlightRowFor(std_id, 'red')
+                var data = this.result[std_id] || {}
                 var marks = data.marks || ''
                 // reset the value to original value after a delay
                 setTimeout(function(){
@@ -246,7 +243,7 @@ var app = new Vue({
                     data.marksSaving = false
                     data.commentSaving = false
                     vm.$set(vm.result, std_id, data)
-                    vm.highlightRowFor(data.student_id, 'positive')
+                    vm.highlightRowFor(data.student_id, 'olive')
                 }
                 else{
                     // required to update the loading state in UI
@@ -254,7 +251,7 @@ var app = new Vue({
                     data.marksSaving = false
                     data.commentSaving = false
                     vm.$set(vm.result, std_id, data)
-                    vm.highlightRowFor(data.student_id, 'negative')
+                    vm.highlightRowFor(data.student_id, 'red')
                 }
             },
             error => {
@@ -264,7 +261,7 @@ var app = new Vue({
                 data.marksSaving = false
                 data.commentSaving = false
                 vm.$set(vm.result, std_id, data)
-                vm.highlightRowFor(data.student_id, 'negative')
+                vm.highlightRowFor(data.student_id, 'orange')
             })
         },
         setComments: function(std_id, event){
@@ -283,7 +280,7 @@ var app = new Vue({
                     var data = response.body.marks
                     data.commentSaving = false
                     vm.$set(vm.result, std_id, data)
-                    vm.highlightRowFor(data.student_id, 'positive')
+                    vm.highlightRowFor(data.student_id, 'olive')
                 }
                 else{
                     // required to update the loading state in UI
@@ -291,7 +288,7 @@ var app = new Vue({
                     data.marksSaving = false
                     data.commentSaving = false
                     vm.$set(vm.result, std_id, data)
-                    vm.highlightRowFor(data.student_id, 'negative')
+                    vm.highlightRowFor(data.student_id, 'orange')
                 }
             },
             error => {
@@ -300,7 +297,7 @@ var app = new Vue({
                 var data = vm.result[std_id]
                 data.commentSaving = false
                 vm.$set(vm.result, std_id, data)
-                vm.highlightRowFor(data.student_id, 'negative')
+                vm.highlightRowFor(data.student_id, 'orange')
             })
         },
         gradeFor: function(percent){
@@ -351,7 +348,7 @@ var app = new Vue({
         if(!test)
             return
         this.cnfModal.heading = 'Confirm Delete'
-        this.cnfModal.content = 'Are you sure you want to delete ALL marks for "'+this.selectedTest.name+'"? you won\'t be able to undo this.'
+        this.cnfModal.content = 'Are you sure you want to delete ALL marks for '+this.selectedTest.name+'? You won\'t be able to undo this.'
         this.cnfModal.action = 'DELETE_MARKS'
         this.cnfModal.data = test
         this.showModal('cnfModal')
@@ -382,9 +379,13 @@ var app = new Vue({
     },
     highlightRowFor: function(dataid, color, secs){
         secs = parseInt(secs) || 1000
-        $('table tr[data-id="' + dataid + '"]').addClass(color)
+        if(!color)
+            color= 'olive'
+        var clazz = 'ui tertiary ' + color + ' inverted basic segment'
+        var selector = 'table tr[data-id="' + dataid + '"]'
+        $(selector).addClass(clazz)
         setTimeout(function(){
-            $('table tr[data-id="' + dataid + '"]').removeClass(color)
+            $(selector).removeClass(clazz)
         }, secs)
     }
 }
