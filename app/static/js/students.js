@@ -289,7 +289,7 @@ var app = new Vue({
             filteredStudents(){
                 var vm = this
                 var lowerTxt = this.searchTxt.toLowerCase()
-                return this.students.filter(student => {
+                var students = this.students.filter(student => {
                     return (vm.categoryFilter.length == 0 || vm.categoryFilter.indexOf(student.category) != -1) &&
                     ( vm.branchFilter.length == 0 || vm.branchFilter.indexOf(student.branch) != -1) &&
                     ( vm.statusFilter == 'all' || vm.statusFilter == student.active+'') &&
@@ -298,6 +298,28 @@ var app = new Vue({
                       this.getBranchName(student.branch).toLowerCase().indexOf(lowerTxt) != -1
                       )
                 })
+                students.sort(function(s1, s2){
+                    var s1a = s1.active || false
+                    var s2a = s2.active || false
+                    if(s1a === s2a){
+                        s1a = vm.getCategoryName(s1.category) || '' 
+                        s2a = vm.getCategoryName(s2.category) || ''
+                        if(s1a === s2a){
+                            s1a = s1.name || ''
+                            s2a = s2.name || ''
+                            s1a = s1a.toLowerCase()
+                            s2a = s2a.toLowerCase()
+                            if (s1a === s2a)
+                                return 0
+                            return s1a > s2a ? 1 : -1
+                        }else{
+                            return s1a > s2a ? 1 : -1
+                        }
+                    } else {
+                        return s2a - s1a                         
+                    }
+                })
+                return students
             }
         },
     });
