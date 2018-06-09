@@ -115,6 +115,7 @@ var app = new Vue({
         // clicks on 'Add test' button the data changes which leads Vue to call updated
         $('.ui.dropdown').dropdown()
         $('.ui.calendar').calendar({type: 'date', minDate: new Date()})
+        $('.sortable').tablesort()
         // $('#examModal .form').form(app.initExamForm)
     },
     computed:{

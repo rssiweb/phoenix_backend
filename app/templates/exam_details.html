@@ -40,8 +40,8 @@
                     <td :data-sort-value="test.date">{{moment(test.date,['DD?/MM/YYYY']).format('MMM DD, YYYY')}}</td>
                     <td>{{test.max_marks}}</td>
                     <td>{{getCategoryName(test.category)}}</td>
-                    <td>{{getSubjectName(test.subject)}}</td>
-                    <td>{{test.evaluator?getFacultyName(test.evaluator):'Admin'}}</td>
+                    <td :data-sort-value="getSubjectName(test.subject).toLowerCase()">{{getSubjectName(test.subject)}}</td>
+                    <td :data-sort-value="test.evaluator ? getFacultyName(test.evaluator).toLowerCase():'Admin'">{{test.evaluator?getFacultyName(test.evaluator):'Admin'}}</td>
                 </tr>
             </tbody>
         </table>

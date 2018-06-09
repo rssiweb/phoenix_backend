@@ -216,7 +216,7 @@ var app = new Vue({
             }
             var marks = event.target.value
             if(marks > this.selectedTest.max_marks){
-                vm.highlightRowFor(std_id, 'red')
+                vm.highlightRowFor(std_id, 'negative')
                 var data = this.result[std_id] || {}
                 var marks = data.marks || ''
                 // reset the value to original value after a delay
@@ -243,7 +243,7 @@ var app = new Vue({
                     data.marksSaving = false
                     data.commentSaving = false
                     vm.$set(vm.result, std_id, data)
-                    vm.highlightRowFor(data.student_id, 'olive')
+                    vm.highlightRowFor(data.student_id, 'positive')
                 }
                 else{
                     // required to update the loading state in UI
@@ -251,7 +251,7 @@ var app = new Vue({
                     data.marksSaving = false
                     data.commentSaving = false
                     vm.$set(vm.result, std_id, data)
-                    vm.highlightRowFor(data.student_id, 'red')
+                    vm.highlightRowFor(data.student_id, 'negative')
                 }
             },
             error => {
@@ -261,7 +261,7 @@ var app = new Vue({
                 data.marksSaving = false
                 data.commentSaving = false
                 vm.$set(vm.result, std_id, data)
-                vm.highlightRowFor(data.student_id, 'orange')
+                vm.highlightRowFor(data.student_id, 'negative')
             })
         },
         setComments: function(std_id, event){
@@ -280,7 +280,7 @@ var app = new Vue({
                     var data = response.body.marks
                     data.commentSaving = false
                     vm.$set(vm.result, std_id, data)
-                    vm.highlightRowFor(data.student_id, 'olive')
+                    vm.highlightRowFor(data.student_id, 'positive')
                 }
                 else{
                     // required to update the loading state in UI
@@ -288,7 +288,7 @@ var app = new Vue({
                     data.marksSaving = false
                     data.commentSaving = false
                     vm.$set(vm.result, std_id, data)
-                    vm.highlightRowFor(data.student_id, 'orange')
+                    vm.highlightRowFor(data.student_id, 'negative')
                 }
             },
             error => {
@@ -297,7 +297,7 @@ var app = new Vue({
                 var data = vm.result[std_id]
                 data.commentSaving = false
                 vm.$set(vm.result, std_id, data)
-                vm.highlightRowFor(data.student_id, 'orange')
+                vm.highlightRowFor(data.student_id, 'negative')
             })
         },
         gradeFor: function(percent){
@@ -380,9 +380,9 @@ var app = new Vue({
     highlightRowFor: function(dataid, color, secs){
         secs = parseInt(secs) || 1000
         if(!color)
-            color= 'olive'
-        var clazz = 'ui tertiary ' + color + ' inverted basic segment'
+            color = 'positive'
         var selector = 'table tr[data-id="' + dataid + '"]'
+        var clazz = color
         $(selector).addClass(clazz)
         setTimeout(function(){
             $(selector).removeClass(clazz)
