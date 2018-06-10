@@ -23,3 +23,9 @@ body{
 .content{
     flex: 1;
 }
+
+@media only screen and (max-width: 767px) {
+    body{
+        padding-top: 0px;
+    }
+}
