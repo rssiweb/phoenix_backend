@@ -7,13 +7,13 @@
         <div class="menu">
             <a class="item {%if page == 1%}active{%endif%}" href="/attendance">Students</a>
             <a class="item disabled">Faculties</a>
-            <a class="item {%if page == 5%}active{%endif%}" href="/report">Reports</a>
         </div>
     </div>
     <a class="item {%if page == 2%}active{%endif%}" href="/students" v-if="is_admin">Students</a>
     <a class="item {%if page == 3%}active{%endif%}" href="/faculties" v-if="is_admin">Faculties</a>
     <a class="item {%if page == 4%}active{%endif%}" href="/me" >Profile</a>
     <a class="item {%if page == 6%}active{%endif%}" href="/exam" >Exam</a>
+    <a class="item {%if page == 5%}active{%endif%}" href="/report">Reports</a>
     <a class="item {%if page == 7%}active{%endif%}" href="/adminactions" v-if="is_admin">Admin</a>
     <a v-on:click="logout" class="item">Logout</a>
 </div>
@@ -41,20 +41,19 @@
                         <div class="menu">
                             <a class="item {%if page == 1%}active{%endif%}" href="/attendance">Students</a>
                             <a class="item disabled">Faculties</a>
-                            <a class="item {%if page == 5%}active{%endif%}" href="/report">Reports</a>
                         </div>
                     </div>
                     <a class="item {%if page == 2%}active{%endif%}" href="/students" v-if="is_admin">Students</a>
                     <a class="item {%if page == 3%}active{%endif%}" href="/faculties" v-if="is_admin">Faculties</a>
-                    <a class="item {%if page == 4%}active{%endif%}" href="/me" >Profile</a>
                     <a class="item {%if page == 6%}active{%endif%}" href="/exam" >Exam</a>
+                    <a class="item {%if page == 5%}active{%endif%}" href="/report">Reports</a>
                     <a class="item {%if page == 7%}active{%endif%}" href="/adminactions" v-if="is_admin">Admin</a>
                     <div class="right menu">
                         {%raw%}
-                        <div class="header item" v-if="name">
+                        <a class="item {%if page == 4%}active{%endif%}" v-if="name" href="/me">
                             <img class="ui avatar image" src="http://via.placeholder.com/35x35">
                             <span>{{name}}</span>
-                        </div>
+                        </a>
                         {%endraw%}
                         <a v-on:click="logout" class="item">Logout</a>
                     </div>

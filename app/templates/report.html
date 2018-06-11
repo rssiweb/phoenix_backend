@@ -5,87 +5,40 @@
 
 <div class="ui basic segment">
     <h2>Reports</h2>
-    <table class="ui stripped table">
-        <thead>
-            <tr>
-                <th>Report</th>
-                <th class="right aligned">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Summary Report</td>
-                <td class="right aligned"><button class="ui mini primary button" @click="showSummaryModal" :class="{loading: loading, disabled: loading}">Export</button></td>
-            </tr>
-            <tr>
-                <td>Detail Report</td>
-                <td class="right aligned"><button class="ui mini primary button" @click="showDetailModal" :class="{loading: loading, disabled: loading}">Export</button></td>
-            </tr>
-        </tbody>
-    </table>
-    <template v-if="false">
-        <form class="ui form" id="reportForm" @submit.prevent="exportReport">
-            <div class="fields">
-                <div class="field">
-                    <label>Select Type</label>
-                    <select class="ui dropdown" type="text">
-                        <option value="monthly">Monthly</option>
-                        <option value="detailed" disabled="">Detailed</option>
-                    </select>
+    <div class="ui segments">
+        <div class="ui segment">
+            <h3 class="ui header">Attendance Reports</h3>
+            <div class="ui divided items">
+                <div class="ui item">
+                    <div class="middle aligned content">
+                        Summary Report      
+                    </div>
+                    <div class="extras">
+                        <button class="ui right aligned mini primary button" @click="showSummaryModal" :class="{loading: loading, disabled: loading}">Export</button>
+                    </div>
                 </div>
-
-                <div class="field">
-                    <label>Select Branch(s)</label>
-                    <select class="dropdown multiple" type="text" name="branches" v-model="selectedBranches" multiple>
-                        <option value="">All Branches</option>
-                        <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Select Category(s)</label>
-                    <select class="dropdown multiple" name="cats" v-model="selectedCategories" multiple>
-                        <option value="">All Categories</option>
-                        <option v-for="cat in categories" v-bind:value="cat.id">{{cat.name}}</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Select Month</label>
-                    <div class="ui calendar" id="month">
-                        <input type="text" v-bind:placeholder="moment().format('MMMM YYYY')" name="month"/>
+                <div class="ui item">
+                    <div class="middle aligned content">Detail Report</div>
+                    <div class="extras">
+                        <button class="ui right aligned mini primary button" @click="showDetailModal" :class="{loading: loading, disabled: loading}">Export</button>
                     </div>
                 </div>
             </div>
-            <div class="field">
-                <button type="submit" class="ui mini primary button" :class="{disabled: (!selectedStudents.length && !filteredStudents.length) || loading, loading: loading}">Export Selected</button>
+        </div>
+        <div class="ui segment">
+            <h3 class="ui header">Exam Reports</h3>
+            <div class="ui divided items">
+                <div class="ui item">
+                    <div class="middle aligned content">
+                        Detail Report      
+                    </div>
+                    <div class="extras">
+                        <div class="ui right aligned mini primary button">Export</div>
+                    </div>
+                </div>
             </div>
-        </form>
-
-        <p>{{selectedStudents.length || filteredStudents.length}} students selected</p>
-        <div class="ui error message" v-if="error">{{error}}</div>
-
-        <button class="ui mini compact icon button disabled">Select All</button>
-        <button class="ui mini compact icon button disabled">Invert Selection</button>
-        <button class="ui mini compact icon button disabled">Clear Selection</button>
-
-        <table class="ui stripped selectable sortable table">
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Branch</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="student in filteredStudents" v-on:click="toggleStudentSelection(student)" :class="{positive: selectedStudents.indexOf(student) != -1 }">
-                    <td>{{getCategoryName(student.category)}}</td>
-                    <td>{{student.student_id}}</td>
-                    <td>{{student.name}}</td>
-                    <td>{{getBranchName(student.branch)}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </template>
+        </div>
+    </div>
 </div>
 
 <div class="ui small modal" id="summaryReportModal">
