@@ -36,7 +36,7 @@ TOKEN_LIFESPAN_SEC = int(os.getenv('TOKEN_LIFESPAN_SEC', 7200))
 
 REPORT_FOLDER = os.getenv('REPORT_FOLDER', 'gen/reports')
 
-REDISTOGO_URL = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')  # default value added for worker process to run
+REDISTOGO_URL = os.getenv('REDISTOGO_URL')  # default value added for worker process to run
 
 SENDGRID_USERNAME = os.getenv('SENDGRID_USERNAME')
 SENDGRID_PASSWORD = os.getenv('SENDGRID_PASSWORD')
