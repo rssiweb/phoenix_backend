@@ -1,13 +1,10 @@
-from rq import Worker, Queue, Connection
+from config import REDISTOGO_URL
 import redis
-import os
-
+from rq import Worker, Queue, Connection
 
 listen = ['high', 'default', 'low']
 
-redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
-print redis_url
-conn = redis.from_url(redis_url)
+conn = redis.from_url(REDISTOGO_URL)
 
 if __name__ == '__main__':
     with Connection(conn):

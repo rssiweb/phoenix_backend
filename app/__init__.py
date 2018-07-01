@@ -6,17 +6,14 @@ from flask_rq2 import RQ
 
 # Define the WSGI application object
 app = Flask(__name__)
-
-rq = RQ(app, default_timeout=180 * 2)
-
-bcrypt = Bcrypt(app)
-
-logger = app.logger
-
 # Configurations
 app.config.from_object('config')
 
+logger = app.logger
+
 # Define Database object which is imported by some modules
+bcrypt = Bcrypt(app)
+rq = RQ(app, default_timeout=180 * 2)
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
