@@ -34,4 +34,10 @@ BCRYPT_LOG_ROUNDS = int(os.getenv('BCRYPT_LOG_ROUNDS', 10))
 # default token life to 2 hours
 TOKEN_LIFESPAN_SEC = int(os.getenv('TOKEN_LIFESPAN_SEC', 7200))
 
-REPORT_FOLDER = os.getenv('REPORT_FOLDER', 'reports')
+REPORT_FOLDER = os.getenv('REPORT_FOLDER', 'gen/reports')
+
+REDISTOGO_URL = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')  # default value added for worker process to run
+
+SENDGRID_USERNAME = os.getenv('SENDGRID_USERNAME')
+SENDGRID_PASSWORD = os.getenv('SENDGRID_PASSWORD')
+SENDGRID_DISPLAYNAME = os.getenv('SENDGRID_DISPLAYNAME', 'RSSI Mailer')

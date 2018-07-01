@@ -12,6 +12,7 @@ var app = new Vue({
         message: '',
         loading: 'Loading ...',
 
+        branches: [],
         faculties: [],
         facultyToReset: {},
 
@@ -21,14 +22,24 @@ var app = new Vue({
         addingOrUpdating: false,
 
         searchTxt: '',
+        initModal: {},
+        initFacultyForm: {},
     },
     created: function(){
         this.loadv2([
-            {name:'Faculties',
-             url:'/api/admin/faculty/list',
-             variableName: 'faculties',
-             dataInReponse: 'faculties'},
-             ])
+            {
+                name:'Faculties',
+                url:'/api/admin/faculty/list',
+                variableName: 'faculties',
+                dataInReponse: 'faculties'
+            },
+            {
+                name:'Branches',
+                url:'/api/branch/list',
+                variableName: 'branches',
+                dataInReponse: 'branches'
+            },
+            ])
     },
     updated: function(){
         $(this.$el).find('table').tablesort()
@@ -38,6 +49,20 @@ var app = new Vue({
         showResetDialog(faculty) {
             this.facultyToReset = faculty
             $('#resetModal').modal('show')
+        },
+        showAddFaculty: function(){
+            this.isFacultyUpdate = false
+            this.facultyToUpdate = {}
+            $('#addFacultyForm input[name="gender"]').dropdown('clear')
+            $('#addFacultyForm input[name="branch_id"]').dropdown('clear')
+            this.showModal('addFacultyModal')
+        },
+        showUpdateFaculty: function(faculty){
+            this.isFacultyUpdate = true
+            this.facultyToUpdate = Object.assign({}, faculty)
+            $('#addFacultyForm input[name="gender"]').dropdown('set selected', this.facultyToUpdate.gender)
+            $('#addFacultyForm input[name="branch_id"]').dropdown('set selected', this.facultyToUpdate.branch)
+            this.showModal('addFacultyModal')
         },
         addFaculty() {
             var vm = this
@@ -65,7 +90,7 @@ var app = new Vue({
                 vm.loading = ''
             });
         },
-        updateFaculty() {
+        updateFaculty: function() {
             if(!this.isFacultyUpdate){
                 return this.addFaculty()
             }
@@ -80,7 +105,7 @@ var app = new Vue({
             .then((response) => {
                 console.log(response)
                 vm.addingOrUpdating = false
-                if(response.body.status == 'success'){
+                if(response.body.status === 'success'){
                     vm.resetFacultyForm()
                     vm.$set(vm.faculties, facultyIndex, response.body.faculty)
                 }else{
@@ -91,7 +116,6 @@ var app = new Vue({
                 console.log(error);
                 vm.error = error.statusText
             });
-            
         },
         markFacultyToUpdate(faculty) {
             console.log('update', faculty)
@@ -216,10 +240,10 @@ var app = new Vue({
             return facultyIndex
         },
         isValidPassword(password){
-            if(!password){
-                return {result:true}
-            }
             res = {result: true, message:[]}
+            if(!password){
+                return res
+            }
             if(password.length < 5){
                 res.message.push('Must contain atleast 5 characters')
                 res.result = false

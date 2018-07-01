@@ -2,7 +2,6 @@ var app = new Vue({
     mixins: [utils],
     el: '#app',
     data:{
-        heading: 'Exam Center',
         landed: false,
 
         students: [],

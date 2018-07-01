@@ -8,3 +8,4 @@ psycopg2
 Pillow
 pytz
 mysqlclient
+Flask-RQ2==18.0

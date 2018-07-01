@@ -73,6 +73,7 @@ class Faculty(User):
                     admin=self.admin,
                     gender=self.gender,
                     active=self.isActive,
+                    branch=self.branch_id,
                     superUser=self.superUser,
                     )
 

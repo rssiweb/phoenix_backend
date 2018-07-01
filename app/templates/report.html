@@ -5,45 +5,85 @@
 
 <div class="ui basic segment">
     <h2>Reports</h2>
-    <div class="ui segments">
-        <div class="ui segment">
-            <h3 class="ui header">Attendance Reports</h3>
-            <div class="ui divided items">
-                <div class="ui item">
-                    <div class="middle aligned content">
-                        Summary Report      
-                    </div>
-                    <div class="extras">
-                        <button class="ui right aligned mini primary button" @click="showSummaryModal" :class="{loading: loading, disabled: loading}">Export</button>
+    
+    <div class="ui segment">
+        <h3 class="ui header">Attendance Reports</h3>
+        <div class="ui divided items">
+            <div class="ui item">
+                <div class="middle aligned content">
+                    <h4 class="ui header">Summary Report</h4>
+                    <div class="meta">
+                        <span>Monthly report of Attendance for all or selected Category and Branch</span>
                     </div>
                 </div>
-                <div class="ui item">
-                    <div class="middle aligned content">Detail Report</div>
-                    <div class="extras">
-                        <button class="ui right aligned mini primary button" @click="showDetailModal" :class="{loading: loading, disabled: loading}">Export</button>
+                <div class="extras">
+                    <button class="ui right aligned mini primary button" @click="showAttendanceModal" :class="{loading: loading, disabled: loading}">Export</button>
+                </div>
+            </div>
+            <div class="ui item">
+                <div class="middle aligned content">
+                    <h4 class="ui header">Detail Report</h4>
+                    <div class="meta">
+                        <span>Attendance report for selected start and end data for selected Students or Category or Branch</span>
                     </div>
+                </div>
+                <div class="extras">
+                    <button class="ui right aligned mini primary button" @click="showDetailedAttendanceModal" :class="{loading: loading, disabled: loading}">Export</button>
                 </div>
             </div>
         </div>
-        <div class="ui segment">
-            <h3 class="ui header">Exam Reports</h3>
-            <div class="ui divided items">
-                <div class="ui item">
-                    <div class="middle aligned content">
-                        Detail Report      
+    </div>
+    <div class="ui segment">
+        <h3 class="ui header">Exam Reports</h3>
+        <div class="ui divided items">
+            <div class="ui item">
+                <div class="middle aligned content">
+                    <h4 class="ui header">Detail Report</h4>
+                    <div class="meta">
+                        <span>Exam result reports</span>
                     </div>
-                    <div class="extras">
-                        <div class="ui right aligned mini primary button">Export</div>
-                    </div>
+                </div>
+                <div class="extras">
+                    <button class="ui right aligned mini primary button" @click="showResultModal" :class="{loading: loading, disabled: loading}">Export</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="ui small modal" id="summaryReportModal">
+<!-- Result Detail Report Modal -->
+<div class="ui small modal" id="resultModal">
     <div class="header">
-        Summary Report
+        Exam Report
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="equal width fields">
+                <div class="field">
+                    <label>Select Branch</label>
+                    <select class="dropdown" type="text" name="branche" v-model="selectedBranch">
+                        <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Select Exam</label>
+                    <select class="dropdown" name="exam" v-model="selectedExam">
+                        <option v-for="exam in exams" v-bind:value="exam.id">{{exam.name}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="ui positive button" @click.prevent="requestExamReport">Run</button>
+        <button class="ui negative button">Cancel</button>
+    </div>
+</div>
+
+<!-- Summary Report Modal -->
+<div class="ui small modal" id="attendanceReportModal">
+    <div class="header">
+        Attendance Report
     </div>
     <div class="content">
         <div class="ui form">
@@ -73,15 +113,15 @@
         <p>{{selectedStudents.length || filteredStudents.length}} students selected</p>
     </div>
     <div class="actions">
-        <button class="ui positive button" @click.prevent="exportReport">Run</button>
+        <button class="ui positive button" @click.prevent="requestAttendanceReport">Run</button>
         <button class="ui negative button">Cancel</button>
     </div>
 </div>
 
 <!-- Detail Report Modal -->
-<div class="ui large modal" id="detailReportModal">
+<div class="ui large modal" id="detailedAttendaceModal">
     <div class="header">
-        Detail Report
+        Detail Attendace Report
     </div>
     <div class=" scrolling content">
         <div class="ui form">
@@ -139,7 +179,7 @@
         </table>
     </div>
     <div class="actions">
-        <button class="ui positive button" @click.prevent="exportReport">Run</button>
+        <button class="ui positive button" @click.prevent="requestAttendanceReport">Run</button>
         <button class="ui negative button">Cancel</button>
     </div>
 </div>

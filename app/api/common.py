@@ -1,8 +1,7 @@
-from flask import request, Blueprint, send_from_directory
+from flask import request, Blueprint
 from app import db, jsonify, bcrypt
-from app.models import Faculty, Student, Branch, Category
+from app.models import Faculty
 from app.utils import decorators, isValidPassword
-from app.utils import report
 
 api = Blueprint('common_api', __name__, url_prefix='/api')
 
@@ -71,33 +70,3 @@ def reset_password():
     db.session.commit()
     data = dict(status='success', message='Password updated successfully')
     return jsonify(data), 200
-
-
-@api.route('/exportReport', methods=['POST'])
-@decorators.login_required
-def export_report():
-    data = request.json or request.data or request.form
-    month = data.get('month')
-    if not month:
-        pass
-    ids = data.get('students')
-    categories = data.get('categories', [])
-    branches = data.get('branches', [])
-    students = db.session.query(Student)\
-                         .join(Student.category)\
-                         .filter(Student.id.in_(ids))\
-                         .order_by(Category.name)\
-                         .order_by(Student.name).all()
-    if categories:
-        categories = db.session.query(Category)\
-                               .filter(Category.id.in_(categories)).all()
-    else:
-        categories = Category.query.all()
-    if branches:
-        branches = db.session.query(Branch)\
-                             .filter(Branch.id.in_(branches)).all()
-    else:
-        branches = Branch.query.all()
-
-    reportFileName = report.buildReport(students, month, categories, branches)
-    return send_from_directory(directory='.', filename=reportFileName)

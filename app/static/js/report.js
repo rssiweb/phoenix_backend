@@ -5,9 +5,15 @@ var app = new Vue({
         branches: [],
         categories: [],
         students: [],
+        exams: [],
+
         selectedCategories: [],
         selectedBranches: [],
         selectedStudents: [],
+        
+        selectedBranch: undefined,
+        selectedExam: undefined,
+
         month: moment().format('DD MMMM YYYY'),
         loading: false,
         taskCount: 0,
@@ -77,8 +83,8 @@ var app = new Vue({
             dom.find('table').tablesort()
             dom.find('.dropdown').dropdown()
             dom.find('#month').calendar(this.monthInitData)
-            dom.find('#summaryReportModal').modal(this.summaryReportModalInit)
-            dom.find('#detailReportModal').modal(this.detailReportModalInit)
+            dom.find('#attendanceReportModal').modal(this.summaryReportModalInit)
+            dom.find('#detailedAttendaceModal').modal(this.detailReportModalInit)
             this.initialized = true
         }
     },
@@ -91,6 +97,14 @@ var app = new Vue({
                  variableName: 'students',
                  dataInReponse: 'students'},
                 ])
+        },
+        selectedBranch: function(){
+            this.loadv2([
+            {name:'Exams',
+             url:'/api/exam/'+this.selectedBranch+'/list',
+             variableName: 'exams',
+             dataInReponse: 'exams'}
+             ])
         }
     },
     methods: {
@@ -109,11 +123,32 @@ var app = new Vue({
         setEndMonth: function(date, text, mode){
             console.log('end date set to', date)
         },
-        exportReport(){
+        requestExamReport: function(){
+            var vm = this
+            vm.loading = true
+            var url = '/api/report/generate/exam/' + this.selectedExam
+            this.$http.get(url)
+            .then(response => {
+                if(response.body.status==='success'){
+                    vm.showToast(response.body.message, 'success')
+                }else{
+                    vm.showToast('Request failed! try again', 'warn')
+                }
+                console.log(response)
+                vm.loading = false
+            },
+            error =>{
+                console.log(error)
+                this.error = 'Request failed! please re-load the page and try again, if problem still persists please report to admin.'
+                vm.showToast(this.error, 'error')
+                vm.loading = false
+            })
+        },
+        requestAttendanceReport(){
             this.loading = true
             this.error = ''
             var vm = this
-            var url = '/api/exportReport'
+            var url = '/api/report/generate/attendance'
             var students = this.selectedStudents
             if (students.length == 0)
                 students = this.filteredStudents
@@ -128,29 +163,31 @@ var app = new Vue({
                 categories: vm.selectedCategories,
                 branches: vm.selectedBranches,
             }
-            console.log(postData)
-            var config = this.getHeaders()
-            config.responseType = 'blob'
-            this.$http.post(url, postData, config)
+            this.$http.post(url, postData)
             .then(response => {
-                this.loading = false
-                var blob = new Blob([response.data])
-                var link = document.createElement('a')
-                link.href = window.URL.createObjectURL(blob)
-                link.download = 'Report ' + vm.month + '.pdf'
-                link.click()
+                if(response.body.status === 'success'){
+                    vm.showToast(response.body.message, 'success')
+                }else{
+                    vm.showToast('Request failed! try again', 'warn')
+                }
+                console.log(response)
+                vm.loading = false
             },
             error => {
                 this.loading = false
-                this.error = 'Error occured'
+                this.error = 'Request failed! please re-load the page and try again, if problem still persists please report to admin.'
+                vm.showToast(this.error, 'error')
                 console.log(error)
             })
         },
-        showSummaryModal: function(){
-            $('#summaryReportModal').modal('show')
+        showAttendanceModal: function(){
+            $('#attendanceReportModal').modal('show')
         },
-        showDetailModal: function(){
-            $('#detailReportModal').modal('show')
+        showDetailedAttendanceModal: function(){
+            $('#detailedAttendaceModal').modal('show')
+        },
+        showResultModal: function(){
+          $('#resultModal').modal('show')
         }
     },
     computed: {

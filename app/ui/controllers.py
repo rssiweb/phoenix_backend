@@ -33,9 +33,14 @@ def report():
     return render_template('report.html', page=5)
 
 
-@ui.route('/exam')
+@ui.route('/exam/marks')
 def exam():
-    return render_template('exam_center.html', page=6)
+    return render_template('exam_marks.html', page=6)
+
+
+@ui.route('/exam/result')
+def result():
+    return render_template('exam_result.html', page=8)
 
 
 @ui.route('/adminactions')

@@ -12,7 +12,13 @@
     <a class="item {%if page == 2%}active{%endif%}" href="/students" v-if="is_admin">Students</a>
     <a class="item {%if page == 3%}active{%endif%}" href="/faculties" v-if="is_admin">Faculties</a>
     <a class="item {%if page == 4%}active{%endif%}" href="/me" >Profile</a>
-    <a class="item {%if page == 6%}active{%endif%}" href="/exam" >Exam</a>
+    <div class="item">
+        <div class="header">Exam</div>
+        <div class="menu">
+            <a class="item {%if page == 6%}active{%endif%}" href="/exam/marks" >Marks</a>
+            <a class="item {%if page == 8%}active{%endif%}" href="/exam/result" >Result</a>
+        </div>
+    </div>
     <a class="item {%if page == 5%}active{%endif%}" href="/report">Reports</a>
     <a class="item {%if page == 7%}active{%endif%}" href="/adminactions" v-if="is_admin">Admin</a>
     <a v-on:click="logout" class="item">Logout</a>
@@ -45,7 +51,14 @@
                     </div>
                     <a class="item {%if page == 2%}active{%endif%}" href="/students" v-if="is_admin">Students</a>
                     <a class="item {%if page == 3%}active{%endif%}" href="/faculties" v-if="is_admin">Faculties</a>
-                    <a class="item {%if page == 6%}active{%endif%}" href="/exam" >Exam</a>
+                    <div class="ui dropdown item">
+                        Exam
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item {%if page == 6%}active{%endif%}" href="/exam/marks" >Marks</a>
+                            <a class="item {%if page == 8%}active{%endif%}" href="/exam/result" >Result</a>
+                        </div>
+                    </div>
                     <a class="item {%if page == 5%}active{%endif%}" href="/report">Reports</a>
                     <a class="item {%if page == 7%}active{%endif%}" href="/adminactions" v-if="is_admin">Admin</a>
                     <div class="right menu">

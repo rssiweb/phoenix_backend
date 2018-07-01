@@ -3,9 +3,11 @@ from PIL import ImageFont
 from PIL import ImageDraw
 from app.models import Attendance
 from datetime import datetime, timedelta
+from config import REPORT_FOLDER
 import copy
 import calendar
 import pytz
+import os
 
 
 def draw_row(srno, draw, student, month):
@@ -109,5 +111,6 @@ def buildReport(students, month, categories, branches):
         att_sheet.paste(tmp_row, (0, y_offset))
         y_offset += row.size[1]
     att_sheet.paste(footer, (0, y_offset))
-    att_sheet.save('app/report.pdf', 'PDF', resolution=100.0)
-    return 'report.pdf'
+    filepath = os.path.join(REPORT_FOLDER, 'Attendace Report.pdf')
+    att_sheet.save(filepath, 'PDF', resolution=100.0)
+    return filepath
