@@ -73,6 +73,7 @@
                     <div class="ui text loader">{{deleteLoading ? "Deleting marks..." : "Loading marks.."}}</div>
                 </div>
                 <template v-if="filteredStudents.length">
+                    <button class="ui right floated mini button" :class="{positive: enableEditing, primary: !enableEditing}" @click.prevent="enableEditing = !enableEditing">{{enableEditing? "Done" : "Edit Marks"}}</button>
                     <button class="ui negative right floated mini button" @click.prevent="showDeleteMarks">Clear All Marks</button>
                     <p v-if="selectedTest">Max Marks: {{selectedTest.max_marks}}</p>
                     <table class="ui compact table" >
@@ -92,7 +93,7 @@
                                 <td>{{std.name}}</td>
                                 <td>
                                     <div class="ui icon input" :class="[result[std.id] && result[std.id].marksSaving ? 'loading disabled' : '']">
-                                        <input type="number" name="marks" v-on:change="setObtainedMarks(std.id, $event)" step="0.5" placeholder="Marks Scored" :disabled="!is_admin && selectedTest.evaluator != me.id" min="0" :max="selectedTest.max_marks" :value="getMarks(std.id)">
+                                        <input type="number" name="marks" v-on:change="setObtainedMarks(std.id, $event)" step="0.5" placeholder="Marks Scored" :disabled="(!is_admin && selectedTest.evaluator != me.id) || !enableEditing" min="0" :max="selectedTest.max_marks" :value="getMarks(std.id)">
                                         <i class="ui icon"></i>
                                     </div>
                                 </td>
@@ -102,7 +103,7 @@
                                 <td>{{getGrade(std.id).grade}}</td>
                                 <td>
                                     <div class="ui icon input" :class="[result[std.id] && result[std.id].commentSaving ? 'loading disabled' : '']">
-                                        <input type="text" name="comment" placeholder="Comment" :disabled="!is_admin && selectedTest.evaluator != me.id" :value="getComments(std.id)" v-on:change="setComments(std.id, $event)" >
+                                        <input type="text" name="comment" placeholder="Comment" :disabled="(!is_admin && selectedTest.evaluator != me.id) || !enableEditing" :value="getComments(std.id)" v-on:change="setComments(std.id, $event)" >
                                         <i class="ui icon"></i>
                                     </div>
                                 </td>

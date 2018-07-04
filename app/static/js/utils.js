@@ -95,7 +95,7 @@ var utils = {
                 console.log(type, 'is not a valid toast type')
                 return
             }
-            var duration = 2000
+            var duration = 3000
             if (indefinite){
                 duration = undefined
             }

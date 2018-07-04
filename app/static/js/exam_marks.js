@@ -27,6 +27,8 @@ var app = new Vue({
         error: '',
         message: '',
         loading: 'Loading ...',
+        enableEditing: false,
+
         cnfModal: {
             heading: '',
             content: '',
