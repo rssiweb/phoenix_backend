@@ -51,18 +51,18 @@ def set_marks(testid, studentid):
     comments = data.get('comment')
     marks = Marks.query.filter_by(test_id=test.id, student_id=student.id).first()
     if not marks:
-        if not marksObjtained:
+        if marksObjtained is None:
             res['statusText'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
             res['statusData'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.type(['marks'])
             return jsonify(res), 200
-        if comments:
+        if comments is not None:
             marks = Marks(test_id=test.id, student_id=student.id, marks=marksObjtained, comments=comments)
         else:
             marks = Marks(test_id=test.id, student_id=student.id, marks=marksObjtained)
     else:
-        if marksObjtained:
+        if marksObjtained is not None:
             marks.marks = marksObjtained
-        if comments:
+        if comments is not None:
             marks.comments = comments
     db.session.add(marks)
     db.session.commit()
