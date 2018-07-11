@@ -9,6 +9,8 @@ var app = new Vue({
         heading: 'Faculties',
 
         error: '',
+        resetError: '',
+        facAddUpdateError: '',
         message: '',
         loading: 'Loading ...',
 
@@ -23,98 +25,174 @@ var app = new Vue({
 
         searchTxt: '',
         initModal: {},
-        initFacultyForm: {},
+        initFacultyForm: {
+            on: 'blur',
+            fields: {
+                branch_id: 'empty',
+                facultyId: 'empty',
+                name: 'empty',
+                gender: 'exactCount[1]',
+                email: 'email',
+            }
+        },
+        initResetForm: {
+            on: 'blur',
+            fields: {
+                password: ['empty', 'minLength[6]'],
+                confirmPassword: 'match[newpassword]',
+            }
+        },
+        facModalInit: {
+            onShow: function(){
+                console.log('showing modal')
+                var form = $('#addFacultyModal form')
+                form.form(app.initFacultyForm)
+                form.find('.dropdown').dropdown()
+                form.form('clear')
+                $(form).find('.ui.error.message').empty()
+
+                if(app.isFacultyUpdate){
+                    var values = app.facultyToUpdate
+                    values.branch_id = app.facultyToUpdate.branch
+                    form.form('set values', values)
+                    form.form('remove rule', 'password', ['minLength[6]', 'empty'])
+                    form.form('remove rule', 'confirmPassword', 'match[password]')
+                }else{
+                    form.form('add rule', 'password', ['minLength[6]', 'empty'])
+                    form.form('add rule', 'confirmPassword', 'match[password]')
+                }
+            },
+            onApprove: function(){
+                
+                app.facAddUpdateError = ''
+
+                var form = $(this).find('form')
+                form.find('.ui.error.message').empty()
+                if(!form.form('is valid')){
+                    form.form('validate form')
+                } else {
+                    app.loading = 'Adding faculty'
+                    var data = form.form('get values')
+                    app.addUpdateFaculty(data, function(){
+                        $('#addFacultyModal').modal('hide')
+                    })
+                }
+                return false
+            }
+        },
+        resetPwdModalInit: {
+            onShow: function(){
+                console.log('showing modal')
+                var form = $('#resetPasswordModal form')
+                form.form(app.initResetForm)
+                form.form('clear')
+                form.find('.ui.error.message').empty()
+            },
+            onApprove: function(){
+                
+                app.resetError = ''
+
+                var form = $(this).find('form')
+                form.find('.ui.error.message').empty()
+
+                if(!form.form('is valid')){
+                    form.form('validate form')
+                    return false
+                }
+                else{
+                    app.loading = 'Updating password'
+                    var data = form.form('get values')
+                
+                    app.resetPassword(data, function(){
+                        $('#resetPasswordModal').modal('hide')
+                    })
+                    return false
+                }
+            }
+        }
     },
     created: function(){
         this.loadv2([
-            {
-                name:'Faculties',
-                url:'/api/admin/faculty/list',
-                variableName: 'faculties',
-                dataInReponse: 'faculties'
-            },
-            {
-                name:'Branches',
-                url:'/api/branch/list',
-                variableName: 'branches',
-                dataInReponse: 'branches'
-            },
-            ])
+        {
+            name:'Faculties',
+            url:'/api/admin/faculty/list',
+            variableName: 'faculties',
+            dataInReponse: 'faculties'
+        },
+        {
+            name:'Branches',
+            url:'/api/branch/list',
+            variableName: 'branches',
+            dataInReponse: 'branches'
+        },
+        ])
     },
     updated: function(){
-        $(this.$el).find('table').tablesort()
-        $(this.$el).find('.dropdown').dropdown()
+        var dom = $(this.$el)
+        dom.find('table').tablesort()
+        dom.find('.dropdown').dropdown()
+        dom.find('#addFacultyModal').modal(this.facModalInit)
+        dom.find('#resetPasswordModal').modal(this.resetPwdModalInit)
     },
     methods: {
         showResetDialog(faculty) {
             this.facultyToReset = faculty
-            $('#resetModal').modal('show')
+            this.showModal('resetPasswordModal')
         },
         showAddFaculty: function(){
             this.isFacultyUpdate = false
-            this.facultyToUpdate = {}
-            $('#addFacultyForm input[name="gender"]').dropdown('clear')
-            $('#addFacultyForm input[name="branch_id"]').dropdown('clear')
             this.showModal('addFacultyModal')
         },
         showUpdateFaculty: function(faculty){
             this.isFacultyUpdate = true
             this.facultyToUpdate = Object.assign({}, faculty)
-            $('#addFacultyForm input[name="gender"]').dropdown('set selected', this.facultyToUpdate.gender)
-            $('#addFacultyForm input[name="branch_id"]').dropdown('set selected', this.facultyToUpdate.branch)
             this.showModal('addFacultyModal')
         },
-        addFaculty() {
+        addUpdateFaculty(postData, callback) {
             var vm = this
-            var loading = 'Adding ' + this.facultyToUpdate.name + '...'
-            
-            var postData = this.facultyToUpdate
-            console.log('adding', postData)
 
-            var url = '/api/admin/faculty/add'
+            var url = undefined
+            if (this.isFacultyUpdate){
+                url = '/api/admin/faculty/update'
+                var loading = 'Updating ' + postData.name + '...'
+            }
+            else{
+                url = '/api/admin/faculty/add'
+                vm.loading = 'Adding ' + postData.name + '...'
+            }
             
-            vm.$http.post(url,postData, vm.getHeaders())
+            vm.$http.post(url, postData)
             .then((response) => {
                 console.log(response);
-                if(response.body.status=='success'){
-                    vm.faculties.push(response.body.faculty)
-                    vm.resetFacultyForm()
-                }else{
-                    vm.error = response.body.message
+                if(response.body.status === 'success'){
+                    
+                    var newFaculty = response.body.faculty
+                    if(vm.isFacultyUpdate){
+                        // update the faculty to the list
+                        var facIndex = vm.getFacIndex(newFaculty)
+                        if(facIndex != -1)
+                            vm.$set(vm.faculties, facIndex, response.body.faculty)
+                        else {
+                            vm.faculties.push(newFaculty)
+                            console.log('Faculty updated but he is not present in the fac list')
+                        }
+                    } else {
+                        // Add the faculty to the list
+                        vm.faculties.push(newFaculty)
+                    }
+                    
+                    if(callback)
+                        callback()
+                    vm.showToast(response.body.message, 'success')
+                } else {
+                    vm.facAddUpdateError = response.body.message
                 }
-                vm.loading = ''
+                vm.loading = undefined
             },
             (error) => {
                 console.log(error)
-                vm.error = error.statusText
-                vm.loading = ''
-            });
-        },
-        updateFaculty: function() {
-            if(!this.isFacultyUpdate){
-                return this.addFaculty()
-            }
-            var vm = this
-            var postData = this.facultyToUpdate
-            var url = '/api/admin/faculty/update'
-            var facultyIndex = this.getFacIndex(this.facultyToUpdate)
-
-            vm.addingOrUpdating = true
-            
-            vm.$http.post(url,postData, vm.getHeaders())
-            .then((response) => {
-                console.log(response)
-                vm.addingOrUpdating = false
-                if(response.body.status === 'success'){
-                    vm.resetFacultyForm()
-                    vm.$set(vm.faculties, facultyIndex, response.body.faculty)
-                }else{
-                    vm.error = response.body.message
-                }
-            }, (error) => {
-                vm.addingOrUpdating = false
-                console.log(error);
-                vm.error = error.statusText
+                vm.showToast(error.body.message || error.statusText, 'warn')
+                vm.loading = undefined
             });
         },
         markFacultyToUpdate(faculty) {
@@ -123,47 +201,32 @@ var app = new Vue({
             this.facultyToUpdate = Object.assign({}, faculty)
             $('#addFacultyForm select').dropdown('set selected', this.facultyToUpdate.gender)
         },
-        resetPassword() {
-            console.log('reset password', this.facultyToReset)
+        updateFacultyBranch: function(event){
+            this.facultyToUpdate.branch = event.target.value
+            console.log('new branch value', event.target.value)
+        },
+        resetPassword(postData, callback) {
+            console.log('reset password', postData)
             var vm = this
-            var postData = this.facultyToReset
-            var loading = 'Updating ' + this.facultyToReset.name + '\'s Password ...'
+            var loading = 'Updating ' + postData.name + '\'s Password ...'
             var url = '/api/admin/faculty/reset'
             var facultyIndex = this.getFacIndex(this.facultyToReset)
             console.log(postData)
-            vm.$http.post(url, postData, vm.getHeaders())
+            vm.$http.post(url, postData)
             .then((response) => {
                 console.log(response)
-                var toastConfig = {
-                    theme: 'primary',
-                    className: "ui olive label",
-                    position: "bottom-right", 
-                    icon : 'check',
-                    duration : 3000
-                }
-                var msg = ''
                 if(response.body.status == 'success') {
-                    toastConfig.className = 'ui olive label'
-                    vm.facultyToReset.password = ''
-                    vm.facultyToReset.confirmPassword = ''
+                    if(callback)
+                        callback()
+                    vm.showToast(response.body.message, 'success')
                 } else {
-                    toastConfig.className = 'ui orange label'
+                    vm.resetError = response.body.message
                 }
-                msg = response.body.message
-                if(msg)
-                    vm.$toasted.show(msg, toastConfig)
-                vm.loading = ''
+                vm.loading = undefined
             }, (error) => {
                 console.log(error)
-                var toastConfig = {
-                    theme: 'primary',
-                    className: "ui orange label",
-                    position: "bottom-right", 
-                    icon : 'exclamation-triangle',
-                    duration : 3000
-                }
-                var msg = error.body.message || error.statusText
-                vm.$toasted.show(msg, toastConfig) 
+                vm.showToast(error.body.message || error.statusText, 'warn')
+                vm.loading = undefined
             })
         },
         toogleActive(faculty) {
@@ -212,12 +275,6 @@ var app = new Vue({
             var url = '/api/admin/faculty/'+faculty.facultyId+'/admin/'+faculty.admin;
             console.log('WIP')
         },
-        resetFacultyForm() {
-            this.isFacultyUpdate = false
-            this.facultyToUpdate = {}
-            this.confirmPassword = ''
-            $('#addFacultyForm select').dropdown('clear')
-        },
         getJsonFromForm(formInputArr) {
             data = {}
             $(formInputArr).each(function(index, input){
@@ -230,10 +287,10 @@ var app = new Vue({
         clearError(){
             this.error = ''
         },
-        getFacIndex(fac) {
+        getFacIndex(faculty) {
             var facultyIndex = -1
             this.faculties.forEach((fac, index) => {
-                if (fac.facultyId == this.facultyToUpdate.facultyId) {
+                if (fac.facultyId == faculty.facultyId) {
                     facultyIndex = index
                 }
             })
@@ -270,27 +327,6 @@ var app = new Vue({
         },
         facultyBtnTxt() {
             return this.isFacultyUpdate ?  "Update" : "Add";
-        },
-        enableFacultyBtn() {
-            if(this.loading) return false;
-            if(this.isFacultyUpdate &&
-               this.facultyToUpdate.name &&
-               this.facultyToUpdate.facultyId &&
-               this.facultyToUpdate.email &&
-               this.validEmail &&
-               this.facultyToUpdate.gender)
-                return true;
-            if(!this.isFacultyUpdate &&
-               this.facultyToUpdate.name &&
-               this.facultyToUpdate.facultyId &&
-               this.facultyToUpdate.email &&
-               this.validEmail &&
-               this.facultyToUpdate.gender &&
-               this.isValidPassword(this.facultyToUpdate.password).result &&
-               this.isValidPassword(this.facultyToUpdate.password).message.length == 0 &&
-               this.facultyToUpdate.password == this.confirmPassword)
-                return true;
-            return false;
         },
         newPasswordMatch(){
             return this.facultyToReset.password==this.facultyToReset.confirmPassword;

@@ -1,7 +1,7 @@
 from flask import request, Blueprint
 from app import db, jsonify
 from app.models import Faculty
-from app.utils import decorators, validEmail, isValidPassword
+from app.utils import decorators, isValidPassword
 
 api = Blueprint('admin_faculty_api', __name__, url_prefix='/api/admin/faculty')
 
@@ -52,9 +52,6 @@ def update_faculty():
         res['message'] = 'values for field(s) {0} is required'\
                          .format(blank_values)
         return jsonify(res), res_code
-    if not validEmail(email):
-        res['message'] = 'Invalid Email address %s'.format(email)
-        return jsonify(res), res_code
     faculty = Faculty.query.filter_by(facultyId=facultyId).first()
     if not faculty:
         res['message'] = 'Faculty does not exists'
@@ -102,10 +99,6 @@ def add():
         res['message'] = 'values for field(s) {0} is required'\
                          .format(blank_values)
         return jsonify(res), res_code
-    if not validEmail(email):
-        res['message'] = 'Invalid Email address %s'.format(email)
-        return jsonify(res), res_code
-
     faculty = Faculty.query.filter_by(facultyId=facultyId).first()
     if not faculty:
         try:
@@ -128,7 +121,7 @@ def add():
             print e
             res['message'] = 'Some error occurred. Please try again.'
     else:
-        res['meassage'] = 'Faculty already exists.'
+        res['message'] = 'Faculty already exists.'
         res_code = 202
     return jsonify(res), res_code
 

@@ -41,7 +41,7 @@
         <p><br/><br/><br/><br/></p>
     </div>
 
-    <table class="ui compact sortable striped table" v-if="faculties && !loading && !error">
+    <table class="ui compact sortable striped table" v-if="faculties && !loading">
         <thead>
             <tr>
                 <th>Faculty ID</th>
@@ -85,8 +85,9 @@
 <!-- Modals -->
 <div id="addFacultyModal" class="ui small modal">
     <div class="header">{{facultyBtnTxt}} Faculty</div>
+    
     <div class="content">
-        <div class="ui form" id="addFacultyForm">
+        <form class="ui form">
             <div class="required field">
                 <label>Branch</label>
                 <div class="ui selection dropdown">
@@ -101,15 +102,15 @@
             <div class="ui equal width fields">
                 <div class="required field" :class="{disabled: isFacultyUpdate}">
                     <label>Faculty ID</label>
-                    <input type="text" name="id" placeholder="Faculty ID" v-model="facultyToUpdate.facultyId"  :tabindex="isFacultyUpdate ? -1 : 0">
+                    <input type="text" name="facultyId" placeholder="Faculty ID" :tabindex="isFacultyUpdate ? -1 : 0">
                 </div>
                 <div class="required field">
                     <label>Name</label>
-                    <input type="text" name="name" placeholder="Full Name" v-model="facultyToUpdate.name">
+                    <input type="text" name="name" placeholder="Full Name">
                 </div>
                 <div class="required field">
                     <label>Gender</label>
-                    <select name="gender" class="ui dropdown" v-model="facultyToUpdate.gender">
+                    <select name="gender" class="ui dropdown">
                         <option value="">Gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
@@ -118,64 +119,65 @@
                 </div>
             </div>
             <div class="ui equal width fields">
-                
-                <div class="required field">
+
+                <div class="field">
                     <label>Contact</label>
-                    <input type="text" name="contact" placeholder="Contact Number" v-model="facultyToUpdate.contact">
+                    <input type="text" name="contact" placeholder="Contact Number">
                 </div>
-                <div class="required field" :class="{error: !validEmail}">
+                <div class="required field">
                     <label>Email</label>
-                    <input type="text" name="email" placeholder="Email" v-model="facultyToUpdate.email">
+                    <input type="text" name="email" placeholder="Email">
                 </div>
             </div>
-            <div class="ui equal width fields">
-                <div class="required field" v-show="!isFacultyUpdate">
+            <div class="ui equal width fields" v-show="!isFacultyUpdate">
+                <div class="required field" >
                     <label>Password</label>
-                    <input type="password" name="password" placeholder="Password" v-model="facultyToUpdate.password">
+                    <input id="password" type="password" name="password" placeholder="Password">
                 </div>
-                <div class="required field" v-bind:class="{error: !matchPassword}" v-show="!isFacultyUpdate">
+                <div class="required field">
                     <label>Confirm Password</label>
-                    <input type="password" name="confirmPassword" placeholder="Confirm Password" v-model="confirmPassword">
+                    <input type="password" name="confirmPassword" placeholder="Confirm Password">
                 </div>
             </div>
-        </div>
-        <div class="ui error message" v-if="!isValidPassword(facultyToUpdate.password).result">
-            <ul class="list">
-                <li v-for="err in isValidPassword(facultyToUpdate.password).message">{{err}}</li>
-            </ul>
+            <div class="ui error message"></div>
+        </form>
+        <div class="ui error message" v-if="facAddUpdateError">
+            {{facAddUpdateError}}
         </div>
     </div>
     <div class="actions">
-        <button class="ui positive button" @click.prevent="updateFaculty" :class="{'loading disabled': addingOrUpdating, disabled: !enableFacultyBtn }">{{facultyBtnTxt}}</button>
-        <button class="ui button" @click.prevent="resetFacultyForm">Reset</button>
+        <button class="ui positive button" :class="{'loading disabled': loading}">{{facultyBtnTxt}}</button>
+        <button class="ui button" :class="{'loading disabled': loading}" type="reset" form='addFacultyForm'>Reset</button>
     </div>
+    
 </div>
-<div id="resetModal" class="ui tiny modal">
+<!-- Password reset modal -->
+<div id="resetPasswordModal" class="ui tiny modal">
     <div class="header">Reset {{facultyToReset.name}}'s Password</div>
     <div class="content">
-        <div class="ui form">
+        <form class="ui form">
             <div class="ui field">
                 <label>Email</label>
                 {{facultyToReset.email}}
             </div>
-            <div class="ui field" :class="{'error': !isValidPassword(facultyToReset.password).result }">
+            <input type="hidden" name="facultyId" :value="facultyToReset.facultyId">
+            <div class="ui field">
                 <label>New Password</label>
-                <input type="password" name="password" placeholder="New Password" v-model="facultyToReset.password"  />
+                <input type="password" id="newpassword" name="password" placeholder="New Password"/>
             </div>
-            <div class="ui field" :class="{error: !newPasswordMatch}">
+            <div class="ui field">
                 <label>Confirm Password</label>
-                <input type="password" name="confirmPassword" placeholder="Confirm Password" v-model="facultyToReset.confirmPassword"/>
+                <input type="password" name="confirmPassword" placeholder="Confirm Password"/>
             </div>
-        </div>
-        <div class="ui error message" v-show="!isValidPassword(facultyToReset.password).result">
-            <ul class="ui list" v-if="isValidPassword(facultyToReset.password).message">
-                <li v-for="message in isValidPassword(facultyToReset.password).message">{{message}}</li>
-            </ul>
+            <div class="ui error message"></div>
+        </form>
+        <div class="ui error message" v-if="resetError">
+            {{resetError}}
         </div>
     </div>
     <div class="actions">
-        <button class="ui positive button" @click.prevent="resetPassword" :class="{'disabled': !facultyToReset.password || !newPasswordMatch}">Change Password</button>
-        <button class="ui negative button">Cancel</button>
+        <button class="ui positive button" :class="{'loading disabled': loading}">Change Password</button>
+        <button class="ui negative button" :class="{'loading disabled': loading}">Cancel</button>
     </div>
 </div>
 {%endraw%}
