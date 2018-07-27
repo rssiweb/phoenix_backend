@@ -284,7 +284,7 @@ class Exam(Base):
     __tablename__ = 'exam'
 
     name = db.Column(db.String(100), nullable=False, unique=True)
-    start_date = db.Column(db.Date(), nullable=True, default=datetime.utcnow)
+    start_date = db.Column(db.Date(), nullable=False, default=datetime.utcnow)
     end_date = db.Column(db.Date(), nullable=True)
     state = db.Column(db.String(100), nullable=True)
     branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)

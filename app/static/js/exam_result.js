@@ -10,6 +10,7 @@ var app = new Vue({
         me: undefined,
         branches: [],
         exams: [],
+        marks: {},
         subjects: [],
         students: [],
         categories: [],
@@ -36,7 +37,7 @@ var app = new Vue({
         ], this.init)
     },
     updated: function(){
-        console.log('updated')
+        $(this.$el).find('table.sortable').tablesort()
     },
     watch: {
         selectedBranch: function(){
@@ -51,12 +52,6 @@ var app = new Vue({
                 url:'/api/category/'+this.selectedBranch.id+'/list',
                 variableName: 'categories',
                 dataInReponse: 'categories'
-            },
-            {
-                name:'Exams',
-                url:'/api/exam/'+this.selectedBranch.id+'/list',
-                variableName: 'exams',
-                dataInReponse: 'exams'
             },
             {
                 name:'Grades',
@@ -80,10 +75,25 @@ var app = new Vue({
                 variableName: 'subjects',
                 dataInReponse: 'subjects'
             },
+            {
+                name:'Marks',
+                url:'/api/admin/marks/exam/'+this.selectedExam.id,
+                variableName: 'marks',
+                dataInReponse: 'marks'
+            }
             ])
         }
     },
     computed: {
+        catWiseStudents: function(){
+            var cstds = {}
+            this.students.forEach(std => {
+                if (!cstds[std.category])
+                    cstds[std.category] = []
+                cstds[std.category].push(std)
+            })
+            return cstds
+        }
     },
     methods: {
         init: function(){
@@ -121,6 +131,37 @@ var app = new Vue({
             if(index != -1){
                 this.selectedExam = this.exams[index]
             }
+        },
+        getMarks: function(std, sub){
+            var testid = undefined
+            this.selectedExam.tests.forEach(test => {
+                if(test.subject===sub.id && test.category === std.category){
+                    testid = test.id
+                }
+            })
+            var marks = this.marks[testid]
+            if(!marks){
+                // console.log('No test for', sub.name, this.getCategoryName(std.category))
+                return 'X'
+            }
+            var mark_value = undefined
+            marks.forEach(mark=>{
+                if(mark.student_id===std.id){
+                    mark_value = mark.marks
+                }
+            })
+            return mark_value || 'A'
+        },
+        getMaxMarks: function(sub, catId){
+            var catId = parseInt(catId)
+            console.log('getMaxMarks', sub, catId)
+            var test = {max_marks: '-'}
+            this.selectedExam.tests.forEach(t => {
+                if(t.subject === sub.id && t.category === catId){
+                    test = t
+                }
+            })
+            return test.max_marks
         },
     }
 })

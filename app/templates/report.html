@@ -47,7 +47,47 @@
                     <button class="ui right aligned mini primary button" @click="showResultModal" :class="{loading: loading, disabled: loading}">Export</button>
                 </div>
             </div>
+            <div class="ui item">
+                <div class="middle aligned content">
+                    <h4 class="ui header">Mark Sheets</h4>
+                    <div class="meta">
+                        <span>Genrate Marks sheet of students</span>
+                    </div>
+                </div>
+                <div class="extras">
+                    <button class="ui right aligned mini primary button" @click="showMarksSheetModal" :class="{loading: loading, disabled: loading}">Export</button>
+                </div>
+            </div>
         </div>
+    </div>
+</div>
+
+<!-- Mark Sheet Report Modal -->
+<div class="ui small modal" id="marksheetModal">
+    <div class="header">
+        Exam Report
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="equal width fields">
+                <div class="field">
+                    <label>Select Branch</label>
+                    <select class="dropdown" type="text" name="branche" v-model="selectedBranch">
+                        <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Select Exam</label>
+                    <select class="dropdown" name="exam" v-model="selectedExam">
+                        <option v-for="exam in exams" v-bind:value="exam.id">{{exam.name}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="ui positive button" @click.prevent="requestMarksheetReport">Run</button>
+        <button class="ui negative button">Cancel</button>
     </div>
 </div>
 

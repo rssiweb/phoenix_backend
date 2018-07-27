@@ -180,6 +180,26 @@ var app = new Vue({
                 console.log(error)
             })
         },
+        requestMarksheetReport: function(){
+            var vm = this
+            vm.loading = true
+            this.$http.get('/api/report/generate/marksheet/' + this.selectedExam)
+            .then(response => {
+                if(response.body.status==='success'){
+                    vm.showToast(response.body.message, 'success')
+                }else{
+                    vm.showToast('Request failed! try again', 'warn')
+                }
+                console.log(response)
+                vm.loading = false
+            },
+            error =>{
+                console.log(error)
+                this.error = 'Request failed! please re-load the page and try again, if problem still persists please report to admin.'
+                vm.showToast(this.error, 'error')
+                vm.loading = false
+            })
+        },
         showAttendanceModal: function(){
             $('#attendanceReportModal').modal('show')
         },
@@ -188,6 +208,9 @@ var app = new Vue({
         },
         showResultModal: function(){
           $('#resultModal').modal('show')
+        },
+        showMarksSheetModal: function(){
+          $('#marksheetModal').modal('show')
         }
     },
     computed: {

@@ -35,7 +35,7 @@ def set_marks(testid, studentid):
         return jsonify(res), 200
     if not request.user or (not request.user.admin and request.user.id != test.evaluator_id):
         res['statusText'] = errs.CUSTOM_ERROR.text
-        res['statusData'] = errs.CUSTOM_ERROR.type('You are not authrized.')
+        res['statusData'] = errs.CUSTOM_ERROR.type('You are not authorized.')
         return jsonify(res), 200
     student = Student.query.get(studentid)
     if not student:

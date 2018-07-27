@@ -180,7 +180,7 @@ var app = new Vue({
                         // Add the faculty to the list
                         vm.faculties.push(newFaculty)
                     }
-                    
+
                     if(callback)
                         callback()
                     vm.showToast(response.body.message, 'success')
@@ -236,20 +236,13 @@ var app = new Vue({
             console.log(faculty)
             var url = '/api/admin/faculty/'+faculty.facultyId+'/active/'+(!faculty.active)
             
-            vm.$http.put(url,{}, vm.getHeaders())
+            vm.$http.put(url,{})
             .then((response) => {
                 console.log(response);
-                if(response.body.status=='success'){
-                    console.log('done active')
+                if(response.body.status === 'success'){
                     faculty.active = !faculty.active;
                 }else{
-                    this.$toasted.show(response.body.message+' '+faculty.name + '\'s status did not change.',{ 
-                        theme: 'primary',
-                        className: "ui orange label",
-                        position: "bottom-right", 
-                        icon : 'exclamation-triangle',
-                        duration : 3000
-                    });    
+                    vm.showToast(response.body.message+' '+faculty.name + '\'s status did not change.', 'error');
                 }
                 faculty.stateLoading = false;
                 vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
@@ -257,13 +250,7 @@ var app = new Vue({
             (error) => {
                 faculty.stateLoading = false;  
                 console.log(error);
-                this.$toasted.show(error.statusText + ' error occured. '+faculty.name + '\'s status did not change.',{ 
-                    theme: 'primary',
-                    className: "ui orange label",
-                    position: "bottom-right", 
-                    icon : 'exclamation-triangle',
-                    duration : 3000
-                });
+                vm.showToast(error.statusText + ' error occured. '+faculty.name + '\'s status did not change.', 'error');
                 vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
             });
         },
@@ -274,18 +261,6 @@ var app = new Vue({
             console.log(faculty)
             var url = '/api/admin/faculty/'+faculty.facultyId+'/admin/'+faculty.admin;
             console.log('WIP')
-        },
-        getJsonFromForm(formInputArr) {
-            data = {}
-            $(formInputArr).each(function(index, input){
-                console.log(input)
-                data[input.name] = input.value
-                input.value = ''
-            });
-            return data
-        },
-        clearError(){
-            this.error = ''
         },
         getFacIndex(faculty) {
             var facultyIndex = -1
@@ -321,15 +296,8 @@ var app = new Vue({
         }
     },
     computed:{
-        matchPassword() {
-            return !this.facultyToUpdate.password ||
-            this.facultyToUpdate.password == this.confirmPassword;
-        },
         facultyBtnTxt() {
             return this.isFacultyUpdate ?  "Update" : "Add";
-        },
-        newPasswordMatch(){
-            return this.facultyToReset.password==this.facultyToReset.confirmPassword;
         },
         filteredFaculties(){
             return this.faculties.filter(faculty => {
@@ -344,17 +312,8 @@ var app = new Vue({
         lowerCaseSearchTxt(){
             return this.searchTxt.toLowerCase()
         },
-        validEmail() {
-            var email = this.facultyToUpdate.email
-            if(!email) return true;
-            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return re.test(email);
-        }
     },
     watch:{
-        facultyToReset(){
-            console.log('changed', this.facultyToReset)
-        },
     },
     filters: {
       capitalize: function (value) {

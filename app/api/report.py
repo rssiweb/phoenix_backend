@@ -1,8 +1,10 @@
 from flask import request, Blueprint, send_from_directory
 from app import jsonify
 from app.utils import decorators
-from app.jobs.report import attendance as attendance_job, JobMeta
+from app.jobs.report import attendance as attendance_job
+from app.jobs.utils import JobMeta
 from app.jobs.report import exam_report
+from app.jobs.marksheet import build_marksheets
 
 api = Blueprint('report_api', __name__, url_prefix='/api/report')
 
@@ -33,6 +35,16 @@ def enqueue_exam(examid):
     jobmeta.owner = request.user
     exam_report.queue(jobmeta, examid)
     message = 'Exam report queued, you will receive an email on {} email address.'.format(request.user.email)
+    return jsonify(dict(status='success', message=message))
+
+
+@api.route('/generate/marksheet/<int:examid>', methods=['GET'])
+@decorators.login_required
+def enqueue_marksheet(examid):
+    jobmeta = JobMeta()
+    jobmeta.owner = request.user
+    build_marksheets.queue(jobmeta, examid)
+    message = 'Marksheet report queued, you will receive an email on {} email address.'.format(request.user.email)
     return jsonify(dict(status='success', message=message))
 
 

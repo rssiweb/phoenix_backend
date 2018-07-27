@@ -36,64 +36,70 @@
         </div>
 
         <div class="ui basic segment">
-            <div class="ui two fields">
-                <div class="ui field">
-                    <label>Branch</label>
-                    <div class="ui selection dropdown" id="branchDropDown">
-                        <input type="hidden" name="branch" v-on:change="onBranchChange"/>
-                        <i class="dropdown icon"></i>
-                        <div class="default text">Select Branch</div>
-                        <div class="menu">
-                            <div class="item" :data-value="branch.id" v-for="branch in branches">{{branch.name}}</div>
+            <div class="ui form">
+                <div class="ui stackable two fields">
+                    <div class="ui field">
+                        <label>Branch</label>
+                        <div class="ui selection dropdown" id="branchDropDown">
+                            <input type="hidden" name="branch" v-on:change="onBranchChange"/>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Branch</div>
+                            <div class="menu">
+                                <div class="item" :data-value="branch.id" v-for="branch in branches">{{branch.name}}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="ui field">
-                    <label>Exam</label>
-                    <div class="ui selection dropdown" id="examDropDown">
-                        <input type="hidden" name="branch" v-on:change="onExamChange"/>
-                        <i class="dropdown icon"></i>
-                        <div class="default text">Select Exam</div>
-                        <div class="menu">
-                            <div class="item" :data-value="exam.id" v-for="exam in exams">{{exam.name}}</div>
+                    <div class="ui field">
+                        <label>Exam</label>
+                        <div class="ui selection dropdown" id="examDropDown">
+                            <input type="hidden" name="branch" v-on:change="onExamChange"/>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Exam</div>
+                            <div class="menu">
+                                <div class="item" :data-value="exam.id" v-for="exam in exams">{{exam.name}}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="ui segments" v-if="selectedExam">
-            <div class="ui segment">
-                <h3 class="ui header">
-                    <div class="content">
-                        {{selectedExam.name}}
-                    </div>
-                </h3>
-            </div>
-            <div class="ui segment">
-                <table class="ui table">
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Student ID</th>
-                            <th>Name</th>
-                            <th>Age</th>
-                            <th v-for="subject in subjects">
-                                {{subject.name}}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="std in students">
-                            <td>{{getCategoryName(std.category)}}</td>
-                            <td>{{std.student_id}}</td>
-                            <td>{{std.name}}</td>
-                            <td>{{moment(std.dob).fromNow(true)}}</td>
-                            <th v-for="subject in subjects">
-                                {{subject.name}}
-                            </th>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="ui basic segment" v-if="selectedExam">
+
+            <h3 class="ui header">
+                <div class="content">
+                    {{selectedExam.name}}
+                </div>
+            </h3>
+            
+            <div class="ui container">
+                <template v-for="(stds, catid) in catWiseStudents">
+                    <table class="ui sortable striped table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th v-for="subject in subjects">
+                                    {{subject.name}}
+                                    <br/>
+                                    {{getMaxMarks(subject, catid)}}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="std in stds">
+                                <td>{{getCategoryName(std.category)}}</td>
+                                <td>{{std.student_id}}</td>
+                                <td>{{std.name}}</td>
+                                <td>{{moment(std.dob).fromNow(true)}}</td>
+                                <td v-for="sub in subjects">
+                                    {{getMarks(std, sub)}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </template>
             </div>
         </div>
     </div>

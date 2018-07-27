@@ -47,6 +47,7 @@ from app.api.admin.subject import api as admin_subapi
 from app.api.admin.exam import api as admin_examapi
 from app.api.admin.test import api as admin_testapi
 from app.api.admin.grade import api as admin_gradeapi
+from app.api.admin.marks import api as admin_marksapi
 
 from app.ui.controllers import ui
 
@@ -55,6 +56,7 @@ for api in [commonapi, studentapi, categoryapi, branchapi, attendanceapi,
 
             admin_attendanceapi, admin_branchapi, admin_catapi, admin_facapi,
             admin_stdapi, admin_subapi, admin_examapi, admin_testapi, admin_gradeapi,
+            admin_marksapi,
 
             ui]:
     app.register_blueprint(api)

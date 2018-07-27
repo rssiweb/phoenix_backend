@@ -15,7 +15,7 @@ def parseDate(strDate, format):
 def validEmail(email):
     if not email:
         return False
-    return _email_pattern.match(email)
+    return bool(_email_pattern.match(email))
 
 
 def isValidPassword(password):
