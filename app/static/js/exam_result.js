@@ -163,6 +163,7 @@ var app = new Vue({
             })
             return test.max_marks
         },
+        
         fixStudentCategory: function(){
             console.log('called me', this.students)
             this.students.forEach((std, stdidx) => {
