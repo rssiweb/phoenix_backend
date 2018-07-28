@@ -291,6 +291,8 @@ class Exam(Base):
 
     tests = relationship("Test", back_populates="exam", cascade="all, delete, delete-orphan")
 
+    students = relationship("StudentTestAssociation")
+
     def __init__(self, name, branch_id, start_date=None, end_date=None, state=None):
         self.name = name
         if start_date:
@@ -312,7 +314,8 @@ class Exam(Base):
                     start_date=self.start_date,
                     end_date=self.end_date,
                     state=self.state,
-                    tests=[test.serialize() for test in self.tests]
+                    tests=[test.serialize() for test in self.tests],
+                    students=[a.student_id for a in self.students]
                     )
 
 
@@ -330,6 +333,8 @@ class Test(Base):
     cat_sub_association = relationship("Association")
     exam = relationship("Exam", back_populates="tests")
     evaluator = relationship("Faculty")
+
+    students = relationship("StudentTestAssociation")
 
     __table_args__ = (db.UniqueConstraint('name', 'exam_id', name='testcode_in_exam_uc'),)
 
@@ -357,7 +362,22 @@ class Test(Base):
                     subject=self.cat_sub_association.subject.id,
                     category=self.cat_sub_association.category.id,
                     evaluator=self.evaluator_id,
+                    students=[std.student_id for std in self.students]
                     )
+
+
+class StudentTestAssociation(Base):
+    __tablename__ = 'std_test_association'
+
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
+    test_id = db.Column(db.Integer, db.ForeignKey('test.id'))
+    exam_id = db.Column(db.Integer, db.ForeignKey('exam.id'))
+
+    test = relationship("Test")
+    student = relationship("Student")
+    exam = relationship("Exam")
+
+    __table_args__ = (db.UniqueConstraint('test_id', 'student_id', 'exam_id', name='std_test_uc'),)
 
 
 class Subject(Base):

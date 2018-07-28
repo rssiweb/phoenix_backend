@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from app import jsonify
 from app.models import Student
 from datetime import datetime
@@ -56,5 +56,15 @@ def list_by_branch(branchid):
 @decorators.login_required
 def list_all_by_branch(branchid):
     students = [s.serialize() for s in Student.query.filter_by(branch_id=branchid)]
+    data = dict(status='success', students=students)
+    return jsonify(data), 200
+
+
+@api.route('/', methods=['GET'])
+@decorators.login_required
+def by_ids():
+    args = request.args
+    ids = [int(i) for i in args.get('ids', '').split(',')]
+    students = [s.serialize() for s in Student.query.filter(Student.id.in_(ids)).all()]
     data = dict(status='success', students=students)
     return jsonify(data), 200

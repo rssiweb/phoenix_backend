@@ -65,7 +65,7 @@ var app = new Vue({
             this.loadv2([
             {
                 name:'Students',
-                url:'/api/student/'+this.selectedBranch.id+'/list',
+                url:'/api/student?ids=' + this.selectedExam.students,
                 variableName: 'students',
                 dataInReponse: 'students'
             },
@@ -81,7 +81,7 @@ var app = new Vue({
                 variableName: 'marks',
                 dataInReponse: 'marks'
             }
-            ])
+            ], this.fixStudentCategory)
         }
     },
     computed: {
@@ -93,7 +93,7 @@ var app = new Vue({
                 cstds[std.category].push(std)
             })
             return cstds
-        }
+        },
     },
     methods: {
         init: function(){
@@ -162,6 +162,17 @@ var app = new Vue({
                 }
             })
             return test.max_marks
+        },
+        fixStudentCategory: function(){
+            console.log('called me', this.students)
+            this.students.forEach((std, stdidx) => {
+                this.selectedExam.tests.forEach(test => {
+                    if (test.students.indexOf(std.id) != -1){
+                        std.category = test.category
+                        this.$set(std, this.students, stdidx)
+                    }
+                })
+            })
         },
     }
 })

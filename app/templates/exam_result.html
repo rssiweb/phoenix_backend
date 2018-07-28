@@ -89,7 +89,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="std in stds">
-                                <td>{{getCategoryName(std.category)}}</td>
+                                <td>{{getCategoryName(catid)}}</td>
                                 <td>{{std.student_id}}</td>
                                 <td>{{std.name}}</td>
                                 <td>{{moment(std.dob).fromNow(true)}}</td>

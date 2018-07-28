@@ -1,6 +1,6 @@
 from flask import request, Blueprint
 from app import db, jsonify
-from app.models import Test, Exam, Subject, Category, Association, Faculty
+from app.models import Test, Exam, Subject, Category, Association, Faculty, Student, StudentTestAssociation
 from app.utils import decorators
 from app.utils.constants import StatusErrors as error
 from datetime import datetime
@@ -97,6 +97,13 @@ def add():
     test = Test(name=name, max_marks=max_marks, exam_id=exam_id, cat_sub_id=cat_sub_association.id, test_date=date)
     if (evaluator is not None):
         test.evaluator_id = evaluator.id
+
+    for std in Student.query.filter_by(category=category, isActive=True).all():
+        association = StudentTestAssociation()
+        association.student = std
+        association.exam = exam
+        test.students.append(association)
+
     db.session.add(test)
     db.session.commit()
     res['status'] = 'success'
