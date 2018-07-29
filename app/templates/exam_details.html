@@ -32,16 +32,25 @@
                     <th>Category</th>
                     <th>Subject</th>
                     <th>Evaluator</th>
+                    <th>Students</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="test in tests" @click="showUpdateTest(test.id)">
-                    <td>{{test.name}}</td>
+                <tr v-for="test in tests">
+                    <td>
+                        <a @click.prevent="showUpdateTest(test.id)" href="">{{test.name}}</a>
+                    </td>
                     <td :data-sort-value="test.date">{{moment(test.date,['DD?/MM/YYYY']).format('MMM DD, YYYY')}}</td>
                     <td>{{test.max_marks}}</td>
                     <td>{{getCategoryName(test.category)}}</td>
                     <td :data-sort-value="getSubjectName(test.subject).toLowerCase()">{{getSubjectName(test.subject)}}</td>
                     <td :data-sort-value="test.evaluator ? getFacultyName(test.evaluator).toLowerCase():'Admin'">{{test.evaluator?getFacultyName(test.evaluator):'Admin'}}</td>
+                    <td>
+                        {{test.students.length}} Students
+                        <a href="#"  @click.prevent="showStudentsUnderTest(test)">
+                            <i class="ui info icon"></i>
+                        </a>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -117,6 +126,31 @@
         <button class="ui left floated negative button" @click="showDeleteTest" v-if="updateAction">Delete</button>
         <button class="ui positive button">{{updateAction ? "Update" : "Create"}}</button>
         <button class="ui negative button">Cancel</button>
+    </div>
+</div>
+<div class="ui modal" id="studentsUnderTestModal">
+    <div class="header">
+        Students Appearing in {{studentsUnderTestModal.name}}
+    </div>
+    <div class="ui scrolling content">
+        <table class="ui compact small table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Category</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="std in studentsUnderTestModal.students">
+                    <td>{{std.student_id}}</td>
+                    <td>{{std.name}}</td>
+                    <td>{{std.age}}</td>
+                    <td>{{getCategoryName(std.category)}}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 <div class="ui tiny modal" id="cnfModal">

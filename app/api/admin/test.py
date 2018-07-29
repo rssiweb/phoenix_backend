@@ -98,7 +98,7 @@ def add():
     if (evaluator is not None):
         test.evaluator_id = evaluator.id
 
-    for std in Student.query.filter_by(category=category, isActive=True).all():
+    for std in Student.query.filter_by(category=category, branch_id=exam.branch_id, isActive=True).all():
         association = StudentTestAssociation()
         association.student = std
         association.exam = exam

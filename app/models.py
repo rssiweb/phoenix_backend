@@ -291,7 +291,7 @@ class Exam(Base):
 
     tests = relationship("Test", back_populates="exam", cascade="all, delete, delete-orphan")
 
-    students = relationship("StudentTestAssociation")
+    students = relationship("StudentTestAssociation", cascade="all, delete, delete-orphan")
 
     def __init__(self, name, branch_id, start_date=None, end_date=None, state=None):
         self.name = name
@@ -334,7 +334,7 @@ class Test(Base):
     exam = relationship("Exam", back_populates="tests")
     evaluator = relationship("Faculty")
 
-    students = relationship("StudentTestAssociation")
+    students = relationship("StudentTestAssociation", cascade="all, delete, delete-orphan")
 
     __table_args__ = (db.UniqueConstraint('name', 'exam_id', name='testcode_in_exam_uc'),)
 
@@ -369,9 +369,9 @@ class Test(Base):
 class StudentTestAssociation(Base):
     __tablename__ = 'std_test_association'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    test_id = db.Column(db.Integer, db.ForeignKey('test.id'))
-    exam_id = db.Column(db.Integer, db.ForeignKey('exam.id'))
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
+    exam_id = db.Column(db.Integer, db.ForeignKey('exam.id'), nullable=False)
 
     test = relationship("Test")
     student = relationship("Student")

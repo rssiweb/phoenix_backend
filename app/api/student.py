@@ -64,7 +64,9 @@ def list_all_by_branch(branchid):
 @decorators.login_required
 def by_ids():
     args = request.args
-    ids = [int(i) for i in args.get('ids', '').split(',')]
-    students = [s.serialize() for s in Student.query.filter(Student.id.in_(ids)).all()]
+    ids = [int(i) for i in args.get('ids', '').split(',') if i]
+    students = []
+    if ids:
+        students = [s.serialize() for s in Student.query.filter(Student.id.in_(ids)).all()]
     data = dict(status='success', students=students)
     return jsonify(data), 200

@@ -6,3 +6,4 @@ venv/*
 app.db
 gen/
 backup/
+erd.mwb

@@ -12,6 +12,7 @@ var app = new Vue({
         categories: [],
         subjects: [],
         tests: [],
+        students: [],
 
         exam: {},
         catSubjects: [],
@@ -81,6 +82,18 @@ var app = new Vue({
                 }
             },
         },
+        studentsUnderTestModal: {
+            name: '',
+            students: [],
+        },
+        studentsUnderTestModalInit: {
+            onShow: function(){
+                console.log('refresh', $('#studentsUnderTestModal'))
+                $('#studentsUnderTestModal').modal('refresh')
+            },
+            observeChanges: true
+        }
+
     },
     created: function(){
         this.loadv2([
@@ -107,7 +120,11 @@ var app = new Vue({
              {name:'Exam',
              url:'/api/exam/' + this.examId,
              variableName: 'exam',
-             dataInReponse: 'exam'}
+             dataInReponse: 'exam'},
+             {name:'Students',
+             url:'/api/student/' + this.branchId + '/list',
+             variableName: 'students',
+             dataInReponse: 'students'}
              ], this.afterInit)
     },
     updated: function(){
@@ -131,6 +148,7 @@ var app = new Vue({
             dom.find('#afterLanding').show()
             dom.find('#testModal').modal(this.initTestModal)
             dom.find('#cnfModal').modal(this.cnfModalInit)
+            dom.find('#studentsUnderTestModal').modal(this.studentsUnderTestModalInit)
             
             this.landed = true
         },
@@ -354,6 +372,13 @@ var app = new Vue({
                 var msg = response.body.statusText || 'Unexpected error occured! Try again.'
                 vm.showToast(msg, 'warn', 'close')
             })
-        }
+        },
+        showStudentsUnderTest: function(test){
+            this.studentsUnderTestModal.name = test.name
+                this.studentsUnderTestModal.students = this.students.filter(std => {
+                    return test.students.indexOf(std.id) != -1
+                })
+            this.showModal('studentsUnderTestModal')
+        },
     },
 });
