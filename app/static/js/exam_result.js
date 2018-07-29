@@ -14,7 +14,7 @@ var app = new Vue({
         subjects: [],
         students: [],
         categories: [],
-        grades: [],
+        gradeRules: [],
         faculties: [],
 
         selectedBranch: undefined,
@@ -58,6 +58,12 @@ var app = new Vue({
                 url:'/api/grade/'+this.selectedBranch.id+'/list',
                 variableName: 'gradeRules',
                 dataInReponse: 'grades'
+            },
+            {
+                name:'Faculty',
+                url:'/api/admin/faculty/'+this.selectedBranch.id+'/list',
+                variableName: 'faculties',
+                dataInReponse: 'faculties'
             }
             ])
         },
@@ -85,15 +91,6 @@ var app = new Vue({
         }
     },
     computed: {
-        catWiseStudents: function(){
-            var cstds = {}
-            this.students.forEach(std => {
-                if (!cstds[std.category])
-                    cstds[std.category] = []
-                cstds[std.category].push(std)
-            })
-            return cstds
-        },
     },
     methods: {
         init: function(){
@@ -132,17 +129,11 @@ var app = new Vue({
                 this.selectedExam = this.exams[index]
             }
         },
-        getMarks: function(std, sub){
-            var testid = undefined
-            this.selectedExam.tests.forEach(test => {
-                if(test.subject===sub.id && test.category === std.category){
-                    testid = test.id
-                }
-            })
-            var marks = this.marks[testid]
+        getMarks: function(std, testId){
+            testId = parseInt(testId)
+            var marks = this.marks[testId]
             if(!marks){
-                // console.log('No test for', sub.name, this.getCategoryName(std.category))
-                return 'X'
+                return
             }
             var mark_value = undefined
             marks.forEach(mark=>{
@@ -150,20 +141,8 @@ var app = new Vue({
                     mark_value = mark.marks
                 }
             })
-            return mark_value || 'A'
+            return mark_value
         },
-        getMaxMarks: function(sub, catId){
-            var catId = parseInt(catId)
-            console.log('getMaxMarks', sub, catId)
-            var test = {max_marks: '-'}
-            this.selectedExam.tests.forEach(t => {
-                if(t.subject === sub.id && t.category === catId){
-                    test = t
-                }
-            })
-            return test.max_marks
-        },
-        
         fixStudentCategory: function(){
             console.log('called me', this.students)
             this.students.forEach((std, stdidx) => {
@@ -174,6 +153,46 @@ var app = new Vue({
                     }
                 })
             })
+        },
+        getStudentByIds: function(ids){
+            return this.students.filter(std => {
+                return ids.indexOf(std.id) != -1
+            })
+        },
+        getPercent: function(std, test){
+            if(!std || !test)
+                return
+            var mo = this.getMarks(std, test.id)
+            var mm = test.max_marks
+            if (!mo || !mm)
+                return
+            mm = parseInt(mm) || 0
+            var percentage = 0
+            if (mm > 0)
+                percentage = (mo / mm * 100).toFixed(2)
+            return percentage
+        },
+        _getGrade: function(std, test){
+            var percent = this.getPercent(std, test)
+            if(!percent)
+                return
+            percent = Math.round(percent)
+            var grade = {}
+            this.gradeRules.forEach(gRule=>{
+                if(gRule.min <= percent && gRule.max >= percent)
+                    grade = gRule
+            })
+            return grade
+        },
+        getGrade: function(std, test){
+            var grade = this._getGrade(std, test)
+            if(grade)
+                return grade.grade
+        },
+        getGradeDescription: function(std, test){
+            var grade = this._getGrade(std, test)
+            if(grade)
+                return grade.comment
         },
     }
 })

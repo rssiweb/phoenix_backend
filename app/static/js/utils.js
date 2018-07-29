@@ -255,6 +255,16 @@ var utils = {
             })
             return name
         },
+        getSubject: function(subId){
+            var subject = undefined
+            subId = parseInt(subId)
+            this.subjects.forEach((sub, index)=>{
+                if(sub.id === subId){
+                    subject = sub
+                }
+            })
+            return subject
+        },
         getFacultyName: function(facid){
             var name = ''
             facid = parseInt(facid)

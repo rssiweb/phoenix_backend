@@ -70,36 +70,39 @@
                     {{selectedExam.name}}
                 </div>
             </h3>
-            
             <div class="ui container">
-                <template v-for="(stds, catid) in catWiseStudents">
-                    <table class="ui sortable striped table">
-                        <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th>Student ID</th>
-                                <th>Name</th>
-                                <th>Age</th>
-                                <th v-for="subject in subjects">
-                                    {{subject.name}}
-                                    <br/>
-                                    {{getMaxMarks(subject, catid)}}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="std in stds">
-                                <td>{{getCategoryName(catid)}}</td>
-                                <td>{{std.student_id}}</td>
+                <table class="ui sortable striped table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Name</th>
+                            <th>Test Code</th>
+                            <th>Subject</th>
+                            <th>Examiner</th>
+                            <th>Full Marks</th>
+                            <th>Obtained Marks</th>
+                            <th>Percent</th>
+                            <th>Grade</th>
+                            <th>Grade Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="test in selectedExam.tests">
+                            <tr v-for="std in getStudentByIds(test.students)">
+                                <td>{{getCategoryName(test.category)}}</td>
                                 <td>{{std.name}}</td>
-                                <td>{{moment(std.dob).fromNow(true)}}</td>
-                                <td v-for="sub in subjects">
-                                    {{getMarks(std, sub)}}
-                                </td>
+                                <td>{{test.name}}</td>
+                                <td>{{getSubjectName(test.subject)}}</td>
+                                <td>{{getFacultyName(test.evaluator)}}</td>
+                                <td>{{test.max_marks}}</td>
+                                <td>{{getMarks(std, test.id)}}</td>
+                                <td>{{getPercent(std, test)}}</td>
+                                <td>{{getGrade(std, test)}}</td>
+                                <td>{{getGradeDescription(std, test)}}</td>
                             </tr>
-                        </tbody>
-                    </table>
-                </template>
+                        </template>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
