@@ -22,11 +22,11 @@ var app = new Vue({
 
         resultRows: [],
         rfilters: {
-            categories: '',
-            tests: '',
-            evaluators: '',
-            students: '',
-            subjects: '',
+            categories: [],
+            tests: [],
+            evaluators: [],
+            students: [],
+            subjects: [],
         }
     },
     created: function(){
@@ -105,15 +105,15 @@ var app = new Vue({
             var vm = this
             return this.resultRows.filter(row => {
                 var pass = true
-                if (vm.rfilters.categories && vm.rfilters.categories.indexOf(String(row.catid)) == -1)
+                if (vm.rfilters.categories.length && vm.rfilters.categories.indexOf(String(row.catid)) == -1)
                     pass = false
-                if (vm.rfilters.subjects && vm.rfilters.subjects.indexOf(String(row.subjectid)) == -1)
+                if (vm.rfilters.subjects.length && vm.rfilters.subjects.indexOf(String(row.subjectid)) == -1)
                     pass = false
-                if (vm.rfilters.evaluators && vm.rfilters.evaluators.indexOf(String(row.evaluatorid)) == -1)
+                if (vm.rfilters.evaluators.length && vm.rfilters.evaluators.indexOf(String(row.evaluatorid)) == -1)
                     pass = false
-                if (vm.rfilters.tests && vm.rfilters.tests.indexOf(String(row.testid)) == -1)
+                if (vm.rfilters.tests.length && vm.rfilters.tests.indexOf(String(row.testid)) == -1)
                     pass = false
-                if (vm.rfilters.students && vm.rfilters.students.indexOf(String(row.stdid)) == -1)
+                if (vm.rfilters.students.length && vm.rfilters.students.indexOf(String(row.stdid)) == -1)
                     pass = false
                 return pass
             })
@@ -250,6 +250,13 @@ var app = new Vue({
                     grade = gRule
             })
             return grade
+        },
+        setFilter: function(name, value){
+            if (!value){
+                this.rfilters[name] = []
+                return
+            }
+            this.rfilters[name] = value.split(',')
         },
     }
 })

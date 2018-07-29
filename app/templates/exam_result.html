@@ -73,7 +73,7 @@
                 <div class="ui stackable fields">
                     <div class="ui field">
                         <div class="ui search multiple selection dropdown">
-                            <input type="hidden" name="categories" @change="rfilters.categories=$event.target.value"/>
+                            <input type="hidden" name="categories" @change="setFilter('categories',$event.target.value)"/>
                             <i class="dropdown icon"></i>
                             <div class="default text">Select Category</div>
                             <div class="menu">
@@ -83,7 +83,7 @@
                     </div>
                     <div class="ui field">
                         <div class="ui search multiple selection dropdown">
-                            <input type="hidden" name="tests" @change="rfilters.branches=$event.target.value"/>
+                            <input type="hidden" name="tests" @change="setFilter('tests',$event.target.value)"/>
                             <i class="dropdown icon"></i>
                             <div class="default text">Select Test</div>
                             <div class="menu">
@@ -93,7 +93,7 @@
                     </div>
                     <div class="ui field">
                         <div class="ui search multiple selection dropdown">
-                            <input type="hidden" name="evaluators" @change="rfilters.categories=$event.target.value"/>
+                            <input type="hidden" name="evaluators" @change="setFilter('evaluators',$event.target.value)"/>
                             <i class="dropdown icon"></i>
                             <div class="default text">Select Evaluator</div>
                             <div class="menu">
@@ -103,11 +103,21 @@
                     </div>
                     <div class="ui field">
                         <div class="ui search multiple selection dropdown">
-                            <input type="hidden" name="students" @change="rfilters.students=$event.target.value"/>
+                            <input type="hidden" name="students" @change="setFilter('students',$event.target.value)"/>
                             <i class="dropdown icon"></i>
                             <div class="default text">Select Student</div>
                             <div class="menu">
                                 <div class="item" :data-value="std.id" v-for="std in students">{{std.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui field">
+                        <div class="ui search multiple selection dropdown">
+                            <input type="hidden" name="subjects" @change="setFilter('subjects',$event.target.value)"/>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Subjects</div>
+                            <div class="menu">
+                                <div class="item" :data-value="sub.id" v-for="sub in subjects">{{sub.name}}</div>
                             </div>
                         </div>
                     </div>
