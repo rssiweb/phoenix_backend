@@ -64,12 +64,55 @@
             </div>
         </div>
         <div class="ui basic segment" v-if="selectedExam">
-
             <h3 class="ui header">
                 <div class="content">
                     {{selectedExam.name}}
                 </div>
             </h3>
+            <div class="ui form">
+                <div class="ui stackable fields">
+                    <div class="ui field">
+                        <div class="ui search multiple selection dropdown">
+                            <input type="hidden" name="categories" @change="rfilters.categories=$event.target.value"/>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Category</div>
+                            <div class="menu">
+                                <div class="item" :data-value="cat.id" v-for="cat in categories">{{cat.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui field">
+                        <div class="ui search multiple selection dropdown">
+                            <input type="hidden" name="tests" @change="rfilters.branches=$event.target.value"/>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Test</div>
+                            <div class="menu">
+                                <div class="item" :data-value="test.id" v-for="test in selectedExam.tests">{{test.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui field">
+                        <div class="ui search multiple selection dropdown">
+                            <input type="hidden" name="evaluators" @change="rfilters.categories=$event.target.value"/>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Evaluator</div>
+                            <div class="menu">
+                                <div class="item" :data-value="fac.id" v-for="fac in faculties">{{fac.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui field">
+                        <div class="ui search multiple selection dropdown">
+                            <input type="hidden" name="students" @change="rfilters.students=$event.target.value"/>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Student</div>
+                            <div class="menu">
+                                <div class="item" :data-value="std.id" v-for="std in students">{{std.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="ui container">
                 <table class="ui sortable striped table">
                     <thead>
@@ -86,21 +129,19 @@
                             <th>Grade Description</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <template v-for="test in selectedExam.tests">
-                            <tr v-for="std in getStudentByIds(test.students)">
-                                <td>{{getCategoryName(test.category)}}</td>
-                                <td>{{std.name}}</td>
-                                <td>{{test.name}}</td>
-                                <td>{{getSubjectName(test.subject)}}</td>
-                                <td>{{getFacultyName(test.evaluator)}}</td>
-                                <td>{{test.max_marks}}</td>
-                                <td>{{getMarks(std, test.id)}}</td>
-                                <td>{{getPercent(std, test)}}</td>
-                                <td>{{getGrade(std, test)}}</td>
-                                <td>{{getGradeDescription(std, test)}}</td>
-                            </tr>
-                        </template>
+                    <tbody>        
+                        <tr v-for="row in filteredResults">
+                            <td>{{row.category}}</td>
+                            <td>{{row.name}}</td>
+                            <td>{{row.testCode}}</td>
+                            <td>{{row.subject}}</td>
+                            <td>{{row.evaluator}}</td>
+                            <td>{{row.maxMarks}}</td>
+                            <td>{{row.obtainedMarks}}</td>
+                            <td>{{row.percent}}</td>
+                            <td>{{row.grade}}</td>
+                            <td>{{row.gradeDesc}}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

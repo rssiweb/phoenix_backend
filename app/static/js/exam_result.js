@@ -19,6 +19,15 @@ var app = new Vue({
 
         selectedBranch: undefined,
         selectedExam: undefined,
+
+        resultRows: [],
+        rfilters: {
+            categories: '',
+            tests: '',
+            evaluators: '',
+            students: '',
+            subjects: '',
+        }
     },
     created: function(){
         this.loadv2([
@@ -38,6 +47,7 @@ var app = new Vue({
     },
     updated: function(){
         $(this.$el).find('table.sortable').tablesort()
+        $('.dropdown').dropdown()
     },
     watch: {
         selectedBranch: function(){
@@ -87,10 +97,27 @@ var app = new Vue({
                 variableName: 'marks',
                 dataInReponse: 'marks'
             }
-            ], this.fixStudentCategory)
+            ], this.buildResult)
         }
     },
     computed: {
+        filteredResults: function(){
+            var vm = this
+            return this.resultRows.filter(row => {
+                var pass = true
+                if (vm.rfilters.categories && vm.rfilters.categories.indexOf(String(row.catid)) == -1)
+                    pass = false
+                if (vm.rfilters.subjects && vm.rfilters.subjects.indexOf(String(row.subjectid)) == -1)
+                    pass = false
+                if (vm.rfilters.evaluators && vm.rfilters.evaluators.indexOf(String(row.evaluatorid)) == -1)
+                    pass = false
+                if (vm.rfilters.tests && vm.rfilters.tests.indexOf(String(row.testid)) == -1)
+                    pass = false
+                if (vm.rfilters.students && vm.rfilters.students.indexOf(String(row.stdid)) == -1)
+                    pass = false
+                return pass
+            })
+        }
     },
     methods: {
         init: function(){
@@ -129,15 +156,16 @@ var app = new Vue({
                 this.selectedExam = this.exams[index]
             }
         },
-        getMarks: function(std, testId){
+        getMarks: function(stdId, testId){
             testId = parseInt(testId)
+            stdId = parseInt(stdId)
             var marks = this.marks[testId]
             if(!marks){
                 return
             }
             var mark_value = undefined
             marks.forEach(mark=>{
-                if(mark.student_id===std.id){
+                if(mark.student_id===stdId){
                     mark_value = mark.marks
                 }
             })
@@ -154,15 +182,55 @@ var app = new Vue({
                 })
             })
         },
+        buildResult: function(){
+            var vm = this
+            vm.fixStudentCategory()
+            vm.resultRows = []
+            vm.selectedExam.tests.forEach(test => {
+                var tstds = test.students || []
+                tstds.forEach(stdId => {
+                    var mo = vm.getMarks(stdId, test.id)
+                    var mm = test.max_marks
+                    var percent = vm.getPercent(stdId, test)
+                    var grade = vm._getGrade(percent) || {}
+                    var std = vm.getStudentByIds([stdId])[0]
+                    var row = {
+
+                        category: vm.getCategoryName(test.category),
+                        catid: test.category,
+
+                        name: std.name,
+                        stdid: std.id,
+
+                        testCode: test.name,
+                        testid: test.id,
+
+                        subject: vm.getSubjectName(test.subject),
+                        subjectid: test.subject,
+
+                        evaluator: vm.getFacultyName(test.evaluator),
+                        evaluatorid: test.evaluator,
+
+                        maxMarks: mm,
+                        obtainedMarks: mo,
+                        percent: percent,
+                        grade: grade.grade,
+                        gradeDesc: grade.comment
+                    }
+                    vm.resultRows.push(row)
+                })
+            })
+
+        },
         getStudentByIds: function(ids){
             return this.students.filter(std => {
                 return ids.indexOf(std.id) != -1
             })
         },
-        getPercent: function(std, test){
-            if(!std || !test)
+        getPercent: function(stdId, test){
+            if(!stdId || !test)
                 return
-            var mo = this.getMarks(std, test.id)
+            var mo = this.getMarks(stdId, test.id)
             var mm = test.max_marks
             if (!mo || !mm)
                 return
@@ -172,27 +240,16 @@ var app = new Vue({
                 percentage = (mo / mm * 100).toFixed(2)
             return percentage
         },
-        _getGrade: function(std, test){
-            var percent = this.getPercent(std, test)
+        _getGrade: function(percent){
             if(!percent)
                 return
-            percent = Math.round(percent)
+            percent = Math.round(parseInt(percent))
             var grade = {}
             this.gradeRules.forEach(gRule=>{
                 if(gRule.min <= percent && gRule.max >= percent)
                     grade = gRule
             })
             return grade
-        },
-        getGrade: function(std, test){
-            var grade = this._getGrade(std, test)
-            if(grade)
-                return grade.grade
-        },
-        getGradeDescription: function(std, test){
-            var grade = this._getGrade(std, test)
-            if(grade)
-                return grade.comment
         },
     }
 })
