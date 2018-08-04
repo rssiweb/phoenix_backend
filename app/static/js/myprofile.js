@@ -8,38 +8,43 @@ var app = new Vue({
     data: {
         landed: false,
         me: {},
+        branches: [],
         currentPassword: '',
         password: '',
         confirmPassword: '',
 
     },
     created(){
-        this.getProfile()
-    },
-    updated(){
-        var dom = $(this.$el)
-        dom.find('.dropdown').dropdown()
-        dom.find('#afterLanding').show()
-        this.landed = true
+        this.loadv2([
+        {
+            name:'Profile',
+            url:'/api/myprofile',
+            variableName: 'me',
+            dataInReponse: 'me'
+        },
+        {
+            name:'Branches',
+            url:'/api/branch/list',
+            variableName: 'branches',
+            dataInReponse: 'branches'
+        }], this.init)
     },
     methods: {
+        init: function(){
+            var dom = $(this.$el)
+            dom.find('.dropdown').dropdown()
+            dom.find('#afterLanding').show()
+            this.landed = true
+        },
         logout: function(){
             Cookies.remove('auth_token')
             window.location = '/'
         },
-        getHeaders: function(){
-            return {headers: { Authorization: 'Basic ' +  this.token}}
-        },
-        getProfile(){
-            var vm = this
-            this.$http.get('/api/myprofile',this.getHeaders())
-            .then(response => {
-                console.log(response)
-                vm.me = response.body.me
-            },
-            error => {
-                console.log(error)
-            })
+        getRoles: function(){
+            var res = ['Faculty']
+            if(this.me.admin)
+                res.push('Admin')
+            return res.join(' / ')
         },
         clearForm(){
             this.password = ''
@@ -104,5 +109,4 @@ var app = new Vue({
             return res
         }
     },
-    watch: {}
 })
