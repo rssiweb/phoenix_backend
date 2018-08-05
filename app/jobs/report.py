@@ -46,8 +46,7 @@ def examToDict(exam_id):
     logger.info('converting exam "%s" to dict', exam.name)
     data = []
     test_ids = [test.id for test in exam.tests]
-    marks = Marks.query.filter(Marks.test_id.in_(test_ids)).all()
-    std_ids = set([mark.student_id for mark in marks])
+    std_ids = [a.student_id for a in test.students for test in exam.tests]
     students = Student.query.filter(Student.id.in_(std_ids)).all()
     for std in students:
         std_data = dict()
@@ -65,8 +64,9 @@ def examToDict(exam_id):
             std_data[sub.name] = mark.marks
             sumMarks += mark.marks
             maxMarks += test.max_marks
-        std_data['Total'] = sumMarks
-        std_data['Percentage'] = float('%.2f' % (float(sumMarks) / maxMarks * 100))
+        if sumMarks and maxMarks:
+            std_data['Total'] = sumMarks
+            std_data['Percentage'] = float('%.2f' % (float(sumMarks) / maxMarks * 100))
         data.append(std_data)
     logger.info('converted %s students result to dict', len(data))
     return data

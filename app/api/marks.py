@@ -42,26 +42,30 @@ def set_marks(testid, studentid):
         res['statusText'] = errs.CUSTOM_ERROR.text
         res['statusData'] = errs.CUSTOM_ERROR.type('No such Student')
         return jsonify(res), 200
+    if student.id not in [a.student_id for a in test.students]:
+        res['statusText'] = errs.CUSTOM_ERROR.text
+        res['statusData'] = errs.CUSTOM_ERROR.type('Student not enrolled for this test')
+        return jsonify(res), 200
     comments = data.get('comment')
-    marksObjtained = data.get('marks')
+    marksObtained = data.get('marks')
     try:
-        marksObjtained = float(marksObjtained)
+        marksObtained = float(marksObtained)
     except Exception:
-        marksObjtained = None
+        marksObtained = None
     comments = data.get('comment')
     marks = Marks.query.filter_by(test_id=test.id, student_id=student.id).first()
     if not marks:
-        if marksObjtained is None:
+        if marksObtained is None:
             res['statusText'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
             res['statusData'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.type(['marks'])
             return jsonify(res), 200
         if comments is not None:
-            marks = Marks(test_id=test.id, student_id=student.id, marks=marksObjtained, comments=comments)
+            marks = Marks(test_id=test.id, student_id=student.id, marks=marksObtained, comments=comments)
         else:
-            marks = Marks(test_id=test.id, student_id=student.id, marks=marksObjtained)
+            marks = Marks(test_id=test.id, student_id=student.id, marks=marksObtained)
     else:
-        if marksObjtained is not None:
-            marks.marks = marksObjtained
+        if marksObtained is not None:
+            marks.marks = marksObtained
         if comments is not None:
             marks.comments = comments
     db.session.add(marks)
