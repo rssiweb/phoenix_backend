@@ -125,7 +125,7 @@ var app = new Vue({
     computed: {
         filteredStudents: function(){
             return this.students.filter((std) => {
-                return std.category === this.studentCatFilter
+                return this.selectedTest && this.selectedTest.students.indexOf(std.id) != -1
             })
         },
         selectedTest: function(){
