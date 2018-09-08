@@ -47,7 +47,7 @@ def exam_to_dict(examid, att_start, att_end):
     exam = Exam.query.get(int(examid))
     test_ids = [test.id for test in exam.tests]
     marks = Marks.query.filter(Marks.test_id.in_(test_ids)).all()
-    std_ids = set([mark.student_id for mark in marks])
+    std_ids = set([a.student_id for a in exam.students])
     students = Student.query.filter(Student.id.in_(std_ids)).all()
     grades = Grade.query.filter_by(branch_id=exam.branch_id).all()
     all_att = Attendance.query.filter(Attendance.date >= att_start,

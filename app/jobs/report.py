@@ -46,7 +46,7 @@ def examToDict(exam_id):
     logger.info('converting exam "%s" to dict', exam.name)
     data = []
     test_ids = [test.id for test in exam.tests]
-    std_ids = [a.student_id for a in test.students for test in exam.tests]
+    std_ids = [a.student_id for a in exam.students]
     students = Student.query.filter(Student.id.in_(std_ids)).all()
     for std in students:
         std_data = dict()
@@ -84,7 +84,6 @@ def getExamDictFor(catName, examDict):
 def exam_report(meta, exam_id):
     owner = meta.owner
     exam = Exam.query.get(exam_id)
-    cats = Category.query.filter_by(branch_id=exam.branch_id)
     subs = Subject.query.filter_by(branch_id=exam.branch_id)
     data = examToDict(exam.id)
     header = ['Category', 'Student ID', 'Name', 'Age', ]
@@ -97,12 +96,6 @@ def exam_report(meta, exam_id):
     filename = '%s All Category.csv' % exam.name
     filename = writeDictToCsv(header, data, filename, 'Percentage', reverse=True)
     csv_filenames.append(filename)
-
-    for cat in cats:
-        cat_data = getExamDictFor(cat.name, data)
-        filename = '%s %s.csv' % (exam.name, cat.name)
-        filename = writeDictToCsv(header, cat_data, filename, 'Percentage', reverse=True)
-        csv_filenames.append(filename)
     logger.info('created report for all categories')
 
     filename = '%s %s_%s.zip' % (exam.name, owner.name, time.time())
