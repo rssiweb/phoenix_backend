@@ -60,6 +60,46 @@
             </div>
         </div>
     </div>
+    <div class="ui segment">
+        <h3 class="ui header">Other Jobs</h3>
+        <div class="ui divided items">
+            <div class="ui item">
+                <div class="middle aligned content">
+                    <h4 class="ui header">ID Cards</h4>
+                    <div class="meta">
+                        <span>generate the ID for students</span>
+                    </div>
+                </div>
+                <div class="extras">
+                    <button class="ui right aligned mini primary button" @click="showModal('ICardModal')" :class="{loading: loading, disabled: loading}">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- I-Card Modal -->
+<div class="ui small modal" id="ICardModal">
+    <div class="header">
+        Generate I-Card
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="equal width fields">
+                <div class="field">
+                    <label>Select Branch</label>
+                    <select class="dropdown" type="text" name="branch" v-model="selectedBranch">
+                        <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="ui positive button" @click.prevent="requestGenerateICard">Run</button>
+        <button class="ui negative button">Cancel</button>
+    </div>
 </div>
 
 <!-- Mark Sheet Report Modal -->
@@ -72,7 +112,7 @@
             <div class="equal width fields">
                 <div class="field">
                     <label>Select Branch</label>
-                    <select class="dropdown" type="text" name="branche" v-model="selectedBranch">
+                    <select class="dropdown" type="text" name="branch" v-model="selectedBranch">
                         <option v-for="b in branches" v-bind:value="b.id">{{b.name}}</option>
                     </select>
                 </div>

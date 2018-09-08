@@ -207,10 +207,15 @@ var app = new Vue({
             $('#detailedAttendaceModal').modal('show')
         },
         showResultModal: function(){
-          $('#resultModal').modal('show')
+            $('#resultModal').modal('show')
         },
         showMarksSheetModal: function(){
-          $('#marksheetModal').modal('show')
+            $('#marksheetModal').modal('show')
+        },
+        requestGenerateICard: function(){
+            var data = $('#ICardModal .form').form('get values')
+            console.log(data)
+            this.$http.get('/api/report/generate/card/' + data.branch)
         }
     },
     computed: {
