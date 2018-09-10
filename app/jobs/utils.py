@@ -7,6 +7,7 @@ from config import BASE_REPORT_PATH
 
 import logging as logger
 import base64
+import itertools
 import csv
 import os
 
@@ -34,7 +35,7 @@ def zipFiles(filenames, name='zipped.zip', deleteAfterZip=True):
     return filename
 
 
-def writeDictToCsv(headers, listOfDict, name, order_by=None, reverse=False):
+def writeDictToCsv(headers, listOfDict, name, order_by=None, reverse=False, sub_headers=None):
     ext = '.csv'
     name = str(name)
     if not name.endswith(ext):
@@ -50,7 +51,9 @@ def writeDictToCsv(headers, listOfDict, name, order_by=None, reverse=False):
                                       quoting=csv.QUOTE_MINIMAL,
                                       fieldnames=headers)
         reportwriter.writeheader()
-        for row in content:
+        if not sub_headers:
+            sub_headers = []
+        for row in itertools.chain(sub_headers, content):
             reportwriter.writerow(row)
     logger.info('written %s lines to csv %s', len(content), filename)
     return filename

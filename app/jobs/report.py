@@ -1,8 +1,8 @@
 from app import db, rq, logger
-from app.models import Student, Branch, Category, Exam, Test, Marks, Subject
+from app.models import Student, Branch, Category, Exam, Test, Marks, Subject, Grade
 from app.utils import report
 from app.jobs.utils import send_report_email, writeDictToCsv, zipFiles
-
+from app.utils import get_grades
 from datetime import date, datetime
 import time
 
@@ -48,6 +48,13 @@ def examToDict(exam_id):
     test_ids = [test.id for test in exam.tests]
     std_ids = [a.student_id for a in exam.students]
     students = Student.query.filter(Student.id.in_(std_ids)).all()
+    grades = Grade.query.filter_by(branch_id=exam.branch_id).all()
+    sub_header = []
+    sub_header_data = {test.cat_sub_association.subject.name: test.max_marks for test in exam.tests}
+    sub_header_data['Category'] = 'Max Marks'
+    sub_header.append(sub_header_data)
+    # warming up cache
+    Marks.query.filter(Marks.test_id.in_(test_ids)).all()
     for std in students:
         std_data = dict()
         std_data['Name'] = std.name
@@ -55,21 +62,31 @@ def examToDict(exam_id):
         std_data['Category'] = std.category.name
         std_data['Age'] = (date.today() - std.dob).days / 360
 
-        std_marks = Marks.query.filter(Marks.test_id.in_(test_ids),
-                                       Marks.student_id == std.id).all()
-        sumMarks, maxMarks = 0, 0
-        for mark in std_marks:
-            test = Test.query.get(mark.test_id)
-            sub = test.cat_sub_association.subject
-            std_data[sub.name] = mark.marks
-            sumMarks += mark.marks
+        std_tests = [t for t in exam.tests if std in [a.student for a in t.students]]
+        totalMarks, maxMarks = -1, 0
+        for test in std_tests:
+            mark = Marks.query.filter(Marks.test_id == test.id,
+                                   Marks.student_id == std.id).first()
             maxMarks += test.max_marks
-        if sumMarks and maxMarks:
-            std_data['Total'] = sumMarks
-            std_data['Percentage'] = float('%.2f' % (float(sumMarks) / maxMarks * 100))
+            if mark:
+                if totalMarks == -1:
+                    totalMarks = 0
+                sub = test.cat_sub_association.subject
+                std_data[sub.name] = mark.marks
+                totalMarks += mark.marks
+                if mark.marks == 0:
+                    print 'bc aa gaya yaha'
+        std_data['Total'] = totalMarks if totalMarks > -1 else None
+        std_data['Max Marks'] = maxMarks
+        if totalMarks > -1:
+            percent = float('%.2f' % (float(totalMarks) / maxMarks * 100))
+            std_data['Percentage'] = percent
+            grade = get_grades(percent, grades)
+            std_data['Grade'] = grade.grade
+            std_data['Grade Description'] = grade.comment
         data.append(std_data)
     logger.info('converted %s students result to dict', len(data))
-    return data
+    return data, sub_header
 
 
 def getExamDictFor(catName, examDict):
@@ -84,17 +101,20 @@ def getExamDictFor(catName, examDict):
 def exam_report(meta, exam_id):
     owner = meta.owner
     exam = Exam.query.get(exam_id)
-    subs = Subject.query.filter_by(branch_id=exam.branch_id)
-    data = examToDict(exam.id)
+    subs = [test.cat_sub_association.subject for test in exam.tests]
+    data, sub_headers = examToDict(exam.id)
     header = ['Category', 'Student ID', 'Name', 'Age', ]
-    header.extend([sub.name for sub in subs])
+    header.extend(set([sub.name for sub in subs]))
     header.append('Total')
+    header.append('Max Marks')
     header.append('Percentage')
+    header.append('Grade')
+    header.append('Grade Description')
 
     csv_filenames = []
 
     filename = '%s All Category.csv' % exam.name
-    filename = writeDictToCsv(header, data, filename, 'Percentage', reverse=True)
+    filename = writeDictToCsv(header, data, filename, 'Percentage', reverse=True, sub_headers=sub_headers)
     csv_filenames.append(filename)
     logger.info('created report for all categories')
 

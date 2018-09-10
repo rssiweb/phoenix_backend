@@ -28,3 +28,10 @@ def isValidPassword(password):
     if not re.search('[!@#$%&*]', password):
         return False, "Must contain one special character out of '!', '@', '#', '$', '%', '&', '*'"
     return True, 'Strong Password'
+
+def get_grades(percent, grade_rules):
+    for rule in grade_rules:
+        percent = round(percent, 0)
+        if rule.lower <= percent and percent <= rule.upper:
+            return rule
+    return ''

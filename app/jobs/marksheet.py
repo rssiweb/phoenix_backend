@@ -1,8 +1,10 @@
 from app import rq
 from app.models import Student, Exam, Marks, Grade, Attendance
 from app.jobs.utils import send_report_email, zipFiles
+from app.utils import get_grades
 from datetime import datetime
 from operator import methodcaller
+
 
 from PIL import Image
 from PIL import ImageFont
@@ -76,7 +78,7 @@ def exam_to_dict(examid, att_start, att_end):
                 sub_data['obtained_marks'] = mark.marks
                 percent = (float(mark.marks) / test.max_marks) * 100
                 sub_data['percent'] = percent
-                sub_data['grade'] = get_grades(percent, grades)
+                sub_data['grade'] = get_grades(percent, grades).grade
             else:
                 sub_data['obtained_marks'] = 'A'  # Absent
                 sub_data['grade'] = ''
@@ -91,7 +93,7 @@ def exam_to_dict(examid, att_start, att_end):
         total_data['obtained_marks'] = sum(m.marks for m in marks)
         percent = total_data['obtained_marks'] / total_data['total_marks'] * 100
         total_data['percent'] = percent
-        total_data['grade'] = get_grades(percent, grades)
+        total_data['grade'] = get_grades(percent, grades).grade
         std_data['total'] = total_data
 
         # Attendace data
@@ -122,14 +124,6 @@ def exam_to_dict(examid, att_start, att_end):
             d['cat_position'] = pos + 1  # 0 based position
             d['no_of_cat_students'] = len(cat_data)
     return data
-
-
-def get_grades(percent, grade_rules):
-    for rule in grade_rules:
-        percent = round(percent, 0)
-        if rule.lower <= percent and percent <= rule.upper:
-            return rule.grade
-    return ''
 
 
 @rq.job
