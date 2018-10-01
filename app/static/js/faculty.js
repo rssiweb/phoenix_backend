@@ -257,10 +257,23 @@ var app = new Vue({
         toggleAdmin(faculty){
             faculty.adminLoading = true;
             var vm = this;
-            vm.$set(vm.faculties, vm.faculties.indexOf(faculty), faculty);
-            console.log(faculty)
-            var url = '/api/admin/faculty/'+faculty.facultyId+'/admin/'+faculty.admin;
-            console.log('WIP')
+            var fac_idx = vm.faculties.indexOf(faculty)
+            vm.$set(vm.faculties, fac_idx, faculty);
+            new_admin_state = !faculty.admin
+            var url = '/api/admin/faculty/' + faculty.facultyId + '/admin/' + new_admin_state;
+            vm.$http.post(url).then(response => {
+                console.log(response)
+                if(response.body.status==='success'){
+                    vm.showToast(response.body.message, 'success')
+                    faculty.admin = response.body.admin 
+                    vm.$set(vm.faculties, fac_idx, faculty);
+                }else{
+                    vm.showToast(response.body.message, 'warn')
+                }
+            }, error => {
+                var err_msg = error.body.message || error.statusText || 'Operation failed'
+                vm.showToast(err_msg, 'warn')
+            })
         },
         getFacIndex(faculty) {
             var facultyIndex = -1
