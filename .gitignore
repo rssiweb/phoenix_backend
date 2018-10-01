@@ -8,3 +8,4 @@ gen/
 backup/
 erd.mwb
 specs/
+.vscode/settings.json
