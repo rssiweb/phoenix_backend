@@ -148,7 +148,7 @@ def reset_faculty_password():
     return jsonify(dict(status='success', message='Password updated successfully')), 200
 
 
-@api.route('/<string:facid>/active/<string:active>', methods=['POST'])
+@api.route('/<string:facid>/active/<string:active>', methods=['PUT'])
 @decorators.login_required
 @decorators.only_admins
 def set_faculty_state(facid, active):
