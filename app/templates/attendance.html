@@ -58,8 +58,8 @@
     </div>
 
     <div class="ui container" v-if="!loading">
-        <div class="ui form">
-
+        <div class="ui stackable grid">
+        <div class="ui twelve wide column form">
             <div class="fields">
                 <div class="field">
                     <label>Category</label>
@@ -76,6 +76,12 @@
                     </select>
                 </div>
             </div>
+        </div>
+        <div class="ui four wide column">
+            <div class="ui right aligned basic segment">
+                {{attendance_count}} Students Appeared Today
+            </div>
+        </div>
         </div>
         <div v-if="!loading && students.length > 0">
             <table class="ui compact sortable striped table">
