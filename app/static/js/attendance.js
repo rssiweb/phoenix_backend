@@ -345,5 +345,13 @@ var app = new Vue({
         editModeBtnText: function(){
             return this.editMode ? "Done" : "Edit Mode"
         },
+        attendance_count: function(){
+            var count = 0 
+            this.students.forEach(std=>{
+                if(std.in)
+                    count += 1
+            })
+            return count
+        }
     }
 });
