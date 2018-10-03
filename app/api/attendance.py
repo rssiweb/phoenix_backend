@@ -41,7 +41,6 @@ def set_punch_in(attendance, inTime, studentid=None):
 
 
 def set_punch_out(attendance, outTime):
-    print attendance
     if not attendance or not attendance.punch_in:
         return jsonify(dict(status='fail',
                             message='Cannot puch out before puch in'
@@ -92,20 +91,16 @@ def set_attendance(studentid, what):
         return jsonify(res), res_code
 
     faculty = Faculty.query.get(request.user.id)
-    print faculty
 
     data = request.json or request.data or request.form
-    print data
 
     if what in ('in', 'out'):
         isValid, timeOrError = parseDate(data.get(what), '%H:%M:%S')
         if not isValid:
-            print timeOrError
             res['message'] = 'Invalid time format '
             return jsonify(res), res_code
 
     student = Student.query.get(studentid)
-    print student
     if not student:
         res['message'] = 'Invalid student id'
         return jsonify(res), res_code
