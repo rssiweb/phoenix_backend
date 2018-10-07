@@ -1,6 +1,4 @@
 import unittest
-import mock
-
 
 class ApiTest(unittest.TestCase):
 

@@ -2,12 +2,15 @@ from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
 from app.models import Attendance
+from app.utils import slice_by
 from datetime import datetime, timedelta
 from config import REPORT_FOLDER
+
 import copy
 import calendar
 import pytz
 import os
+import time
 
 
 def draw_row(srno, draw, student, month):
@@ -82,7 +85,7 @@ def draw_header(header2, month, categories, branches):
 
 
 def buildReport(students, month, categories, branches):
-    no_rows = 24
+    no_rows = int(os.environ.get('ATTENDANCE_MAX_STUDENTS', 24))
     month = datetime.strptime(month, '%d %B %Y')
     header1, header2, row, footer = map(Image.open, ['./monthly_report/header1.jpg',
                                                      './monthly_report/header2.jpg',
@@ -92,25 +95,38 @@ def buildReport(students, month, categories, branches):
 
     max_width = max([item.size[0] for item in (header1, header2, row, footer)])
 
-    total_height = sum([item.size[1] for item in (header1, header2, row, footer)])
-
-    total_height += (no_rows - 1) * row.size[1]  # (len(students) - 1) * row.size[1]
-
-    att_sheet = Image.new('RGB', (max_width, total_height))
-
-    att_sheet.paste(header1, (0, 0))
-    draw_header(header2, month, categories, branches)
-    att_sheet.paste(header2, (0, header1.size[1]))
-
-    y_offset = header1.size[1] + header2.size[1]
-    for index in xrange(no_rows):
-        tmp_row = copy.deepcopy(row)
-        if index < len(students):
-            student = students[index]
-            draw_row(index + 1, ImageDraw.Draw(tmp_row), student, month)
-        att_sheet.paste(tmp_row, (0, y_offset))
-        y_offset += row.size[1]
-    att_sheet.paste(footer, (0, y_offset))
-    filepath = os.path.join(REPORT_FOLDER, 'Attendace Report.pdf')
-    att_sheet.save(filepath, 'PDF', resolution=100.0)
-    return filepath
+    total_height = sum([item.size[1] for item in (header1, header2, footer)])
+    total_height += no_rows * row.size[1]
+    sr_no = 1
+    page_imgs = []
+    for students in slice_by(students, no_rows):
+        att_sheet = Image.new('RGB', (max_width, total_height))
+        att_sheet.paste(header1, (0, 0))
+        draw_header(header2, month, categories, branches)
+        att_sheet.paste(header2, (0, header1.size[1]))
+        y_offset = header1.size[1] + header2.size[1]
+        for student in students:
+            tmp_row = copy.deepcopy(row)
+            draw_row(sr_no, ImageDraw.Draw(tmp_row), student, month)
+            att_sheet.paste(tmp_row, (0, y_offset))
+            y_offset += row.size[1]
+            sr_no += 1
+        # Adding blank rows if required
+        if len(students) < no_rows:
+            for _ in xrange(no_rows-len(students)):
+                tmp_row = copy.deepcopy(row)
+                att_sheet.paste(tmp_row, (0, y_offset))
+                y_offset += row.size[1]
+        att_sheet.paste(footer, (0, y_offset))
+        # resize the image and app to list of pages
+        att_sheet = att_sheet.resize((att_sheet.size[0]/5, att_sheet.size[1]/5), Image.ANTIALIAS)
+        page_imgs.append(att_sheet)
+    report_filename = "Attendance Report_{}.pdf".format(str(int(time.time())))
+    report_filepath = os.path.join(REPORT_FOLDER, report_filename)
+    if len(page_imgs) > 0:
+        page_imgs[0].save(report_filepath,
+                           'PDF',
+                           save_all=True,
+                           quality=100,
+                           append_images=page_imgs[1:])
+    return report_filepath
