@@ -1,5 +1,6 @@
 from datetime import datetime
 import re
+import math
 
 _email_pattern = re.compile(r'[^@]+@[^@]+\.[^@]+')
 
@@ -35,3 +36,8 @@ def get_grades(percent, grade_rules):
         if rule.lower <= percent and percent <= rule.upper:
             return rule
     return ''
+
+def slice_by(itr, n):
+    no_slices = int(math.ceil(len(itr) / float(n)))
+    for i in xrange(no_slices):
+        yield itr[n * i : n * i + n]
