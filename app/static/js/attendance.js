@@ -60,9 +60,9 @@ var app = new Vue({
             .then(data => {
                 console.log(data)
                 vm.students.forEach(function(student, stdi){
-                    student.in = undefined
-                    student.out = undefined
-                    student.comment = undefined
+                    vm.$set(student, 'in', undefined)
+                    vm.$set(student, 'out', undefined)
+                    vm.$set(student, 'comment', undefined)
                     data.body.attendance.forEach(function(item, index){
                         if(student.id == item.student.id){
                             console.log(student,item,'matched')
@@ -345,5 +345,23 @@ var app = new Vue({
         editModeBtnText: function(){
             return this.editMode ? "Done" : "Edit Mode"
         },
+        attendance_count: function(){
+            var count = 0 
+            this.students.forEach(std=>{
+                if(std.in)
+                    count += 1
+            })
+            return count
+        },
+        attendance_percent: function(){
+            var count = this.attendance_count
+            var percent = 0
+            var total = this.students.length
+            if(total > 0){
+                percent = (count/total) * 100
+                percent = Math.round(percent * 100) / 100
+            }
+            return percent
+        }
     }
 });

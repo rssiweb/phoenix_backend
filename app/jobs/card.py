@@ -46,7 +46,7 @@ def build_card(meta, branch_id):
 
 
 def generate_cards(persons):
-    font_path = "/app/static/fonts/Ubuntu-M.ttf"
+    font_path = "app/static/fonts/Ubuntu-M.ttf"
     font = ImageFont.truetype(font_path, 70)
     img = Image.open("app/static/card_template.jpg")
     width, _ = img.size
