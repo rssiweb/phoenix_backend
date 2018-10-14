@@ -12,7 +12,9 @@ var app = new Vue({
         subjects: [],
         exams: [],
         grades: [],
-
+        distributionTypes: [],
+        distributionItemTypes: [],
+        distributionItems: [],
 
         newExam: {
             name:'',
@@ -25,11 +27,37 @@ var app = new Vue({
         categoryLoading: '',
         examLoading: '',
         gradeLoading: '',
+        distributionTypeLoading: '',
+        distributionItemTypeLoading: '',
+        distributionItemLoading: '',
 
         updateAction: false,
 
         error: '',
         message: '',
+        showModalSettings: {
+            'gradeModal':{
+                modal_sel: '#gradeModal',
+                form_sel: '.form',
+                defaults: {what:'grade'},
+            },
+
+            'distribution-type-modal': {
+                modal_sel: '#distribution-type-modal',
+                form_sel: '.form',
+                defaults: {what:'dist_type'},
+            },
+            'distribution-item-type-modal': {
+                modal_sel: 'distribution-item-type-modal',
+                form_sel: '.form',
+                defaults: {what:'dist_item_type'},
+            },
+            'distribution-item-modal': {
+                modal_sel: 'distribution-item-modal',
+                form_sel: '.form',
+                defaults: {what:'dist_item'},
+            },
+        },
         initBasicForm: {
             fields:{
                 name: 'empty',
@@ -78,10 +106,31 @@ var app = new Vue({
                     }
                 }
                 else if (data.what === 'grade'){
-                    if(app.updateAction){
+                    if(app.updateAction || app.is_update_action){
                         app.updateGrade(data)
                     }else{
                         app.createGrade(data)
+                    }
+                }
+                else if (data.what === 'dist_type'){
+                    if(app.updateAction){
+                        app.updateDistType(data)
+                    }else{
+                        app.createDistType(data)
+                    }
+                }
+                else if (data.what === 'dist_item_type'){
+                    if(app.updateAction){
+                        app.updateDistItemType(data)
+                    }else{
+                        app.createDistItemType(data)
+                    }
+                }
+                else if (data.what === 'dist_item'){
+                    if(app.updateAction){
+                        app.updateDistItem(data)
+                    }else{
+                        app.createDistItem(data)
                     }
                 }
                 else{
@@ -91,8 +140,40 @@ var app = new Vue({
                 return true
             }
         },
+        items: [
+            {
+                name:"Category",
+                index: 1,
+            },
+            {
+                name:"Subjects",
+                index: 2,
+            },
+            {
+                name:"Examinations",
+                index: 3,
+            },
+            {
+                name:"Grade",
+                index: 4,
+            },
+            {
+                name:"Distribution Types",
+                index: 5,
+            },
+            {
+                name:"Distribution Item Types",
+                index: 6,
+            },
+            {
+                name:"Distribution Items",
+                index: 7,
+            },
+        ],
+        active_item: undefined
     },
     created: function(){
+        this.$data.active_item = this.$data.items[0]
         this.loadv2([
         {
             name:'Categories',
@@ -128,6 +209,13 @@ var app = new Vue({
             variableName: 'grades',
             dataInReponse: 'grades',
             default: []
+        },
+        {
+            name:'Distribution Types',
+            url:'/api/admin/dist_type/list',
+            variableName: 'distributionTypes',
+            dataInReponse: 'distribution_types',
+            default: []
         }
         ], this.afterLoading)
     },
@@ -151,7 +239,10 @@ var app = new Vue({
             dom.find('#catModal').modal(this.initBasicModal)
             dom.find('#examModal').modal(this.initBasicModal)
             dom.find('#gradeModal').modal(this.initBasicModal)
-            
+            dom.find('#distribution-type-modal').modal(this.initBasicModal)
+            dom.find('#distribution-item-type-modal').modal(this.initBasicModal)
+            dom.find('#distribution-item-modal').modal(this.initBasicModal)
+
             dom.find('.ui.form').form(this.bothForms)
 
             this.landed = true
@@ -466,6 +557,39 @@ var app = new Vue({
             if(names)
                 return names.substring(0, names.length-2)
             return names
+        },
+        set_active_item: function(item){
+            this.$data.active_item = item
+        },
+        createDistType: function(distType){
+            var vm = this
+            vm.distributionItemTypeLoading = true
+            this.$http.post('/api/admin/dist_type/add', distType)
+            .then(response => {
+                console.log(response)
+                if(response.body.status === 'success'){
+                    vm.distributionTypes.push(response.body.dist_type)
+                    vm.showToast(msg, 'success', 'tick')
+                }
+                else {
+                    var msg = response.body.statusText || 'Unexpected error occurred'
+                    vm.showToast(msg, 'warn', 'close')
+                }
+                vm.distributionItemTypeLoading = false
+            },
+            error=>{
+                console.log(error)
+                vm.distributionItemTypeLoading = false
+            })
+        },
+        updateDistType: function(distType){
+
+        },
+        updateDistItemType: function(distItemType){
+
+        },
+        updateDistItem: function(distItem){
+
         },
     },
 });

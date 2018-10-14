@@ -56,3 +56,7 @@ def admin_branch_details(branchid):
 @ui.route('/exams_details/<int:branchid>/<int:examid>')
 def admin_exam_details(branchid, examid):
     return render_template('exam_details.html', page=7, examid=examid, branchid=branchid)
+
+@ui.route('/distribution')
+def distribution():
+    return render_template('distribution.html', page=8)
