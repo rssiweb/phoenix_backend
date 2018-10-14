@@ -362,7 +362,7 @@ var app = new Vue({
         },
         attendance_count: function(){
             var count = 0 
-            this.students.forEach(std=>{
+            this.filteredStudents.forEach(std=>{
                 if(std.in)
                     count += 1
             })
@@ -371,7 +371,7 @@ var app = new Vue({
         attendance_percent: function(){
             var count = this.attendance_count
             var percent = 0
-            var total = this.students.length
+            var total = this.filteredStudents.length
             if(total > 0){
                 percent = (count/total) * 100
                 percent = Math.round(percent * 100) / 100
