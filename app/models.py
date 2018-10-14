@@ -174,6 +174,7 @@ class Student(User):
                     contact=self.contact,
                     branch=self.branch_id,
                     active=self.isActive,
+                    end_date=self.effective_end_date,
                     )
 
 

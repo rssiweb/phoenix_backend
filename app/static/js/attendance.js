@@ -25,7 +25,7 @@ var app = new Vue({
         var vm = this
         this.loadv2([
             {name:'Students',
-             url:'/api/student/1/list',
+             url:'/api/student/1/all',
              variableName: 'students',
              dataInReponse: 'students'},
             {name:'Categories',
@@ -352,9 +352,10 @@ var app = new Vue({
         },
         filteredStudents(){
             return this.students.filter(student => {
+                var wasActiveOnDate = !student.end_date || moment(student.end_date).startOf('day').isAfter(moment(this.currentAttendanceDate, ['dddd, Do MMMM YYYY']))
                 var inSearchedCat = this.categoryFilter.length==0 || this.categoryFilter.indexOf(student.category) != -1
                 var inSearchedBranch = this.branchFilter.length==0 || this.branchFilter.indexOf(student.branch) != -1
-                return inSearchedCat && inSearchedBranch
+                return wasActiveOnDate && inSearchedCat && inSearchedBranch
             })
         },
         editModeBtnText: function(){
