@@ -1,20 +1,26 @@
 from app import rq
 from app.models import Student, Faculty
+from app.jobs.utils import send_report_email, zipFiles
 
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
 
 from collections import namedtuple
+from datetime import datetime
 import copy
 import itertools
 import os
+import time
 
 Person = namedtuple('Person', 'name type contact image')
 
+CARD_BODY_STRING = 'Please find the I cards generated on {} in attachments.'
+CARD_REPORT_SUBJECT = os.getenv('MARKSHEET_REPORT_SUBJECT', 'RSSI I-Cards')
 
 @rq.job
 def build_card(meta, branch_id):
+    owner = meta.owner
     branch_id = int(branch_id)
     students = Student.query.filter(Student.isActive!=False, Student.branch_id==branch_id).all()
     faculties = Faculty.query.filter(Student.isActive!=False, Student.branch_id==branch_id).all()
@@ -42,15 +48,20 @@ def build_card(meta, branch_id):
                               getattr(user, 'contact', f_contacts.get(user_id, '          ')),
                               'app/static/img/user/{}.jpg'.format(user_id)
                               ))
-    generate_cards(persons)
+    card_img_files = generate_cards(persons)
+    zip_filename = zipFiles(card_img_files, name='i-cards {}.zip'.format(int(time.time())), deleteAfterZip=True)
+    reportTime = datetime.now().strftime('%d %b %Y %I:%M:%S %p')
+    body = CARD_BODY_STRING.format(reportTime)
+    to = owner.email
+    send_report_email(CARD_REPORT_SUBJECT, to, body, attachFileName=zip_filename, mimetype='application/zip')
 
 
 def generate_cards(persons):
-    font_path = "/app/static/fonts/Ubuntu-M.ttf"
+    font_path = "app/static/fonts/Ubuntu-M.ttf"
     font = ImageFont.truetype(font_path, 70)
     img = Image.open("app/static/card_template.jpg")
     width, _ = img.size
-
+    card_files = []
     for person in persons:
         dp = Image.open(person.image) if os.path.exists(person.image) else None
 
@@ -77,5 +88,9 @@ def generate_cards(persons):
         if dp:
             x_off = (width - dp.size[0]) / 2
             tmp_img.paste(dp, (x_off, 790))
-
-        tmp_img.save('gen/id_cards/%s_card.jpg' % person.name)
+        
+        card_filename = 'card_{}_{}.jpg'.format(person.name, int(time.time()))
+        card_filepath = os.path.join('gen/reports', card_filename)
+        tmp_img.save(card_filepath, quality=95)
+        card_files.append(card_filepath)
+    return card_files

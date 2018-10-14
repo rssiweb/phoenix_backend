@@ -25,7 +25,7 @@ var app = new Vue({
         var vm = this
         this.loadv2([
             {name:'Students',
-             url:'/api/student/1/list',
+             url:'/api/student/1/all',
              variableName: 'students',
              dataInReponse: 'students'},
             {name:'Categories',
@@ -38,6 +38,21 @@ var app = new Vue({
              dataInReponse: 'branches'}
              ],
             function(){
+                // sort students
+                app.students.sort((a, b)=>{
+                    a_data = app.getCategoryName(a.category)
+                    b_data = app.getCategoryName(b.category)
+                    if(a_data === b_data){
+                        a_data = a.name.toLowerCase()
+                        b_data = b.name.toLowerCase()
+                    }
+                    if(a_data < b_data)
+                        return -1
+                    if (a_data === b_data)
+                        return 0
+                    if (a_data > b_data)
+                        return 1
+                })
                 vm.getAttendance()
             })
     },
@@ -60,9 +75,9 @@ var app = new Vue({
             .then(data => {
                 console.log(data)
                 vm.students.forEach(function(student, stdi){
-                    student.in = undefined
-                    student.out = undefined
-                    student.comment = undefined
+                    vm.$set(student, 'in', undefined)
+                    vm.$set(student, 'out', undefined)
+                    vm.$set(student, 'comment', undefined)
                     data.body.attendance.forEach(function(item, index){
                         if(student.id == item.student.id){
                             console.log(student,item,'matched')
@@ -337,13 +352,32 @@ var app = new Vue({
         },
         filteredStudents(){
             return this.students.filter(student => {
+                var wasActiveOnDate = !student.end_date || moment(student.end_date).startOf('day').isAfter(moment(this.currentAttendanceDate, ['dddd, Do MMMM YYYY']))
                 var inSearchedCat = this.categoryFilter.length==0 || this.categoryFilter.indexOf(student.category) != -1
                 var inSearchedBranch = this.branchFilter.length==0 || this.branchFilter.indexOf(student.branch) != -1
-                return inSearchedCat && inSearchedBranch
+                return wasActiveOnDate && inSearchedCat && inSearchedBranch
             })
         },
         editModeBtnText: function(){
             return this.editMode ? "Done" : "Edit Mode"
         },
+        attendance_count: function(){
+            var count = 0 
+            this.filteredStudents.forEach(std=>{
+                if(std.in)
+                    count += 1
+            })
+            return count
+        },
+        attendance_percent: function(){
+            var count = this.attendance_count
+            var percent = 0
+            var total = this.filteredStudents.length
+            if(total > 0){
+                percent = (count/total) * 100
+                percent = Math.round(percent * 100) / 100
+            }
+            return percent
+        }
     }
 });

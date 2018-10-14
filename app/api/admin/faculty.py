@@ -2,6 +2,7 @@ from flask import request, Blueprint
 from app import db, jsonify
 from app.models import Faculty
 from app.utils import decorators, isValidPassword
+from operator import methodcaller
 
 api = Blueprint('admin_faculty_api', __name__, url_prefix='/api/admin/faculty')
 
@@ -11,6 +12,7 @@ api = Blueprint('admin_faculty_api', __name__, url_prefix='/api/admin/faculty')
 @decorators.only_admins
 def list():
     faculties = [f.serialize() for f in Faculty.query.all()]
+    faculties.sort(key=methodcaller('__getitem__', 'facultyId'))
     data = dict(status='success', faculties=faculties)
     return jsonify(data), 200
 
@@ -152,7 +154,6 @@ def reset_faculty_password():
 @decorators.login_required
 @decorators.only_admins
 def set_faculty_state(facid, active):
-    # TODO: fill this placeholder
     active = active == 'true'
     if not facid:
         return jsonify(dict(status='fail', message='Invalid faculty')), 200
@@ -164,3 +165,21 @@ def set_faculty_state(facid, active):
     fac.isActive = active
     db.session.commit()
     return jsonify(dict(status='success', message='Successfully', active=fac.isActive))
+
+@api.route('/<string:facid>/admin/<string:admin>', methods=['POST'])
+@decorators.login_required
+@decorators.only_admins
+def set_faculty_admin(facid, admin):
+    admin = str(admin).lower() == 'true'
+    if not facid:
+        return jsonify(dict(status='fail', message='Invalid faculty')), 200
+    fac = Faculty.query.filter_by(facultyId=facid).first()
+    if not fac:
+        return jsonify(dict(status='fail', message='Invalid faculty')), 200
+    if fac.superUser:
+        return jsonify(dict(status='fail', message='Cannot update super user')), 200
+    fac.admin = admin
+    db.session.commit()
+    return jsonify(dict(status='success',
+                        message='{} is {} Admin'.format(fac.name, 'now an' if fac.admin else 'no longer an'),
+                        admin=fac.admin))

@@ -74,9 +74,9 @@
                     v-if="!faculty.superUser">{{faculty.active? "MARK INACTIVE" : "ACTIVE"}}</button>
 
                     <button
-                    class="ui mini compact button disabled"
+                    class="ui mini compact button"
                     v-bind:class="{ loading: faculty.loading, disabled: faculty.loading, olive: !faculty.admin, orange: faculty.admin}"
-                    @click="toogleAdmin(faculty)"> {{faculty.admin? "REVOKE ADMIN ACCESS" : "PROMOTE TO ADMIN"}} </button>
+                    @click="toggleAdmin(faculty)"> {{faculty.admin? "REVOKE ADMIN ACCESS" : "PROMOTE TO ADMIN"}} </button>
                 </td>
             </tr>
         </tbody>
@@ -84,6 +84,7 @@
 </div>
 <!-- Modals -->
 <div id="addFacultyModal" class="ui small modal">
+    <i class="close icon"></i>
     <div class="header">{{facultyBtnTxt}} Faculty</div>
     
     <div class="content">

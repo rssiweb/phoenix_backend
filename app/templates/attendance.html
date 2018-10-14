@@ -58,8 +58,8 @@
     </div>
 
     <div class="ui container" v-if="!loading">
-        <div class="ui form">
-
+        <div class="ui stackable grid">
+        <div class="ui twelve wide column form">
             <div class="fields">
                 <div class="field">
                     <label>Category</label>
@@ -77,6 +77,12 @@
                 </div>
             </div>
         </div>
+        <div class="ui four wide column">
+            <div class="ui right aligned basic segment">
+                Attendance - {{attendance_percent}}% ({{attendance_count}} out of {{filteredStudents.length}} students are present.)
+            </div>
+        </div>
+        </div>
         <div v-if="!loading && students.length > 0">
             <table class="ui compact sortable striped table">
                 <thead>
@@ -85,7 +91,6 @@
                         <th>Student ID</th>
                         <th>Name</th>
                         <th>Age</th>
-                        <th>Contact</th>
                         <th>Punch In</th>
                         <th>Punch Out</th>
                         <th>Comment (Optional)</th>
@@ -98,7 +103,6 @@
                         <td>{{student.student_id}}</td>
                         <td :data-sort-value="student.name.toLowerCase()">{{student.name}}</td>
                         <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>
-                        <td>{{student.contact}}</td>
                         <td>
                             <div class="ui mini input" v-bind:class="{error: student.inerror}">
                                 <input type="text" placeholder="Punch In" v-model="student.in" v-on:change="savePunchIn(student)" >
@@ -124,7 +128,6 @@
                         <td>{{student.student_id}}</td>
                         <td :data-sort-value="student.name.toLowerCase()">{{student.name}}</td>
                         <td :data-sort-value="moment(student.dob).valueOf()">{{moment(student.dob).fromNow(true)}}</td>
-                        <td>{{student.contact}}</td>
                         <td>
                             <div v-if="student.in">
                                 <p>{{ getTimeString(student.in) }}</p>
