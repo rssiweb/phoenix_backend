@@ -38,6 +38,21 @@ var app = new Vue({
              dataInReponse: 'branches'}
              ],
             function(){
+                // sort students
+                app.students.sort((a, b)=>{
+                    a_data = app.getCategoryName(a.category)
+                    b_data = app.getCategoryName(b.category)
+                    if(a_data === b_data){
+                        a_data = a.name.toLowerCase()
+                        b_data = b.name.toLowerCase()
+                    }
+                    if(a_data < b_data)
+                        return -1
+                    if (a_data === b_data)
+                        return 0
+                    if (a_data > b_data)
+                        return 1
+                })
                 vm.getAttendance()
             })
     },
