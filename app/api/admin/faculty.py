@@ -2,6 +2,7 @@ from flask import request, Blueprint
 from app import db, jsonify
 from app.models import Faculty
 from app.utils import decorators, isValidPassword
+from operator import methodcaller
 
 api = Blueprint('admin_faculty_api', __name__, url_prefix='/api/admin/faculty')
 
@@ -11,6 +12,7 @@ api = Blueprint('admin_faculty_api', __name__, url_prefix='/api/admin/faculty')
 @decorators.only_admins
 def list():
     faculties = [f.serialize() for f in Faculty.query.all()]
+    faculties.sort(key=methodcaller('__getitem__', 'facultyId'))
     data = dict(status='success', faculties=faculties)
     return jsonify(data), 200
 
