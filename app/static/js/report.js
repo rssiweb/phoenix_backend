@@ -59,7 +59,6 @@ var app = new Vue({
         }
     },
     created(){
-        console.log('created')
         this.loadv2([
             {name:'Categories',
              url:'/api/category/1/list',
@@ -78,7 +77,6 @@ var app = new Vue({
     updated(){
         console.log('updated')
         if(!this.initialized && !this.loading){
-            console.log('initialized')
             var dom = $(this.$el)
             dom.find('table').tablesort()
             dom.find('.dropdown').dropdown()
@@ -90,7 +88,6 @@ var app = new Vue({
     },
     watch: {
         month(){
-            console.log('fetch students', this.month)
             this.loadv2([
                 {name:'Students',
                  url: '/api/student/' + this.month.replace(/ /g,'') + '/all',
@@ -134,11 +131,9 @@ var app = new Vue({
                 }else{
                     vm.showToast('Request failed! try again', 'warn')
                 }
-                console.log(response)
                 vm.loading = false
             },
             error =>{
-                console.log(error)
                 this.error = 'Request failed! please re-load the page and try again, if problem still persists please report to admin.'
                 vm.showToast(this.error, 'error')
                 vm.loading = false
@@ -170,14 +165,12 @@ var app = new Vue({
                 }else{
                     vm.showToast('Request failed! try again', 'warn')
                 }
-                console.log(response)
                 vm.loading = false
             },
             error => {
                 this.loading = false
                 this.error = 'Request failed! please re-load the page and try again, if problem still persists please report to admin.'
                 vm.showToast(this.error, 'error')
-                console.log(error)
             })
         },
         requestMarksheetReport: function(){
@@ -190,11 +183,9 @@ var app = new Vue({
                 }else{
                     vm.showToast('Request failed! try again', 'warn')
                 }
-                console.log(response)
                 vm.loading = false
             },
             error =>{
-                console.log(error)
                 this.error = 'Request failed! please re-load the page and try again, if problem still persists please report to admin.'
                 vm.showToast(this.error, 'error')
                 vm.loading = false
@@ -213,9 +204,23 @@ var app = new Vue({
             $('#marksheetModal').modal('show')
         },
         requestGenerateICard: function(){
+            var vm = this
+            vm.loading = true
             var data = $('#ICardModal .form').form('get values')
-            console.log(data)
             this.$http.get('/api/report/generate/card/' + data.branch)
+            .then(response => {
+                if(response.body.status==='success'){
+                    vm.showToast(response.body.message, 'success')
+                }else{
+                    vm.showToast('Request failed! try again', 'warn')
+                }
+                vm.loading = false
+            },
+            error =>{
+                this.error = 'Request failed! please re-load the page and try again, if problem still persists please report to admin.'
+                vm.showToast(this.error, 'error')
+                vm.loading = false
+            })
         }
     },
     computed: {
