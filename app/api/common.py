@@ -2,6 +2,7 @@ from flask import request, Blueprint
 from app import db, jsonify, bcrypt
 from app.models import Faculty
 from app.utils import decorators, isValidPassword
+import cloudinary
 
 api = Blueprint('common_api', __name__, url_prefix='/api')
 
@@ -17,14 +18,21 @@ def get_token():
         try:
             password = data.get('password')
             if bcrypt.check_password_hash(faculty.password, password):
+                image = None
+                if faculty.image:
+                    url = faculty.image.split('/image/upload/')[1]
+                    url = '/'.join(url.split('/')[1:]) if url else url
+                    image = cloudinary.CloudinaryImage(url).build_url(transformation=[
+                        {'width': 150, 'height': 150},
+                    ])
                 res = {
                     'status': 'success',
                     'message': 'log in successful.',
                     'auth_token': faculty.encode_auth_token(email).decode(),
                     'is_admin': faculty.admin,
-                    'name': faculty.name
+                    'name': faculty.name,
+                    'profile_image': image,
                 }
-                print res
                 return jsonify(res), 202
         except Exception as e:
             print str(e)

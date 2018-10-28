@@ -12,6 +12,7 @@ import copy
 import itertools
 import os
 import time
+import cStringIO, urllib
 
 Person = namedtuple('Person', 'name type contact image')
 
@@ -24,29 +25,16 @@ def build_card(meta, branch_id):
     branch_id = int(branch_id)
     students = Student.query.filter(Student.isActive!=False, Student.branch_id==branch_id).all()
     faculties = Faculty.query.filter(Student.isActive!=False, Student.branch_id==branch_id).all()
+    faculties = Faculty.query.filter(Faculty.id.in_([1])).all()
+    students = Student.query.filter(Student.id.in_([6,7,8,9,10])).all()
     persons = []
-    f_contacts = {
-    'VLKO17001': '9831233994',
-    'VLKO17002': '8267927080',
-    'VLKO17003': '8574143794',
-    'VLKO17004': '9456649746',
-    'VLKO17005': '9176075155',
-    'VLKO18006': '7044064067',
-    'VLKO18007': '8726535702',
-    'VLKO18008': '8765339655',
-    'VLKO18009': '9458761831',
-    'VLKO18010': '8318597683',
-    'VLKO18011': '8009959431',
-    'VLKO18012': '8932061116',
-    'VLKO18013': '9918868804',
-    }
     for user in itertools.chain(students, faculties):
         user_type = "Student" if isinstance(user, Student) else "Faculty"
         user_id = getattr(user, 'student_id', getattr(user, 'facultyId', '')).upper()
         persons.append(Person(user.name,
                               user_type,
-                              getattr(user, 'contact', f_contacts.get(user_id, '          ')),
-                              'app/static/img/user/{}.jpg'.format(user_id)
+                              getattr(user, 'contact', '          '),
+                              user.image
                               ))
     card_img_files = generate_cards(persons)
     zip_filename = zipFiles(card_img_files, name='i-cards {}.zip'.format(int(time.time())), deleteAfterZip=True)
@@ -63,8 +51,12 @@ def generate_cards(persons):
     width, _ = img.size
     card_files = []
     for person in persons:
-        dp = Image.open(person.image) if os.path.exists(person.image) else None
-
+        try:
+            dp_content = urllib.urlopen(person.image).read() if person.image else None
+        except Exception as e:
+            print e
+            dp_content = None
+        dp = Image.open(cStringIO.StringIO(dp_content)) if dp_content else None
         tmp_img = copy.copy(img)
         draw = ImageDraw.Draw(tmp_img)
 

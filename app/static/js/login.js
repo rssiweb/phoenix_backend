@@ -20,6 +20,7 @@ var app = new Vue({
                 Cookies.set('auth_token',response.body.auth_token, values);
                 Cookies.set('is_admin',response.body.is_admin, values);
                 Cookies.set('name',response.body.name, values);
+                Cookies.set('profile_image',response.body.profile_image, values);
 
                 Vue.use(CloudinaryPlugin, {})
                 

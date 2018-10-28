@@ -20,13 +20,16 @@ class User(Base):
     name = db.Column(db.String(128))
     isActive = db.Column(db.Boolean, default=True)
     superUser = db.Column(db.Boolean, default=False)
+    contact = db.Column(db.String(50), nullable=True)
+    image = db.Column(db.String(300), nullable=True)
 
     def __init__(self, name, isActive=True):
         self.name = name
         self.isActive = isActive
 
     def serialize(self):
-        return dict(name=self.name)
+        return dict(name=self.name,
+                    image=self.image)
 
 
 class Faculty(User):
@@ -40,7 +43,7 @@ class Faculty(User):
                        nullable=True)
     branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)
 
-    def __init__(self, facultyId, name, email, password, gender, branch_id):
+    def __init__(self, facultyId, name, email, password, gender, branch_id, contact=None):
         super(Faculty, self).__init__(name)
         self.facultyId = facultyId
         self.email = email
@@ -56,6 +59,7 @@ class Faculty(User):
         if not branch:
             raise ValueError('No Branch with id "%s" found' % branch_id)
         self.branch_id = branch.id
+        self.contact = contact
 
     def set_password(self, newPassword):
         self.password = bcrypt.generate_password_hash(
@@ -69,12 +73,14 @@ class Faculty(User):
         return dict(id=self.id,
                     facultyId=self.facultyId,
                     name=self.name,
+                    image=self.image,
                     email=self.email,
                     admin=self.admin,
                     gender=self.gender,
                     active=self.isActive,
                     branch=self.branch_id,
                     superUser=self.superUser,
+                    contact=self.contact,
                     )
 
     def __repr__(self):
@@ -121,7 +127,6 @@ class Student(User):
     category = relationship('Category', foreign_keys=[category_id])
 
     dob = db.Column(db.Date(), nullable=True)
-    contact = db.Column(db.String(50), nullable=True)
 
     branch_id = db.Column(db.Integer(), db.ForeignKey('branch.id'))
     branch = relationship('Branch', foreign_keys=[branch_id])
@@ -131,7 +136,7 @@ class Student(User):
     distributions = relationship("Distribution", back_populates="student")
 
     def __init__(self, student_id, category, name,
-                 dob=None, contact=None, branch=None, isActive=True, effective_end_date=None):
+                 dob=None, contact=None, branch=None, isActive=True, effective_end_date=None, image=None):
         super(Student, self).__init__(name, isActive)
         self.student_id = student_id
 
@@ -162,6 +167,8 @@ class Student(User):
         self.branch = br
 
         self.effective_end_date = effective_end_date
+        if image:
+            self.image = str(image).strip()
 
     def __repr__(self):
         class_type = type(self)
@@ -170,6 +177,7 @@ class Student(User):
     def serialize(self):
         return dict(id=self.id,
                     name=self.name,
+                    image=self.image,
                     dob=self.dob,
                     category=self.category_id,
                     student_id=self.student_id,
