@@ -31,7 +31,7 @@ def build_card(meta, branch_id):
         user_id = getattr(user, 'student_id', getattr(user, 'facultyId', '')).upper()
         persons.append(Person(user.name,
                               user_type,
-                              getattr(user, 'contact', '          '),
+                              getattr(user, 'contact', None),
                               user.image
                               ))
     card_img_files = generate_cards(persons)
@@ -70,7 +70,8 @@ def generate_cards(persons):
 
         font = ImageFont.truetype(font_path, 70)
 
-        number = 'Contact: +91 ' + person.contact
+        contact = person.contact if person.contact else (' ' * 20)
+        number = 'Contact: +91 %10s' % str(contact)
         text_width, _ = draw.textsize(number, font=font)
         text_x = (width - text_width) / 2
         draw.text((text_x, 1534), number, (0, 0, 0), font=font)
