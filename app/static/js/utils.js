@@ -35,6 +35,7 @@ var utils = {
             token: Cookies.get('auth_token'),
             is_admin: (Cookies.get('is_admin') == 'true'),
             name: Cookies.get('name'),
+            profile_image: Cookies.get('profile_image'),
 
             showModals: {},
             is_update_action: false,

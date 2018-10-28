@@ -20,6 +20,7 @@ class User(Base):
     name = db.Column(db.String(128))
     isActive = db.Column(db.Boolean, default=True)
     superUser = db.Column(db.Boolean, default=False)
+    contact = db.Column(db.String(50), nullable=True)
     image = db.Column(db.String(300), nullable=True)
 
     def __init__(self, name, isActive=True):
@@ -42,7 +43,7 @@ class Faculty(User):
                        nullable=True)
     branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)
 
-    def __init__(self, facultyId, name, email, password, gender, branch_id):
+    def __init__(self, facultyId, name, email, password, gender, branch_id, contact=None):
         super(Faculty, self).__init__(name)
         self.facultyId = facultyId
         self.email = email
@@ -58,6 +59,7 @@ class Faculty(User):
         if not branch:
             raise ValueError('No Branch with id "%s" found' % branch_id)
         self.branch_id = branch.id
+        self.contact = contact
 
     def set_password(self, newPassword):
         self.password = bcrypt.generate_password_hash(
@@ -78,6 +80,7 @@ class Faculty(User):
                     active=self.isActive,
                     branch=self.branch_id,
                     superUser=self.superUser,
+                    contact=self.contact,
                     )
 
     def __repr__(self):
@@ -124,7 +127,6 @@ class Student(User):
     category = relationship('Category', foreign_keys=[category_id])
 
     dob = db.Column(db.Date(), nullable=True)
-    contact = db.Column(db.String(50), nullable=True)
 
     branch_id = db.Column(db.Integer(), db.ForeignKey('branch.id'))
     branch = relationship('Branch', foreign_keys=[branch_id])

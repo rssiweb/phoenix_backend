@@ -48,6 +48,8 @@ def update_faculty():
     name = data.get('name')
     gender = data.get('gender')
     facultyId = data.get('facultyId')
+    contact = data.get('contact')
+    image = data.get('image')
     blank_values = [key for key in required_fields
                     if not data.get(key, '').strip()]
     if blank_values:
@@ -61,6 +63,8 @@ def update_faculty():
     faculty.email = email
     faculty.name = name
     faculty.gender = gender
+    faculty.contact = contact
+    faculty.image = image
     db.session.commit()
     res['message'] = 'Faculty updated successfully'
     res['status'] = 'success'
@@ -95,6 +99,8 @@ def add():
     gender = data.get('gender')
     facultyId = data.get('facultyId')
     branchId = data.get('branch_id')
+    contact = data.get('contact')
+    image = data.get('image')
     blank_values = [key for key in required_fields
                     if not data.get(key, '').strip()]
     if blank_values:
@@ -110,7 +116,9 @@ def add():
                 email=email,
                 password=password,
                 gender=gender,
-                branch_id=branchId)
+                branch_id=branchId,
+                contact=contact,
+                image=image)
             # insert the user
             db.session.add(faculty)
             db.session.commit()

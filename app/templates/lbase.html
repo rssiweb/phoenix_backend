@@ -68,7 +68,7 @@
                     <div class="right menu">
                         {%raw%}
                         <a class="item {%if page == 4%}active{%endif%}" v-if="name" href="/me">
-                            <img class="ui avatar image" src="http://via.placeholder.com/35x35">
+                            <img class="ui avatar image" :src="profile_image">
                             <span>{{name}}</span>
                         </a>
                         {%endraw%}
