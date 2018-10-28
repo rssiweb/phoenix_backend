@@ -120,6 +120,7 @@ def import_students():
     getBranch = itemgetter(heading.index('preferred branch'))
     getStatus = itemgetter(heading.index('status'))
     getEndDate = itemgetter(heading.index('effective from'))
+    getPhotoUrl = itemgetter(heading.index('photo url'))
 
     added = []
     updated = []
@@ -128,7 +129,7 @@ def import_students():
         category_name, student_id = getCategory(row), getStudentId(row)
         name, contact = getName(row), getContact(row)
         dob = datetime.strptime(getDob(row), '%d/%m/%Y').date()
-        branch_name = getBranch(row)
+        branch_name, image_url = getBranch(row), getPhotoUrl(row)
         # if there is any thing in the status we assume the student to be inactive
         active = getStatus(row) != 'R'
         effective_end_date = getEndDate(row)
@@ -154,6 +155,7 @@ def import_students():
                              student.branch == branch,
                              student.isActive == active,
                              student.effective_end_date == effective_end_date,
+                             student.image == image_url,
                              ])
             if not unchanged:
                 student.category = category
@@ -163,6 +165,7 @@ def import_students():
                 student.branch = branch
                 student.isActive = active
                 student.effective_end_date = effective_end_date
+                student.image = image_url
                 updated.append(student)
         else:
             student = Student(student_id=student_id,
@@ -173,6 +176,7 @@ def import_students():
                               branch=branch.name,
                               isActive=active,
                               effective_end_date=effective_end_date,
+                              image=image_url,
                               )
             db.session.add(student)
             added.append(student)

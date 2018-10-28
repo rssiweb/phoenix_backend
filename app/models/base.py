@@ -20,13 +20,15 @@ class User(Base):
     name = db.Column(db.String(128))
     isActive = db.Column(db.Boolean, default=True)
     superUser = db.Column(db.Boolean, default=False)
+    image = db.Column(db.String(300), nullable=True)
 
     def __init__(self, name, isActive=True):
         self.name = name
         self.isActive = isActive
 
     def serialize(self):
-        return dict(name=self.name)
+        return dict(name=self.name,
+                    image=self.image)
 
 
 class Faculty(User):
@@ -69,6 +71,7 @@ class Faculty(User):
         return dict(id=self.id,
                     facultyId=self.facultyId,
                     name=self.name,
+                    image=self.image,
                     email=self.email,
                     admin=self.admin,
                     gender=self.gender,
@@ -131,7 +134,7 @@ class Student(User):
     distributions = relationship("Distribution", back_populates="student")
 
     def __init__(self, student_id, category, name,
-                 dob=None, contact=None, branch=None, isActive=True, effective_end_date=None):
+                 dob=None, contact=None, branch=None, isActive=True, effective_end_date=None, image=None):
         super(Student, self).__init__(name, isActive)
         self.student_id = student_id
 
@@ -162,6 +165,8 @@ class Student(User):
         self.branch = br
 
         self.effective_end_date = effective_end_date
+        if image:
+            self.image = str(image).strip()
 
     def __repr__(self):
         class_type = type(self)
@@ -170,6 +175,7 @@ class Student(User):
     def serialize(self):
         return dict(id=self.id,
                     name=self.name,
+                    image=self.image,
                     dob=self.dob,
                     category=self.category_id,
                     student_id=self.student_id,
