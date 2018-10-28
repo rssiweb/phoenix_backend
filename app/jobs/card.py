@@ -25,8 +25,6 @@ def build_card(meta, branch_id):
     branch_id = int(branch_id)
     students = Student.query.filter(Student.isActive!=False, Student.branch_id==branch_id).all()
     faculties = Faculty.query.filter(Student.isActive!=False, Student.branch_id==branch_id).all()
-    faculties = Faculty.query.filter(Faculty.id.in_([1])).all()
-    students = Student.query.filter(Student.id.in_([6,7,8,9,10])).all()
     persons = []
     for user in itertools.chain(students, faculties):
         user_type = "Student" if isinstance(user, Student) else "Faculty"
