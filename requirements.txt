@@ -2,6 +2,7 @@ alembic==0.9.9
 bcrypt==3.1.4
 cffi==1.11.5
 click==6.7
+cloudinary==1.14.0
 croniter==0.3.23
 Flask==1.0.2
 Flask-Bcrypt==0.7.1
@@ -31,5 +32,6 @@ rq-scheduler==0.8.3
 sendgrid==5.4.0
 six==1.11.0
 SQLAlchemy==1.2.7
+urllib3==1.24
 Wand==0.4.4
 Werkzeug==0.14.1
