@@ -60,13 +60,13 @@ def generate_cards(persons):
 
         text_width, _ = draw.textsize(person.name, font=font)
         text_x = (width - text_width) / 2
-        draw.text((text_x, 1334), person.name, (0, 0, 0), font=font)
+        draw.text((text_x, 1399), person.name, (0, 0, 0), font=font)
 
         font = ImageFont.truetype(font_path, 60)
 
         text_width, _ = draw.textsize(person.type, font=font)
         text_x = (width - text_width) / 2
-        draw.text((text_x, 1434), person.type, (0, 0, 0), font=font)
+        draw.text((text_x, 1499), person.type, (0, 0, 0), font=font)
 
         font = ImageFont.truetype(font_path, 70)
 
@@ -74,11 +74,11 @@ def generate_cards(persons):
         number = 'Contact: +91 %10s' % str(contact)
         text_width, _ = draw.textsize(number, font=font)
         text_x = (width - text_width) / 2
-        draw.text((text_x, 1534), number, (0, 0, 0), font=font)
+        draw.text((text_x, 1599), number, (0, 0, 0), font=font)
 
         if dp:
             x_off = (width - dp.size[0]) / 2
-            tmp_img.paste(dp, (x_off, 790))
+            tmp_img.paste(dp, (x_off, 855))
         
         card_filename = 'card_{}_{}.jpg'.format(person.name, int(time.time()))
         card_filepath = os.path.join('gen/reports', card_filename)
