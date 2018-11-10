@@ -14,7 +14,7 @@ import os
 import time
 import cStringIO, urllib
 
-Person = namedtuple('Person', 'name type contact image')
+Person = namedtuple('Person', 'name type contact image userid')
 
 CARD_BODY_STRING = 'Please find the I cards generated on {} in attachments.'
 CARD_REPORT_SUBJECT = os.getenv('MARKSHEET_REPORT_SUBJECT', 'RSSI I-Cards')
@@ -28,11 +28,12 @@ def build_card(meta, branch_id):
     persons = []
     for user in itertools.chain(students, faculties):
         user_type = "Student" if isinstance(user, Student) else "Faculty"
-        user_id = getattr(user, 'student_id', getattr(user, 'facultyId', '')).upper()
+        user_id = getattr(user, 'student_id', getattr(user, 'facultyId', '')).strip().upper()
         persons.append(Person(user.name,
                               user_type,
                               getattr(user, 'contact', None),
-                              user.image
+                              user.image,
+                              user_id
                               ))
     card_img_files = generate_cards(persons)
     zip_filename = zipFiles(card_img_files, name='i-cards {}.zip'.format(int(time.time())), deleteAfterZip=True)
@@ -64,14 +65,14 @@ def generate_cards(persons):
 
         font = ImageFont.truetype(font_path, 60)
 
-        text_width, _ = draw.textsize(person.type, font=font)
+        text_width, _ = draw.textsize(person.userid, font=font)
         text_x = (width - text_width) / 2
-        draw.text((text_x, 1499), person.type, (0, 0, 0), font=font)
+        draw.text((text_x, 1499), person.userid, (0, 0, 0), font=font)
 
         font = ImageFont.truetype(font_path, 70)
 
         contact = person.contact if person.contact else (' ' * 20)
-        number = 'Contact: +91 %10s' % str(contact)
+        number = '+91 %10s' % str(contact)
         text_width, _ = draw.textsize(number, font=font)
         text_x = (width - text_width) / 2
         draw.text((text_x, 1599), number, (0, 0, 0), font=font)
