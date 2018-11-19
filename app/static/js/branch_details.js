@@ -288,7 +288,7 @@ var app = new Vue({
             console.log('update', category)
             var vm = this
             this.categoryLoading = true
-            var postData = {name:category.name, id:category.id}
+            var postData = {name:category.name, id:category.id, subjects: category.subjects}
             var url = '/api/admin/category/update/' + category.id
 
             vm.showToast('Updating '+category.name, 'info', 'hourglass-o', true)
@@ -495,7 +495,7 @@ var app = new Vue({
                 var formData = Object.assign({}, category)
                 formData.what = 'category'
                 form.form('set values', formData)
-                form.find('.checkbox').checkbox('disable')
+                // form.find('.checkbox').checkbox('disable')
                 this.showModal('catModal')
             }else{
                 vm.showToast('Click on invalid category', 'warn', 'info')
