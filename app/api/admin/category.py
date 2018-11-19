@@ -54,6 +54,7 @@ def update(catid):
     res_code = 200
     res = dict(status='fail')
     cat_name = data.get('name')
+    subjects = data.get('subjects')
     if not cat_name:
         res['statusText'] = errors.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
         res['statusData'] = errors.BLANK_VALUES_FOR_REQUIRED_FIELDS.type(['name'])
@@ -64,6 +65,14 @@ def update(catid):
         res['statusData'] = errors.CUSTOM_ERROR.type('No such Category')
         return jsonify(res), res_code
     cat.name = cat_name
+    already_added_subs = [a.subject for a in cat.subjects]
+    for subid in subjects:
+        a = Association()
+        sub = Subject.query.filter_by(id=int(subid)).first()
+        print a, sub
+        if a and sub and sub not in already_added_subs:
+            a.subject = sub
+            cat.subjects.append(a)
     db.session.add(cat)
     db.session.commit()
     res['status'] = 'success'

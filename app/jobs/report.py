@@ -74,8 +74,6 @@ def examToDict(exam_id):
                 sub = test.cat_sub_association.subject
                 std_data[sub.name] = mark.marks
                 totalMarks += mark.marks
-                if mark.marks == 0:
-                    print 'bc aa gaya yaha'
         std_data['Total'] = totalMarks if totalMarks > -1 else None
         std_data['Max Marks'] = maxMarks
         if totalMarks > -1:
