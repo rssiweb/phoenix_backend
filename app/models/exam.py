@@ -2,7 +2,7 @@ from app import db
 from .base import Base
 from sqlalchemy.orm import relationship, backref
 from .base import Association, Branch
-from datetime import datetime
+from datetime import datetime, date
 
 class Exam(Base):
     __tablename__ = 'exam'
