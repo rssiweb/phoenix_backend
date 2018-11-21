@@ -19,7 +19,7 @@
             <a class="item {%if page == 8%}active{%endif%}" href="/exam/result" >Result</a>
         </div>
     </div>
-    <a class="item {%if page == 5%}active{%endif%}" href="/report">Reports</a>
+    <a class="item {%if page == 5%}active{%endif%}" href="/report" v-if="is_admin">Reports</a>
     <a class="item {%if page == 7%}active{%endif%}" href="/adminactions" v-if="is_admin">Admin</a>
     <a class="item {%if page == 8%}active{%endif%}" href="/distribution" v-if="is_admin">Distribution</a>
 
@@ -61,7 +61,7 @@
                             <a class="item {%if page == 8%}active{%endif%}" href="/exam/result" >Result</a>
                         </div>
                     </div>
-                    <a class="item {%if page == 5%}active{%endif%}" href="/report">Reports</a>
+                    <a class="item {%if page == 5%}active{%endif%}" href="/report" v-if="is_admin">Reports</a>
                     <a class="item {%if page == 7%}active{%endif%}" href="/adminactions" v-if="is_admin">Admin</a>
                     <a class="item {%if page == 8%}active{%endif%}" href="/distribution" v-if="is_admin">Distribution</a>
                     
