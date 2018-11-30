@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from app import jsonify
-from app.models import Student
+from app.models import Student, Faculty
 from datetime import datetime
 from app.utils import decorators
 from sqlalchemy import or_
@@ -20,6 +20,11 @@ def list_all_by_endDate(endDate):
     students = Student.query.filter(or_(Student.effective_end_date==None,
                                         Student.effective_end_date>=endDate))
     students = [s.serialize() for s in students]
+    faculty = Faculty.query.get(request.user.id)
+    #TODO: remove this logic with menu fix
+    if not all([faculty, faculty.admin]):
+        for s in students:
+            del s['contact']
     data = dict(status='success', students=students)
     return jsonify(data), 200
 
@@ -29,6 +34,10 @@ def list_all_by_endDate(endDate):
 def list():
     students = Student.query.filter(Student.isActive!=False)
     students = [s.serialize() for s in students]
+    faculty = Faculty.query.get(request.user.id)
+    if not all([faculty, faculty.admin]):
+        for s in students:
+            del s['contact']
     data = dict(status='success', students=students)
     return jsonify(data), 200
 
@@ -38,6 +47,10 @@ def list():
 def list_all():
     students = Student.query.all()
     students = [s.serialize() for s in students]
+    faculty = Faculty.query.get(request.user.id)
+    if not all([faculty, faculty.admin]):
+        for s in students:
+            del s['contact']
     data = dict(status='success', students=students)
     return jsonify(data), 200
 
@@ -48,6 +61,10 @@ def list_by_branch(branchid):
     students = Student.query.filter(Student.branch_id==branchid,
                                     Student.isActive!=False)
     students = [s.serialize() for s in students]
+    faculty = Faculty.query.get(request.user.id)
+    if not all([faculty, faculty.admin]):
+        for s in students:
+            del s['contact']
     data = dict(status='success', students=students)
     return jsonify(data), 200
 
@@ -56,6 +73,10 @@ def list_by_branch(branchid):
 @decorators.login_required
 def list_all_by_branch(branchid):
     students = [s.serialize() for s in Student.query.filter_by(branch_id=branchid)]
+    faculty = Faculty.query.get(request.user.id)
+    if not all([faculty, faculty.admin]):
+        for s in students:
+            del s['contact']
     data = dict(status='success', students=students)
     return jsonify(data), 200
 
@@ -68,5 +89,9 @@ def by_ids():
     students = []
     if ids:
         students = [s.serialize() for s in Student.query.filter(Student.id.in_(ids)).all()]
+    faculty = Faculty.query.get(request.user.id)
+    if not all([faculty, faculty.admin]):
+        for s in students:
+            del s['contact']
     data = dict(status='success', students=students)
     return jsonify(data), 200
