@@ -50,10 +50,12 @@ def set_marks(testid, studentid):
     marksObtained = data.get('marks')
     try:
         marksObtained = float(marksObtained)
-    except Exception:
+    except Exception as ex:
+        print str(ex), marksObtained
         marksObtained = None
     comments = data.get('comment')
     marks = Marks.query.filter_by(test_id=test.id, student_id=student.id).first()
+    print marks
     if not marks:
         if marksObtained is None:
             res['statusText'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
@@ -63,16 +65,23 @@ def set_marks(testid, studentid):
             marks = Marks(test_id=test.id, student_id=student.id, marks=marksObtained, comments=comments)
         else:
             marks = Marks(test_id=test.id, student_id=student.id, marks=marksObtained)
+        res['marks'] = marks.serialize()
+        res['message'] = 'Marks and Comments saved'
+        db.session.add(marks)
     else:
         if marksObtained is not None:
             marks.marks = marksObtained
-        if comments is not None:
-            marks.comments = comments
-    db.session.add(marks)
+            if comments is not None:
+                marks.comments = comments
+            db.session.add(marks)
+            res['marks'] = marks.serialize()
+            res['message'] = 'Marks and Comments saved'
+        else:
+            db.session.delete(marks)
+            res['message'] = 'Marks and Comments deleted'
+            res['marks'] = {}
     db.session.commit()
     res['status'] = 'success'
-    res['marks'] = marks.serialize()
-    res['message'] = 'Marks and Comments saved'
     return jsonify(res), 200
 
 
