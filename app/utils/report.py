@@ -4,7 +4,7 @@ from PIL import ImageDraw
 from app.models import Attendance
 from app.utils import slice_by
 from datetime import datetime, timedelta
-from config import REPORT_FOLDER
+from flask import current_app
 
 import copy
 import calendar
@@ -122,7 +122,7 @@ def buildReport(students, month, categories, branches):
         att_sheet = att_sheet.resize((att_sheet.size[0]/5, att_sheet.size[1]/5), Image.ANTIALIAS)
         page_imgs.append(att_sheet)
     report_filename = "Attendance Report_{}.pdf".format(str(int(time.time())))
-    report_filepath = os.path.join(REPORT_FOLDER, report_filename)
+    report_filepath = current_app.config.get('REPORT_FOLDER')
     if len(page_imgs) > 0:
         page_imgs[0].save(report_filepath,
                            'PDF',

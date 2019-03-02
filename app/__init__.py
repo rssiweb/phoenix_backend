@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_rq2 import RQ
+import config
+import os
 
 logger = None
 
@@ -11,12 +13,15 @@ db = SQLAlchemy()
 rq = RQ(default_timeout=180 * 2)
 migrate = Migrate()
 
-def create_app():
+
+def create_app(config_name=None):
     global logger
+    
     # Define the WSGI application object
     app = Flask(__name__)
+
     # Configurations
-    app.config.from_object('config')
+    app.config.from_object(_get_config_class(config_name))
 
     logger = app.logger
 
@@ -70,3 +75,13 @@ def create_app():
                 ui]:
         app.register_blueprint(api)
     return app
+
+########## Private members below
+
+def _get_config_class(config_name=None):
+    config_name = config_name and getattr(config, config_name, None)
+    if not config_name:
+        config_name = os.getenv('config', 'ProdConfig')
+    
+    config_class = getattr(config, config_name, config.ProdConfig)
+    return config_class()
