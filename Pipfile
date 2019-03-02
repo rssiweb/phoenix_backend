@@ -24,6 +24,8 @@ gunicorn = "*"
 pillow = "*"
 flask-login = "*"
 flask-restful = "*"
+flask-bcrypt = "*"
+pyjwt = "*"
 
 [requires]
 python_version = "2.7"
