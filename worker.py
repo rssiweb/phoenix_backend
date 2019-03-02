@@ -4,6 +4,7 @@ from rq import Worker, Queue, Connection
 from app import create_app
 
 app = create_app()
+app.app_context().push()
 
 listen = ['high', 'default', 'low']
 
