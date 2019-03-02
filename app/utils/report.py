@@ -121,12 +121,13 @@ def buildReport(students, month, categories, branches):
         # resize the image and app to list of pages
         att_sheet = att_sheet.resize((att_sheet.size[0]/5, att_sheet.size[1]/5), Image.ANTIALIAS)
         page_imgs.append(att_sheet)
+    report_path = current_app.config.get('REPORT_FOLDER')
     report_filename = "Attendance Report_{}.pdf".format(str(int(time.time())))
-    report_filepath = current_app.config.get('REPORT_FOLDER')
+    report_filepath = os.path.join(report_path, report_filename)
     if len(page_imgs) > 0:
         page_imgs[0].save(report_filepath,
                            'PDF',
                            save_all=True,
                            quality=100,
                            append_images=page_imgs[1:])
-    return report_filepath
+        return report_filepath

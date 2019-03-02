@@ -35,7 +35,7 @@ class BaseConfig(object):
     # default token life to 2 hours
     TOKEN_LIFESPAN_SEC = int(os.getenv('TOKEN_LIFESPAN_SEC', 2*60*60))
 
-    REPORT_FOLDER = os.getenv('REPORT_FOLDER', 'gen/reports')
+    REPORT_FOLDER = os.path.join(BASE_DIR, os.getenv('REPORT_FOLDER', 'gen/reports'))
 
     REDISTOGO_URL = os.getenv('REDISTOGO_URL')  # default value added for worker process to run
     RQ_REDIS_URL = REDISTOGO_URL

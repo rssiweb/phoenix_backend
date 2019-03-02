@@ -76,8 +76,8 @@ def build_attachment(attachmentFileName, mimetype):
 
 def send_report_email(subject, to, body, attachFileName=None, mimetype="application/pdf"):
     """Minimum required to send an email"""
-    username = current_app.get('SENDGRID_USERNAME')
-    display_name = current_app.get('SENDGRID_DISPLAYNAME')
+    username = current_app.config.get('SENDGRID_USERNAME')
+    display_name = current_app.config.get('SENDGRID_DISPLAYNAME')
     from_email = Email(username, display_name)
     to_email = Email(to)
     content = Content("text/plain", body)
