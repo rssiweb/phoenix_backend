@@ -1,5 +1,6 @@
 import jwt
-from app import db, app, bcrypt
+from flask import current_app
+from app import db, bcrypt
 from datetime import datetime, timedelta, date
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import UniqueConstraint
@@ -63,7 +64,7 @@ class Faculty(User):
 
     def set_password(self, newPassword):
         self.password = bcrypt.generate_password_hash(
-            newPassword, app.config.get('BCRYPT_LOG_ROUNDS')
+            newPassword, current_app.config.get('BCRYPT_LOG_ROUNDS')
         ).decode()
 
     def check_password(self, password):
@@ -95,7 +96,7 @@ class Faculty(User):
         Generates the Auth Token
         :return: string
         """
-        token_life = app.config.get('TOKEN_LIFESPAN_SEC')
+        token_life = current_app.config.get('TOKEN_LIFESPAN_SEC')
         payload = {
             'exp': datetime.utcnow() + timedelta(seconds=token_life),
             'iat': datetime.utcnow(),
@@ -103,7 +104,7 @@ class Faculty(User):
         }
         return jwt.encode(
             payload,
-            app.config.get('SECRET_KEY'),
+            current_app.config.get('SECRET_KEY'),
             algorithm='HS256'
         )
 
@@ -114,7 +115,7 @@ class Faculty(User):
         :param auth_token:
         :return: integer|string
         """
-        payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
+        payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
         return payload['sub']
 
 

@@ -1,9 +1,8 @@
 from zipfile import ZipFile
 from operator import methodcaller
-from config import SENDGRID_USERNAME, SENDGRID_DISPLAYNAME
+from flask import current_app
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Email, Content, Mail, Attachment
-from config import BASE_REPORT_PATH
 
 import logging as logger
 import base64
@@ -21,7 +20,8 @@ def zipFiles(filenames, name='zipped.zip', deleteAfterZip=True):
     _, name = os.path.split(name)
     if not name.endswith(ext):
         name += ext
-    filename = os.path.join(BASE_REPORT_PATH, str(name))
+    base_report_path = current_app.config.get('BASE_REPORT_PATH')
+    filename = os.path.join(base_report_path, str(name))
     with ZipFile(filename, 'w') as myzip:
         for fname in filenames:
             logger.info('zipping %s...', fname)
@@ -76,7 +76,9 @@ def build_attachment(attachmentFileName, mimetype):
 
 def send_report_email(subject, to, body, attachFileName=None, mimetype="application/pdf"):
     """Minimum required to send an email"""
-    from_email = Email(SENDGRID_USERNAME, SENDGRID_DISPLAYNAME)
+    username = current_app.config.get('SENDGRID_USERNAME')
+    display_name = current_app.config.get('SENDGRID_DISPLAYNAME')
+    from_email = Email(username, display_name)
     to_email = Email(to)
     content = Content("text/plain", body)
     mail = Mail(from_email, subject, to_email, content)

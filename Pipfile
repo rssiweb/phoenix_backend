@@ -1,0 +1,33 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+codecov = "*"
+pytest-cov = "*"
+
+[packages]
+flask = "*"
+flask-migrate = "*"
+flask-sqlalchemy = "*"
+flask-rq2 = "*"
+flask-httpauth = "*"
+flask-script = "*"
+itsdangerous = "*"
+jinja2 = "*"
+pdf2image = "*"
+sendgrid = "*"
+sqlalchemy = "*"
+psycopg2 = "*"
+cloudinary = "*"
+gunicorn = "*"
+pillow = "*"
+flask-login = "*"
+flask-restful = "*"
+flask-bcrypt = "*"
+pyjwt = "*"
+
+[requires]
+python_version = "2.7"
