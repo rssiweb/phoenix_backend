@@ -3,8 +3,7 @@
     - "2.7"
     - "3.4"
   install:
-    - pip install -r requirements.txt
+    - pipenv install --dev
   script:
-    - pytest
-  virtualenv:
-    system_site_packages: true
+    - pipenv run pytest --cov=./
+    - pipenv run codecov
