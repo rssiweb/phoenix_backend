@@ -24,9 +24,10 @@ class User(Base):
     contact = db.Column(db.String(50), nullable=True)
     image = db.Column(db.String(300), nullable=True)
 
-    def __init__(self, name, isActive=True):
+    def __init__(self, name, isActive=True, image=None):
         self.name = name
         self.isActive = isActive
+        self.image = image
 
     def serialize(self):
         return dict(name=self.name,
@@ -44,8 +45,8 @@ class Faculty(User):
                        nullable=True)
     branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)
 
-    def __init__(self, facultyId, name, email, password, gender, branch_id, contact=None):
-        super(Faculty, self).__init__(name)
+    def __init__(self, facultyId, name, email, password, gender, branch_id, contact=None, image=None):
+        super(Faculty, self).__init__(name, image=image)
         self.facultyId = facultyId
         self.email = email
         self.set_password(password)
