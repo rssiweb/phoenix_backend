@@ -40,7 +40,8 @@ def writeDictToCsv(headers, listOfDict, name, order_by=None, reverse=False, sub_
     name = str(name)
     if not name.endswith(ext):
         name += ext
-    filename = os.path.join(BASE_REPORT_PATH, str(name))
+    base_report_path = current_app.config.get('BASE_REPORT_PATH')
+    filename = os.path.join(base_report_path, str(name))
     logger.info('writing to csv %s...', filename)
     content = list(listOfDict)
     if order_by and order_by in headers:

@@ -10,3 +10,4 @@ erd.mwb
 specs/
 .vscode/
 .credentials
+.coverage
