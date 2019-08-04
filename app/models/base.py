@@ -299,6 +299,7 @@ class Subject(Base):
     __tablename__ = 'subject'
 
     name = db.Column(db.String(100), nullable=False, unique=True)
+    short_name = db.Column(db.String(100), nullable=True)
     branch_id = db.Column(db.Integer, db.ForeignKey('branch.id'), nullable=True)
 
     categories = relationship("Association", back_populates="subject")
