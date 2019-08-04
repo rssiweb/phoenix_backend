@@ -318,6 +318,7 @@ class Subject(Base):
     def serialize(self):
         return dict(id=self.id,
                     name=self.name,
+                    short_name=self.short_name,
                     branch_id=self.branch_id)
 
 

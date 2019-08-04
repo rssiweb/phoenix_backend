@@ -377,7 +377,7 @@ var app = new Vue({
             subject.id = parseInt(subject.id)
             var vm = this
             vm.subjectLoading = true
-            var postData = {name:subject.name}
+            var postData = {name:subject.name, shortName:subject.short_name}
             vm.showToast('Updating '+subject.name, 'info', 'hourglass-o', true)
             this.$http.post('/api/admin/subject/update/'+subject.id, postData)
             .then(response => {

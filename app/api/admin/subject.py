@@ -42,16 +42,21 @@ def update(subjectid):
     res_code = 200
     res = dict(status='fail')
     subject_name = data.get('name')
-    if not subject_name:
+    subject_short_name = data.get('shortName')
+    if not subject_name and not subject_short_name:
         res['statusText'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.text
-        res['statusData'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.type(['name'])
+        what_is_empty = [n for n, v in [('name', subject_name), ('short_name', subject_short_name)] if not v]
+        res['statusData'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.type(what_is_empty)
         return jsonify(res), res_code
     subject = Subject.query.filter_by(id=subjectid).first()
     if not subject:
         res['statusText'] = errs.CUSTOM_ERROR.text
         res['statusData'] = errs.CUSTOM_ERROR.type('No such Subject')
         return jsonify(res), res_code
-    subject.name = subject_name
+    if subject_name:
+        subject.name = subject_name
+    if subject_short_name:
+        subject.short_name = subject_short_name
     db.session.add(subject)
     db.session.commit()
     res['status'] = 'success'

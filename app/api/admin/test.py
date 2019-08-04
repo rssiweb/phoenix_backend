@@ -257,7 +257,7 @@ def addBatchTests():
         for sub in subjects:
             association = Association.query.filter_by(category=cat, subject=sub).first()
             if association in cat.subjects:
-                name = '{}-{}-{}'.format(cat.name, sub.name, suffix)
+                name = '{}-{}-{}'.format(cat.name, sub.short_name, suffix)
                 test = Test(name=name, cat_sub_id=association.id, max_marks=max_marks, exam_id=exam_id, test_date=date)
                 try:
                     db.session.add(test)
