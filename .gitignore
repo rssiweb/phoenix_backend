@@ -11,3 +11,5 @@ specs/
 .vscode/
 .credentials
 .coverage
+.pytest_cache/
+cov.xml

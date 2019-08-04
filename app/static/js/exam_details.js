@@ -62,6 +62,33 @@ var app = new Vue({
                 
             }
         },
+        initBatchTestForm: {
+            fields:{
+                maxMarks: ['number', 'empty'],
+                categories: 'empty',
+                subjects: 'empty',
+                suffix: 'empty'
+            }
+        },
+        initBatchTestModal: {
+            onShow: function(){
+                var form = $(this).find('.form')
+                form.form(app.initBatchTestForm)
+                form.find('.ui.error.message').empty()
+            },
+            onApprove: function(){
+                var form = $(this).find('.form')
+                $(form).find('.ui.error.message').empty()
+                if(!form.form('is valid')){
+                    form.form('validate form')
+                    var data = form.form('get values')
+                    console.log(data)
+                    return false
+                }
+                var data = form.form('get values')
+                app.createBatchTests(data)
+            }
+        },
         cnfModal: {
             heading: '',
             content: '',
@@ -149,7 +176,7 @@ var app = new Vue({
             dom.find('#testModal').modal(this.initTestModal)
             dom.find('#cnfModal').modal(this.cnfModalInit)
             dom.find('#studentsUnderTestModal').modal(this.studentsUnderTestModalInit)
-            
+            dom.find('#batchTestModal').modal(this.initBatchTestModal)
             this.landed = true
         },
         getTest: function(testid){
@@ -166,6 +193,9 @@ var app = new Vue({
             $('#testModal').find('.form').form('clear')
             $('#testModal').find('.form').find("input[name='name']").attr('disabled', false)
             this.showModal('testModal')
+        },
+        showBatchCreateTest: function(){
+            this.showModal('batchTestModal')
         },
         showUpdateTest: function(testid){
             var test = this.getTest(testid)
@@ -250,6 +280,35 @@ var app = new Vue({
             if(names)
                 return names.substring(0, names.length-2)
             return names
+        },
+        createBatchTests: function(data){
+            console.log(data)
+            var vm = this
+            data.date = moment(data.date,['MMM DD, YYYY']).format('DD/MM/YYYY')
+            console.log(data)
+            vm.testLoading = true
+            this.$http.post('/api/admin/test/add/batch/', data).
+            then(response => {
+                console.log(response)
+                if(response.body.status === 'success'){
+                    var tests = response.body.tests
+                    if(tests && tests.length > 0){
+                        tests.forEach(t => {
+                            vm.tests.push(t)
+                        })
+                    }
+                    vm.showToast(tests.length + ' test added ' + test.name, 'success', 'check')
+                } else {
+                    var msg = response.body.message || response.body.error || response.body.statusText || 'Cannot create test! Try again.'
+                    vm.showToast(msg, 'warn', 'close')
+                }
+                vm.testLoading = false
+            }, error => {
+                console.log(error)
+                var msg = error.statusText || 'Cannot create test! Try again.'
+                vm.showToast(msg, 'warn', 'close')
+                vm.testLoading = false
+            })
         },
         createTest: function(data){
             console.log(data)

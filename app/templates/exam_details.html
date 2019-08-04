@@ -2,7 +2,7 @@
 
 {% block bodywh %}
 {% raw %}
-<div class="ui basic segment" >
+<div class="ui basic segment">
     <div v-if="!landed">
         <div class="ui active inverted dimmer">
             <div class="ui medium text loader">{{loading}}</div>
@@ -21,9 +21,10 @@
         <div class="ui header">
             <button class="ui right floated red mini compact button" @click="showDeleteExam">Delete Exam</button>
             <button class="ui right mini compact primary button" @click="showCreateTest">Add test</button>
+            <button class="ui right mini compact primary button" @click="showBatchCreateTest">Add batch test</button>
         </div>
         <h3>Tests</h3>
-        <table class="ui compact selectable sortable table" v-if="tests.length" >
+        <table class="ui compact selectable sortable table" v-if="tests.length">
             <thead>
                 <tr>
                     <th>Test Code</th>
@@ -43,11 +44,13 @@
                     <td :data-sort-value="test.date">{{moment(test.date,['DD?/MM/YYYY']).format('MMM DD, YYYY')}}</td>
                     <td>{{test.max_marks}}</td>
                     <td>{{getCategoryName(test.category)}}</td>
-                    <td :data-sort-value="getSubjectName(test.subject).toLowerCase()">{{getSubjectName(test.subject)}}</td>
-                    <td :data-sort-value="test.evaluator ? getFacultyName(test.evaluator).toLowerCase():'Admin'">{{test.evaluator?getFacultyName(test.evaluator):'Admin'}}</td>
+                    <td :data-sort-value="getSubjectName(test.subject).toLowerCase()">{{getSubjectName(test.subject)}}
+                    </td>
+                    <td :data-sort-value="test.evaluator ? getFacultyName(test.evaluator).toLowerCase():'Admin'">
+                        {{test.evaluator?getFacultyName(test.evaluator):'Admin'}}</td>
                     <td>
                         {{test.students.length}} Students
-                        <a href="#"  @click.prevent="showStudentsUnderTest(test)">
+                        <a href="#" @click.prevent="showStudentsUnderTest(test)">
                             <i class="ui info icon"></i>
                         </a>
                     </td>
@@ -59,20 +62,73 @@
         </div>
     </div>
 </div>
+
+<div class="ui modal" id="batchTestModal">
+    <div class="header">Add Tests</div>
+    <div class="content">
+        <div class="ui equal width form">
+            <input type="hidden" name="examId" :value="examId">
+            <div class="required field">
+                <label>Suffix</label>
+                <input type="text" name="suffix" placeholder="T12019" />
+            </div>
+            <div class="required field">
+                <label>Test Date</label>
+                <div class="ui calendar">
+                    <div class="ui input left icon">
+                        <i class="calendar icon"></i>
+                        <input type="text" name="date" placeholder="May 17, 2018">
+                    </div>
+                </div>
+            </div>
+            <div class="required field">
+                <label>Max Marks</label>
+                <input type="number" name="maxMarks" placeholder="60" />
+            </div>
+            <div class="required field">
+                <label>Categories</label>
+                <div class="ui selection multiple dropdown">
+                    <input type="hidden" name="categories" />
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Select Categories</div>
+                    <div class="menu">
+                        <div class="item" :data-value="cat.id" v-for="cat in categories">{{cat.name}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="required field">
+                <label>Subjects</label>
+                <div class="ui selection multiple dropdown">
+                    <input type="hidden" name="subjects" />
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Select Subjects</div>
+                    <div class="menu">
+                        <div class="item" :data-value="sub.id" v-for="sub in subjects">{{sub.name}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="ui positive button">Create</button>
+        <button class="ui negative button">Cancel</button>
+    </div>
+</div>
+
 <div class="ui modal" id="testModal">
     <div class="header">{{updateAction ? "Update" : "Add"}} Test</div>
     <div class="content">
-        <div class="ui equal width form" >
+        <div class="ui equal width form">
             <input type="hidden" name="examId" :value="examId">
             <input type="hidden" name="id">
             <div class="fields">
-                <div class="required field" :class="{disabled: updateAction}" >
+                <div class="required field" :class="{disabled: updateAction}">
                     <label>Test Code</label>
-                    <input type="text" name="name" placeholder="TCA-PHY01"/>
+                    <input type="text" name="name" placeholder="TCA-PHY01" />
                 </div>
                 <div class="required field">
                     <label>Max Marks</label>
-                    <input type="number" name="maxMarks" placeholder="60"/>
+                    <input type="number" name="maxMarks" placeholder="60" />
                 </div>
                 <div class="required field">
                     <label>Test Date</label>
@@ -88,7 +144,7 @@
                 <div class="required field">
                     <label>Category</label>
                     <div class="ui selection dropdown">
-                        <input type="hidden" name="category" v-on:change="categoryChanged"/>
+                        <input type="hidden" name="category" v-on:change="categoryChanged" />
                         <i class="dropdown icon"></i>
                         <div class="default text">Select Category</div>
                         <div class="menu">
@@ -99,7 +155,7 @@
                 <div class="required field">
                     <label>Subject</label>
                     <div class="ui selection dropdown" id="sub-dropdown">
-                        <input type="hidden" name="subject"/>
+                        <input type="hidden" name="subject" />
                         <i class="dropdown icon"></i>
                         <div class="default text">Select Subject</div>
                         <div class="menu">
@@ -110,7 +166,7 @@
                 <div class="field">
                     <label>Evaluator</label>
                     <div class="ui selection dropdown" id="fac-dropdown">
-                        <input type="hidden" name="evaluator"/>
+                        <input type="hidden" name="evaluator" />
                         <i class="dropdown icon"></i>
                         <div class="default text">Select Faculty</div>
                         <div class="menu">
@@ -170,11 +226,14 @@
 
 {% block script %}
 <script type="text/javascript">
-    var examid = {{examid}}
-    var branchid = {{branchid}}
+    var examid = {{ examid }}
+    var branchid = {{ branchid }}
 </script>
-<link href="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.css" rel="stylesheet" type="text/css" />
-<script src="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.js"></script>
+<link
+    href="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.css"
+    rel="stylesheet" type="text/css" />
+<script
+    src="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.js"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/utils.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/exam_details.js') }}"></script>
 {% endblock%}

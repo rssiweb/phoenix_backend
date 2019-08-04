@@ -11,7 +11,6 @@ api = Blueprint('admin_test_api', __name__, url_prefix='/api/admin/test')
 @api.route('/add', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
-@decorators.addLag
 def add():
     data = request.json or request.data or request.form
     print data
@@ -114,7 +113,6 @@ def add():
 @api.route('/update/<int:testid>', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
-@decorators.addLag
 def update(testid):
     data = request.json or request.data or request.form
     print data
@@ -210,7 +208,6 @@ def update(testid):
 @api.route('/delete/<int:testid>', methods=['GET'])
 @decorators.login_required
 @decorators.only_admins
-@decorators.addLag
 def delete(testid):
     test = Test.query.get(testid)
     res = dict(status='fail')
@@ -220,3 +217,58 @@ def delete(testid):
         res['status'] = 'success'
     res['id'] = testid
     return jsonify(res), 200
+
+
+@api.route('/add/batch/', methods=['POST'])
+@decorators.login_required
+@decorators.only_admins
+def addBatchTests():
+    data = request.json or request.data or request.form
+    print data
+    res_code = 200
+    res = dict(status='fail')
+
+    exam_id = int(data.get('examId'))
+
+    category_ids =[int(i) for i in str(data.get('categories')).split(',')]
+    subject_ids = [int(i) for i in str(data.get('subjects')).split(',')]
+
+    categories = Category.query.filter(Category.id.in_(category_ids)).all()
+    subjects = Subject.query.filter(Subject.id.in_(subject_ids)).all()
+    
+    date = data.get('date')
+    try:
+        date = datetime.strptime(date, '%d/%m/%Y').date()
+    except ValueError:
+        res['statusText'] = error.INVALID_FORMAT.text
+        res['statusData'] = error.INVALID_FORMAT.type(['dd/mm/yyyy', date])
+        return jsonify(res), res_code
+
+    if date < datetime.today().date():
+        res['statusText'] = error.CUSTOM_ERROR.text
+        res['statusData'] = error.CUSTOM_ERROR.type('Test date %s is not a future date' % date.strftime('%d/%m/%Y'))
+        return jsonify(res), res_code
+    
+    max_marks = int(data.get('maxMarks'))
+    suffix = data.get('suffix')
+
+    tests = []
+    for cat in categories:
+        for sub in subjects:
+            association = Association.query.filter_by(category=cat, subject=sub).first()
+            if association in cat.subjects:
+                name = '{}-{}-{}'.format(cat.name, sub.name, suffix)
+                test = Test(name=name, cat_sub_id=association.id, max_marks=max_marks, exam_id=exam_id, test_date=date)
+                try:
+                    db.session.add(test)
+                    db.session.commit()
+                except Exception as ex:
+                    print(str(ex))
+                    db.session.rollback()
+                else:
+                    tests.append(test)
+            else:
+                print(sub.name, "not in", cat.name)
+    res['status'] = 'success'
+    res['tests'] = [t.serialize() for t in tests]
+    return jsonify(res), res_code

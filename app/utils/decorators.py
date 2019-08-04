@@ -5,14 +5,6 @@ import time
 import jwt
 
 
-def addLag(func):
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        time.sleep(1)
-        return func(*args, **kwargs)
-    return decorated
-
-
 def only_admins(func):
     @wraps(func)
     def decorated(*args, **kwargs):

@@ -10,7 +10,6 @@ api = Blueprint('admin_subject_api', __name__, url_prefix='/api/admin/subject')
 @api.route('/add', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
-@decorators.addLag
 def add():
     data = request.json or request.data or request.form
     res_code = 200
@@ -38,7 +37,6 @@ def add():
 @api.route('/update/<int:subjectid>', methods=['POST'])
 @decorators.login_required
 @decorators.only_admins
-@decorators.addLag
 def update(subjectid):
     data = request.json or request.data or request.form
     res_code = 200

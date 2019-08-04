@@ -16,7 +16,6 @@ def list():
 
 @api.route('/<int:branchid>/list', methods=['GET'])
 @decorators.login_required
-@decorators.addLag
 def list_by_branch(branchid):
     categories = [s.serialize() for s in Category.query.filter_by(branch_id=branchid)]
     data = dict(status='success', categories=categories)
