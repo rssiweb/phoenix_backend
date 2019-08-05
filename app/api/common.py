@@ -35,7 +35,7 @@ def get_token():
                 }
                 return jsonify(res), 202
         except Exception as e:
-            print str(e)
+            print(str(e))
             res = {
                 'status': 'fail',
                 'message': 'Some error occurred. Please try again.'
@@ -61,7 +61,7 @@ def get_profile():
 @decorators.login_required
 def reset_password():
     data = request.json or request.data or request.form
-    print data
+    print(data)
     if not data:
         return jsonify(dict(status='fail', message='No data recevied')), 200
     currentPassword = data.get('currentPassword')

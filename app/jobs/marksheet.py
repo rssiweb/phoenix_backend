@@ -132,9 +132,9 @@ def build_marksheets(meta, examid, att_start, att_end):
     att_end = datetime.strptime(att_end, '%d/%m/%Y').date()
     owner = meta.owner
     exam = Exam.query.get(examid)
-    print exam, owner
+    print(exam, owner)
     if not all([exam, owner]):
-        print 'Invalid exam/owner'
+        print('Invalid exam/owner')
         return
     students = exam_to_dict(exam.id, att_start, att_end)
     marksheet_filenames = []

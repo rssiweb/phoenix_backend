@@ -38,7 +38,7 @@ def attendance(meta, ids, categories, branches, month):
     reportTime = datetime.now().strftime('%b %d %I:%M %p')
     body = EMAIL_BODY_STRING.format('attendace', reportTime)
     response = send_report_email(ATTENDANCE_REPORT_SUBJECT, to, body, attachFileName=reportFileName)
-    print response
+    print(response)
 
 
 def examToDict(exam_id):

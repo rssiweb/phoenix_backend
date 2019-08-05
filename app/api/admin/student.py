@@ -23,7 +23,7 @@ def add_update_student(action):
     required_fields = 'dob name category id contact branch'.split()
 
     data = request.json or request.data or request.form
-    print data
+    print(data)
     if not data:
         res['message'] = 'No data received.'
         return make_response(jsonify(res)), res_code
@@ -83,7 +83,7 @@ def add_update_student(action):
                 res['student'] = student.serialize()
                 res_code = 201
             except Exception as e:
-                print e
+                print(e)
                 res['message'] = 'Some error occurred. Please try again.'
     elif action == 'update':
         student.name = name

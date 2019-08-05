@@ -13,7 +13,7 @@ api = Blueprint('admin_test_api', __name__, url_prefix='/api/admin/test')
 @decorators.only_admins
 def add():
     data = request.json or request.data or request.form
-    print data
+    print(data)
     res_code = 200
     res = dict(status='fail')
     required_fields = set(['name', 'maxMarks', 'examId', 'subject', 'category', 'date'])
@@ -115,7 +115,7 @@ def add():
 @decorators.only_admins
 def update(testid):
     data = request.json or request.data or request.form
-    print data
+    print(data)
     res_code = 200
     res = dict(status='fail')
 
@@ -224,12 +224,12 @@ def delete(testid):
 @decorators.only_admins
 def addBatchTests():
     data = request.json or request.data or request.form
-    print data
+    print(data)
     res_code = 200
     res = dict(status='fail')
 
     exam_id = int(data.get('examId'))
-    exam = Exam.query.filter(Exam.id=exam_id).first()
+    exam = Exam.query.filter_by(id=exam_id).first()
 
     category_ids =[int(i) for i in str(data.get('categories')).split(',')]
     subject_ids = [int(i) for i in str(data.get('subjects')).split(',')]

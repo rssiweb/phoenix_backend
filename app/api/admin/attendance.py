@@ -18,7 +18,7 @@ def set_attendance(date, studentid, what):
         return jsonify(res), res_code
 
     data = request.json or request.data or request.form
-    print data
+    print(data)
     res_code = 200
 
     isValid, dateOrError = parseDate(date, '%d%m%Y')
@@ -26,17 +26,17 @@ def set_attendance(date, studentid, what):
         res['message'] = 'Invalid date format {0}'.format(date)
         return jsonify(res), res_code
     date = dateOrError.date()
-    print date
+    print(date)
 
     student = Student.query.get(studentid)
-    print student
+    print(student)
     if not student:
         res['message'] = 'Invalid student id'
         return jsonify(res), res_code
 
     attendance = Attendance.query.filter_by(date=date,
                                             student_id=student.id).first()
-    print attendance
+    print(attendance)
     if what == 'in':
         return set_punch_in(attendance, date, data.get('in'), studentid=studentid)
     elif what == 'out':

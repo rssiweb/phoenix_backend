@@ -10,7 +10,7 @@ class GradesDict(UserDict):
         for low, high in self.data.keys():
             if key >= low and key <= high:
                 return self.data[(low, high)]
-        print key, 'Unknown Grade'
+        print(key, 'Unknown Grade')
         return 'Unknown Grade'
 
 

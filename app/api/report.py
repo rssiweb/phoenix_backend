@@ -18,7 +18,7 @@ def enqueue_attendance():
     month = data.get('month')
     if not month:
         pass
-    print 'month', month
+    print('month', month)
     ids = data.get('students')
     categories = data.get('categories', [])
     branches = data.get('branches', [])

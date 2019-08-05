@@ -51,11 +51,11 @@ def set_marks(testid, studentid):
     try:
         marksObtained = float(marksObtained)
     except Exception as ex:
-        print str(ex), marksObtained
+        print(str(ex), marksObtained)
         marksObtained = None
     comments = data.get('comment')
     marks = Marks.query.filter_by(test_id=test.id, student_id=student.id).first()
-    print marks
+    print(marks)
     if not marks:
         if marksObtained is None:
             res['statusText'] = errs.BLANK_VALUES_FOR_REQUIRED_FIELDS.text

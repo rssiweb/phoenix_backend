@@ -12,7 +12,7 @@ api = Blueprint('admin_grade_api', __name__, url_prefix='/api/admin/grade')
 def add(branchid):
     res = dict(status='fail')
     data = request.json or request.data or request.form
-    print data
+    print(data)
     req_values = 'min max grade comment'.split()
     for key in req_values:
         val = data.get(key)

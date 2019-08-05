@@ -28,15 +28,15 @@ def add():
         res['error'] = 'Category with this name already present'
         return jsonify(res), res_code
     cat = Category(name=catName, branch_id=branch_id)
-    print subjects, data
+    print(subjects, data)
     for subid in subjects:
         a = Association()
         sub = Subject.query.filter_by(id=int(subid)).first()
-        print a, sub
+        print(a, sub)
         if a and sub:
             a.subject = sub
             cat.subjects.append(a)
-    print cat, cat.serialize()
+    print(cat, cat.serialize())
     db.session.add(cat)
     db.session.commit()
     res['status'] = 'success'
@@ -69,7 +69,7 @@ def update(catid):
     for subid in subjects:
         a = Association()
         sub = Subject.query.filter_by(id=int(subid)).first()
-        print a, sub
+        print(a, sub)
         if a and sub and sub not in already_added_subs:
             a.subject = sub
             cat.subjects.append(a)

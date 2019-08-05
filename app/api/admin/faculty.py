@@ -128,7 +128,7 @@ def add():
                              .format(faculty.name)
             res_code = 201
         except Exception as e:
-            print e
+            print(e)
             res['message'] = 'Some error occurred. Please try again.'
     else:
         res['message'] = 'Faculty already exists.'

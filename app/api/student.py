@@ -11,12 +11,12 @@ api = Blueprint('student_api', __name__, url_prefix='/api/student')
 @api.route('/<string:endDate>/all')
 @decorators.login_required
 def list_all_by_endDate(endDate):
-    print endDate
+    print(endDate)
     endDate = datetime.strptime(endDate, '%d%B%Y')
-    print endDate
+    print(endDate)
     # monthsLastDay = calendar.monthrange(endDate.year, endDate.month)[1]
     # endDate = endDate.replace(day=1)
-    # print endDate
+    # print(endDate)
     students = Student.query.filter(or_(Student.effective_end_date==None,
                                         Student.effective_end_date>=endDate))
     students = [s.serialize() for s in students]

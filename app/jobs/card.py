@@ -53,7 +53,7 @@ def generate_cards(persons):
         try:
             dp_content = urllib.urlopen(person.image).read() if person.image else None
         except Exception as e:
-            print e
+            print(e)
             dp_content = None
         dp = Image.open(cStringIO.StringIO(dp_content)) if dp_content else None
         tmp_img = copy.copy(img)
