@@ -229,6 +229,7 @@ def addBatchTests():
     res = dict(status='fail')
 
     exam_id = int(data.get('examId'))
+    exam = Exam.query.filter(Exam.id=exam_id).first()
 
     category_ids =[int(i) for i in str(data.get('categories')).split(',')]
     subject_ids = [int(i) for i in str(data.get('subjects')).split(',')]
@@ -259,6 +260,11 @@ def addBatchTests():
             if association in cat.subjects:
                 name = '{}-{}-{}'.format(cat.name, sub.short_name, suffix)
                 test = Test(name=name, cat_sub_id=association.id, max_marks=max_marks, exam_id=exam_id, test_date=date)
+                for std in Student.query.filter_by(category=cat, branch_id=exam.branch_id, isActive=True).all():
+                    std_test_association = StudentTestAssociation()
+                    std_test_association.student = std
+                    std_test_association.exam = exam
+                    test.students.append(std_test_association)
                 try:
                     db.session.add(test)
                     db.session.commit()
