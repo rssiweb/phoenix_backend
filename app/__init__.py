@@ -64,6 +64,8 @@ def create_app(config_name=None):
     from app.api.admin.dist_type import api as admin_dist_type
 
     from app.ui.controllers import ui
+    from app.commands import commands
+
 
     for api in [commonapi, studentapi, categoryapi, branchapi, attendanceapi,
                 examapi, subjectapi, testapi, marksapi, gradeapi, reportapi,
@@ -72,7 +74,7 @@ def create_app(config_name=None):
                 admin_stdapi, admin_subapi, admin_examapi, admin_testapi, admin_gradeapi,
                 admin_marksapi, admin_dist_type, 
 
-                ui]:
+                ui, commands]:
         app.register_blueprint(api)
     return app
 
