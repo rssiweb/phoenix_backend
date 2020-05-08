@@ -18,8 +18,8 @@ def get_token():
         try:
             password = data.get('password')
             if bcrypt.check_password_hash(faculty.password, password):
-                image = None
-                if faculty.image:
+                image = faculty.image
+                if image and '/image/upload/' in image:
                     url = faculty.image.split('/image/upload/')[1]
                     url = '/'.join(url.split('/')[1:]) if url else url
                     image = cloudinary.CloudinaryImage(url).build_url(transformation=[
