@@ -6,6 +6,7 @@ from operator import itemgetter
 from app.utils import decorators
 from app.utils.constants import StatusErrors as error
 import csv
+import io
 
 api = Blueprint("admin_student_api", __name__, url_prefix="/api/admin/student")
 
@@ -103,6 +104,7 @@ def add_update_student(action):
 def import_students():
     res = dict(status="fail")
     file = request.files.get("studentsListFile")
+    file = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
     csvreader = csv.reader(file, delimiter=",", quotechar='"')
     # TODO: check type of file
     heading = [title.strip().lower() for title in next(csvreader)]
