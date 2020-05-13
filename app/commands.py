@@ -4,15 +4,16 @@ from app.models import Faculty, Branch
 from app import db
 
 
-commands = Blueprint('users', __name__)
+commands = Blueprint("users", __name__)
 
-@commands.cli.command('create')
-@click.argument('facultyId')
-@click.argument('email')
-@click.argument('password')
-@click.argument('name')
-@click.argument('gender')
-@click.argument('branch_name')
+
+@commands.cli.command("create")
+@click.argument("facultyId")
+@click.argument("email")
+@click.argument("password")
+@click.argument("name")
+@click.argument("gender")
+@click.argument("branch_name")
 def create(facultyid, email, password, name, gender, branch_name):
     faculty = Faculty.query.filter_by(facultyId=facultyid).first()
     branch = Branch.query.filter_by(name=branch_name).first()
@@ -26,7 +27,8 @@ def create(facultyid, email, password, name, gender, branch_name):
                 gender=gender,
                 branch_id=branch.id,
                 contact=None,
-                image=None)
+                image=None,
+            )
             faculty.admin = True
             faculty.superUser = True
             # insert the user

@@ -7,6 +7,8 @@ verify_ssl = true
 pytest = "*"
 codecov = "*"
 pytest-cov = "*"
+black = "*"
+pylint = "*"
 
 [packages]
 flask = "*"
@@ -32,3 +34,6 @@ click = "*"
 
 [requires]
 python_version = "3.8.2"
+
+[pipenv]
+allow_prereleases = true

@@ -16,7 +16,7 @@ migrate = Migrate()
 
 def create_app(config_name=None):
     global logger
-    
+
     # Define the WSGI application object
     app = Flask(__name__)
 
@@ -29,7 +29,7 @@ def create_app(config_name=None):
     bcrypt.init_app(app)
     rq.init_app(app)
     db.init_app(app)
-    
+
     migrate.init_app(app, db)
     migrate.render_as_batch = True
 
@@ -37,7 +37,6 @@ def create_app(config_name=None):
     @app.errorhandler(404)
     def not_found(error):
         return jsonify(dict(error=str(error))), 404
-
 
     from app.api.common import api as commonapi
     from app.api.student import api as studentapi
@@ -66,24 +65,43 @@ def create_app(config_name=None):
     from app.ui.controllers import ui
     from app.commands import commands
 
-
-    for api in [commonapi, studentapi, categoryapi, branchapi, attendanceapi,
-                examapi, subjectapi, testapi, marksapi, gradeapi, reportapi,
-
-                admin_attendanceapi, admin_branchapi, admin_catapi, admin_facapi,
-                admin_stdapi, admin_subapi, admin_examapi, admin_testapi, admin_gradeapi,
-                admin_marksapi, admin_dist_type, 
-
-                ui, commands]:
+    for api in [
+        commonapi,
+        studentapi,
+        categoryapi,
+        branchapi,
+        attendanceapi,
+        examapi,
+        subjectapi,
+        testapi,
+        marksapi,
+        gradeapi,
+        reportapi,
+        admin_attendanceapi,
+        admin_branchapi,
+        admin_catapi,
+        admin_facapi,
+        admin_stdapi,
+        admin_subapi,
+        admin_examapi,
+        admin_testapi,
+        admin_gradeapi,
+        admin_marksapi,
+        admin_dist_type,
+        ui,
+        commands,
+    ]:
         app.register_blueprint(api)
     return app
 
+
 ########## Private members below
+
 
 def _get_config_class(config_name=None):
     config_name = config_name and getattr(config, config_name, None)
     if not config_name:
-        config_name = os.getenv('config', 'ProdConfig')
-    
+        config_name = os.getenv("config", "ProdConfig")
+
     config_class = getattr(config, config_name, config.ProdConfig)
     return config_class()
