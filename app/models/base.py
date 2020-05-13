@@ -179,7 +179,7 @@ class Student(User):
                 raise ValueError("Category %s not found" % category)
         self.category = cat
 
-        if isinstance(dob, basestring):
+        if isinstance(dob, string):
             self.dob = datetime.strptime(dob, "%Y-%m-%d").date()
         else:
             self.dob = dob
