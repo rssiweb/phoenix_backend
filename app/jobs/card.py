@@ -14,33 +14,53 @@ import os
 import time
 import io, urllib
 
-Person = namedtuple('Person', 'name type contact image userid')
+Person = namedtuple("Person", "name type contact image userid")
 
-CARD_BODY_STRING = 'Please find the I cards generated on {} in attachments.'
-CARD_REPORT_SUBJECT = os.getenv('MARKSHEET_REPORT_SUBJECT', 'RSSI I-Cards')
+CARD_BODY_STRING = "Please find the I cards generated on {} in attachments."
+CARD_REPORT_SUBJECT = os.getenv("MARKSHEET_REPORT_SUBJECT", "RSSI I-Cards")
+
 
 @rq.job
 def build_card(meta, branch_id):
     owner = meta.owner
     branch_id = int(branch_id)
-    students = Student.query.filter(Student.isActive!=False, Student.branch_id==branch_id).all()
-    faculties = Faculty.query.filter(Student.isActive!=False, Student.branch_id==branch_id).all()
+    students = Student.query.filter(
+        Student.isActive != False, Student.branch_id == branch_id
+    ).all()
+    faculties = Faculty.query.filter(
+        Student.isActive != False, Student.branch_id == branch_id
+    ).all()
     persons = []
     for user in itertools.chain(students, faculties):
         user_type = "Student" if isinstance(user, Student) else "Faculty"
-        user_id = getattr(user, 'student_id', getattr(user, 'facultyId', '')).strip().upper()
-        persons.append(Person(user.name,
-                              user_type,
-                              getattr(user, 'contact', None),
-                              user.image,
-                              user_id
-                              ))
+        user_id = (
+            getattr(user, "student_id", getattr(user, "facultyId", "")).strip().upper()
+        )
+        persons.append(
+            Person(
+                user.name,
+                user_type,
+                getattr(user, "contact", None),
+                user.image,
+                user_id,
+            )
+        )
     card_img_files = generate_cards(persons)
-    zip_filename = zipFiles(card_img_files, name='i-cards {}.zip'.format(int(time.time())), deleteAfterZip=True)
-    reportTime = datetime.now().strftime('%d %b %Y %I:%M:%S %p')
+    zip_filename = zipFiles(
+        card_img_files,
+        name="i-cards {}.zip".format(int(time.time())),
+        deleteAfterZip=True,
+    )
+    reportTime = datetime.now().strftime("%d %b %Y %I:%M:%S %p")
     body = CARD_BODY_STRING.format(reportTime)
     to = owner.email
-    send_report_email(CARD_REPORT_SUBJECT, to, body, attachFileName=zip_filename, mimetype='application/zip')
+    send_report_email(
+        CARD_REPORT_SUBJECT,
+        to,
+        body,
+        attachFileName=zip_filename,
+        mimetype="application/zip",
+    )
 
 
 def generate_cards(persons):
@@ -71,8 +91,8 @@ def generate_cards(persons):
 
         font = ImageFont.truetype(font_path, 70)
 
-        contact = person.contact if person.contact else (' ' * 20)
-        number = '+91 %10s' % str(contact)
+        contact = person.contact if person.contact else (" " * 20)
+        number = "+91 %10s" % str(contact)
         text_width, _ = draw.textsize(number, font=font)
         text_x = (width - text_width) / 2
         draw.text((text_x, 1599), number, (0, 0, 0), font=font)
@@ -80,9 +100,9 @@ def generate_cards(persons):
         if dp:
             x_off = (width - dp.size[0]) / 2
             tmp_img.paste(dp, (x_off, 855))
-        
-        card_filename = 'card_{}_{}.jpg'.format(person.name, int(time.time()))
-        card_filepath = os.path.join('gen/reports', card_filename)
+
+        card_filename = "card_{}_{}.jpg".format(person.name, int(time.time()))
+        card_filepath = os.path.join("gen/reports", card_filename)
         tmp_img.save(card_filepath, quality=95)
         card_files.append(card_filepath)
     return card_files
