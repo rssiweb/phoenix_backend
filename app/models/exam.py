@@ -136,9 +136,9 @@ class Grade(Base):
             self.lower = int(lower)
         if upper is not None:
             self.upper = int(upper)
-        if grade and isinstance(grade, basestring):
+        if grade and isinstance(grade, string):
             self.grade = grade
-        if comment and isinstance(comment, basestring):
+        if comment and isinstance(comment, string):
             self.comment = comment
 
         branch_id = int(branch_id)
