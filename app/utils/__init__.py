@@ -44,5 +44,5 @@ def get_grades(percent, grade_rules):
 
 def slice_by(itr, n):
     no_slices = int(math.ceil(len(itr) / float(n)))
-    for i in xrange(no_slices):
+    for i in range(no_slices):
         yield itr[n * i : n * i + n]
