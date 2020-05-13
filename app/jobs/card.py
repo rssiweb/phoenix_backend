@@ -12,7 +12,7 @@ import copy
 import itertools
 import os
 import time
-import io, urllib
+import io, urllib.request
 
 Person = namedtuple("Person", "name type contact image userid")
 
@@ -71,7 +71,7 @@ def generate_cards(persons):
     card_files = []
     for person in persons:
         try:
-            dp_content = urllib.urlopen(person.image).read() if person.image else None
+            dp_content = urllib.request.urlopen(person.image).read() if person.image else None
         except Exception as e:
             print(e)
             dp_content = None

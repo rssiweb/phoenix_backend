@@ -119,7 +119,7 @@ def buildReport(students, month, categories, branches):
             sr_no += 1
         # Adding blank rows if required
         if len(students) < no_rows:
-            for _ in xrange(no_rows - len(students)):
+            for _ in range(no_rows - len(students)):
                 tmp_row = copy.deepcopy(row)
                 att_sheet.paste(tmp_row, (0, y_offset))
                 y_offset += row.size[1]
