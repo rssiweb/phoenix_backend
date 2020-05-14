@@ -61,7 +61,7 @@ var app = new Vue({
     created(){
         this.loadv2([
             {name:'Categories',
-             url:'/api/category/1/list',
+             url:'/api/category/list',
              variableName: 'categories',
              dataInReponse: 'categories'},
             {name:'Branches',

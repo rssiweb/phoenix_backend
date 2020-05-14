@@ -25,11 +25,11 @@ var app = new Vue({
         var vm = this
         this.loadv2([
             {name:'Students',
-             url:'/api/student/1/all',
+             url:'/api/student/all',
              variableName: 'students',
              dataInReponse: 'students'},
             {name:'Categories',
-             url:'/api/category/1/list',
+             url:'/api/category/list',
              variableName: 'categories',
              dataInReponse: 'categories'},
             {name:'Branches',
