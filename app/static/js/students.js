@@ -55,7 +55,7 @@ var app = new Vue({
              variableName: 'students',
              dataInReponse: 'students'},
             {name:'Categories',
-             url:'/api/category/1/list',
+             url:'/api/category/list',
              variableName: 'categories',
              dataInReponse: 'categories'},
             {name:'Branches',
