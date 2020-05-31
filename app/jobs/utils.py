@@ -2,7 +2,7 @@ from zipfile import ZipFile
 from operator import methodcaller
 from flask import current_app
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Email, Content, Mail, Attachment, To
+from sendgrid.helpers.mail import Email, Content, Mail, Attachment, To, FileContent, FileName, FileType, Disposition, ContentId
 
 import logging as logger
 import base64
@@ -72,11 +72,11 @@ def build_attachment(attachmentFileName, mimetype):
         return None
     _, name = os.path.split(attachmentFileName)
     attachment = Attachment()
-    attachment.content = base64.b64encode(open(attachmentFileName, "rb").read())
-    attachment.type = mimetype
-    attachment.filename = name
-    attachment.disposition = "attachment"
-    attachment.content_id = "Custom Report"
+    attachment.file_content = FileContent(base64.b64encode(open(attachmentFileName, "rb").read()).decode())
+    attachment.file_type = FileType(mimetype)
+    attachment.file_name = FileName(name)
+    attachment.disposition = Disposition("attachment")
+    attachment.content_id = ContentId("Custom Report")
     return attachment
 
 
@@ -92,7 +92,13 @@ def send_report_email(
     mail = Mail(from_email, to_email, subject, content)
     attachment = build_attachment(attachFileName, mimetype)
     if attachment:
-        mail.add_attachment(attachment)
+        mail.attachment = attachment
     sg = SendGridAPIClient()
-    response = sg.send(mail)
+    body = mail.get()
+    print(body)
+    response = None
+    try:
+        response = sg.client.mail.send.post(request_body=body)
+    except Exception as ex:
+        print(ex)
     return response
