@@ -95,7 +95,6 @@ def send_report_email(
         mail.attachment = attachment
     sg = SendGridAPIClient()
     body = mail.get()
-    print(body)
     response = None
     try:
         response = sg.client.mail.send.post(request_body=body)

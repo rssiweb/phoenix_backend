@@ -126,7 +126,7 @@ def buildReport(students, month, categories, branches):
         att_sheet.paste(footer, (0, y_offset))
         # resize the image and app to list of pages
         att_sheet = att_sheet.resize(
-            (att_sheet.size[0] / 5, att_sheet.size[1] / 5), Image.ANTIALIAS
+            (att_sheet.size[0] // 5, att_sheet.size[1] // 5), Image.ANTIALIAS
         )
         page_imgs.append(att_sheet)
     report_path = current_app.config.get("REPORT_FOLDER")
