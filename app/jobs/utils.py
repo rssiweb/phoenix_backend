@@ -48,7 +48,7 @@ def writeDictToCsv(
     content = list(listOfDict)
     if order_by and order_by in headers:
         content.sort(key=methodcaller("get", order_by), reverse=reverse)
-    with open(filename, "wb") as csvfile:
+    with open(filename, "w") as csvfile:
         reportwriter = csv.DictWriter(
             csvfile,
             delimiter=",",
