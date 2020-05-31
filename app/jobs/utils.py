@@ -89,10 +89,10 @@ def send_report_email(
     from_email = Email(username, display_name)
     to_email = Email(to)
     content = Content("text/plain", body)
-    mail = Mail(from_email, subject, to_email, content)
+    mail = Mail(from_email, to_email, subject, content)
     attachment = build_attachment(attachFileName, mimetype)
     if attachment:
         mail.add_attachment(attachment)
     sg = SendGridAPIClient()
-    response = sg.client.mail.send.post(request_body=mail.get())
+    response = sg.send(mail)
     return response
