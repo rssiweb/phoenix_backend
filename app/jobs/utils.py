@@ -2,7 +2,7 @@ from zipfile import ZipFile
 from operator import methodcaller
 from flask import current_app
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Email, Content, Mail, Attachment
+from sendgrid.helpers.mail import Email, Content, Mail, Attachment, To
 
 import logging as logger
 import base64
@@ -87,7 +87,7 @@ def send_report_email(
     username = current_app.config.get("SENDGRID_USERNAME")
     display_name = current_app.config.get("SENDGRID_DISPLAYNAME")
     from_email = Email(username, display_name)
-    to_email = Email(to)
+    to_email = To(to)
     content = Content("text/plain", body)
     mail = Mail(from_email, to_email, subject, content)
     attachment = build_attachment(attachFileName, mimetype)
