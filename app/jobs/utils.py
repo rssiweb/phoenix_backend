@@ -36,7 +36,7 @@ def zipFiles(filenames, name="zipped.zip", deleteAfterZip=True):
 
 
 def writeDictToCsv(
-    headers, listOfDict, name, order_by=None, reverse=False, sub_headers=None
+    headers, listOfDict, name, order_by=None, reverse=False, sub_headers=None, default_sort_value=None
 ):
     ext = ".csv"
     name = str(name)
@@ -47,7 +47,7 @@ def writeDictToCsv(
     logger.info("writing to csv %s...", filename)
     content = list(listOfDict)
     if order_by and order_by in headers:
-        content.sort(key=methodcaller("get", order_by), reverse=reverse)
+        content.sort(key=methodcaller("get", order_by, default_sort_value), reverse=reverse)
     with open(filename, "w") as csvfile:
         reportwriter = csv.DictWriter(
             csvfile,

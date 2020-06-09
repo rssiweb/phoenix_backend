@@ -128,7 +128,7 @@ def exam_report(meta, exam_id):
 
     filename = "%s All Category.csv" % exam.name
     filename = writeDictToCsv(
-        header, data, filename, "Percentage", reverse=True, sub_headers=sub_headers
+        header, data, filename, "Percentage", reverse=True, sub_headers=sub_headers, default_sort_value=0
     )
     csv_filenames.append(filename)
     logger.info("created report for all categories")
