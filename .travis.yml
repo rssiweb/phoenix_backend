@@ -5,5 +5,5 @@
     - pip install pipenv
     - pipenv install --dev
   script:
-    - pipenv run pytest --cov=./
+    - pipenv run coverage run --source='.' manage.py test
     - pipenv run codecov

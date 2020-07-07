@@ -3,7 +3,7 @@ venv/*
 *.pyo
 .idea/*
 .env
-app.db
+db.sqlite3
 gen/
 backup/
 erd.mwb

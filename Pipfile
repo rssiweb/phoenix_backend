@@ -4,36 +4,15 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "*"
 codecov = "*"
-pytest-cov = "*"
-black = "*"
-pylint = "*"
+coverage = "*"
 
 [packages]
-flask = "*"
-flask-migrate = "*"
-flask-sqlalchemy = "*"
-flask-rq2 = "*"
-flask-httpauth = "*"
-flask-script = "*"
-itsdangerous = "*"
-jinja2 = "*"
-pdf2image = "*"
-sendgrid = "*"
-sqlalchemy = "*"
+django = "*"
 psycopg2-binary = "*"
-cloudinary = "*"
-gunicorn = "*"
-pillow = "*"
-flask-login = "*"
-flask-restful = "*"
-flask-bcrypt = "*"
-pyjwt = "*"
-click = "*"
+djangorestframework = "*"
+django-filter = "*"
+dj-database-url = "*"
 
 [requires]
-python_version = "3.8.2"
-
-[pipenv]
-allow_prereleases = true
+python_version = "3.8"
