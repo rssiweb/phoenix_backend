@@ -32,6 +32,7 @@ class Branch(models.Model):
 
 
 class Session(models.Model):
+    is_active = models.BooleanField()
     name = models.CharField(max_length=50)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
 
@@ -65,34 +66,46 @@ class Category(models.Model):
         return f"({self.session.branch.name}, {self.session.name}): {self.name}"
 
 
-class Faculty(models.Model):
+class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=15)
-    faculty_id = models.CharField(max_length=15, unique=True, null=False, blank=False)
+    profile_id = models.CharField(max_length=15, unique=True, null=False, blank=False)
+    profile_pic = models.CharField(max_length=512, null=True, blank=True)
+    phone = models.CharField(max_length=512, null=True, blank=True)
     gender = models.CharField(
         max_length=10, choices=GENDER_CHOICES, null=True, blank=True
     )
+    dob = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    inactive_from = models.DateField(
+        auto_now=False, auto_now_add=False, null=True, blank=True
+    )
+
+    def __str__(self):
+        return f"{self.profile_id}"
+
+
+class Faculty(models.Model):
+    profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = "Faculties"
 
     def __str__(self):
-        return f"{self.faculty_id}"
+        return f"{self.profile.profile_id}"
 
 
 class Student(models.Model):
+    profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    # students will be copied to new sessions hence student_id cannot be unique
-    student_id = models.CharField(max_length=15)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    dob = models.DateField(auto_now=False, auto_now_add=False)
-    inactive_from = models.DateField(
-        auto_now=False, auto_now_add=False, null=True, blank=True
-    )
+    actual_class = models.CharField(max_length=20)
+
+    class Meta:
+        # students will be copied to new sessions hence student_id cannot be unique
+        unique_together = [["profile", "session"]]
 
     def __str__(self):
-        return f"({self.session.branch.name}, {self.session.name}): {self.student_id}"
+        return f"({self.profile.id}, {self.session.name}): {self.category.id}"
 
 
 class GradeSystem(models.Model):

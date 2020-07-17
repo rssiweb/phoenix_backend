@@ -4,6 +4,7 @@ from api.models import (
     Session,
     Subject,
     Category,
+    UserProfile,
     Faculty,
     Student,
     GradeSystem,
@@ -30,47 +31,61 @@ class SessionAdmin(admin.ModelAdmin):
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
-    list_display = ("session", "name")
+    list_filter = ("session__name",)
+    list_display = ("name",)
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("session", "name")
+    list_filter = ("session__name",)
+    list_display = ("name",)
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "profile_pic", "phone", "gender", "dob", "inactive_from")
 
 
 @admin.register(Faculty)
 class FacultyAdmin(admin.ModelAdmin):
-    list_display = ("faculty_id", "user", "branch", "phone", "gender")
+    list_filter = ("branch__name",)
+    list_display = ("profile", "branch")
 
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ("session", "student_id", "dob", "category", "inactive_from")
+    list_filter = ("session__name",)
+    list_display = (
+        "profile",
+        "category",
+    )
 
 
 @admin.register(GradeSystem)
 class GradeSystemAdmin(admin.ModelAdmin):
+    list_filter = ("session__name",)
     list_display = ("session", "name")
 
 
 @admin.register(Grade)
 class GradeAdmin(admin.ModelAdmin):
+    list_filter = ("grade_system__name",)
     list_display = ("grade_system", "low", "high", "grade", "description")
 
 
 @admin.register(Classroom)
 class ClassroomAdmin(admin.ModelAdmin):
     def category_names(self, obj):
-        return f"{','.join([cat.name for cat in obj.categories])}"
+        return f"{','.join([cat.name for cat in obj.categories.all()])}"
 
     def students_excluded_from_attendance(self, obj):
-        return f"{','.join([student.student_id for student in obj.exluded_from_class])}"
+        return f"{','.join([student.student_id for student in obj.exluded_from_class.all()])}"
 
     def students_excluded_from_test(self, obj):
-        return f"{','.join([student.student_id for student in obj.exluded_from_test])}"
+        return f"{','.join([student.student_id for student in obj.exluded_from_test.all()])}"
 
+    list_filter = ("session__name",)
     list_display = (
-        "session",
         "name",
         "category_names",
         "faculty",
@@ -100,14 +115,17 @@ class StudentAttendanceAdmin(admin.ModelAdmin):
 
 @admin.register(Exam)
 class ExamAdmin(admin.ModelAdmin):
-    list_display = ("session", "name", "start_date", "end_date")
+    list_filter = ("session__name",)
+    list_display = ("name", "start_date", "end_date")
 
 
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):
-    list_display = ("exam", "classroom", "name", "date", "max_marks", "evaluator")
+    list_filter = ("exam__name",)
+    list_display = ("classroom", "name", "date", "max_marks", "evaluator")
 
 
 @admin.register(Mark)
 class MarkAdmin(admin.ModelAdmin):
+    list_filter = ("test__name",)
     list_display = ("test", "student", "mark", "comment")

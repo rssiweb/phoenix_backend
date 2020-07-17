@@ -1,0 +1,231 @@
+[
+    {
+        "model": "api.branch",
+        "pk": 1,
+        "fields": {
+            "name": "Lucknow",
+            "timezone": "Asia/Kolkata"
+        }
+    },
+    {
+        "model": "api.session",
+        "pk": 1,
+        "fields": {
+            "is_active": true,
+            "name": "2020-Q2",
+            "branch": 1
+        }
+    },
+    {
+        "model": "api.subject",
+        "pk": 1,
+        "fields": {
+            "name": "English",
+            "session": 1
+        }
+    },
+    {
+        "model": "api.subject",
+        "pk": 2,
+        "fields": {
+            "name": "Hindi",
+            "session": 1
+        }
+    },
+    {
+        "model": "api.subject",
+        "pk": 3,
+        "fields": {
+            "name": "Math",
+            "session": 1
+        }
+    },
+    {
+        "model": "api.category",
+        "pk": 1,
+        "fields": {
+            "name": "LGA-1",
+            "session": 1
+        }
+    },
+    {
+        "model": "api.category",
+        "pk": 2,
+        "fields": {
+            "name": "LGA-2",
+            "session": 1
+        }
+    },
+    {
+        "model": "api.userprofile",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "profile_id": "FAC_0001",
+            "profile_pic": "google.com",
+            "phone": "8932061116",
+            "gender": "male",
+            "dob": null,
+            "inactive_from": null
+        }
+    },
+    {
+        "model": "api.userprofile",
+        "pk": 2,
+        "fields": {
+            "user": 2,
+            "profile_id": "STD_0001",
+            "profile_pic": "google.com",
+            "phone": "8932061116",
+            "gender": "male",
+            "dob": null,
+            "inactive_from": null
+        }
+    },
+    {
+        "model": "api.userprofile",
+        "pk": 3,
+        "fields": {
+            "user": 3,
+            "profile_id": "STD_0002",
+            "profile_pic": "google.com",
+            "phone": "8932061116",
+            "gender": "male",
+            "dob": null,
+            "inactive_from": null
+        }
+    },
+    {
+        "model": "api.userprofile",
+        "pk": 4,
+        "fields": {
+            "user": 4,
+            "profile_id": "STD_0003",
+            "profile_pic": "google.com",
+            "phone": "8932061116",
+            "gender": "male",
+            "dob": null,
+            "inactive_from": null
+        }
+    },
+    {
+        "model": "api.userprofile",
+        "pk": 5,
+        "fields": {
+            "user": 5,
+            "profile_id": "FAC_0002",
+            "profile_pic": null,
+            "phone": null,
+            "gender": null,
+            "dob": null,
+            "inactive_from": null
+        }
+    },
+    {
+        "model": "api.faculty",
+        "pk": 1,
+        "fields": {
+            "profile": 1,
+            "branch": 1
+        }
+    },
+    {
+        "model": "api.faculty",
+        "pk": 2,
+        "fields": {
+            "profile": 5,
+            "branch": 1
+        }
+    },
+    {
+        "model": "api.student",
+        "pk": 1,
+        "fields": {
+            "profile": 2,
+            "session": 1,
+            "category": 1
+        }
+    },
+    {
+        "model": "api.student",
+        "pk": 2,
+        "fields": {
+            "profile": 3,
+            "session": 1,
+            "category": 1
+        }
+    },
+    {
+        "model": "api.student",
+        "pk": 3,
+        "fields": {
+            "profile": 4,
+            "session": 1,
+            "category": 1
+        }
+    },
+    {
+        "model": "api.gradesystem",
+        "pk": 1,
+        "fields": {
+            "session": 1,
+            "name": "General Grading"
+        }
+    },
+    {
+        "model": "api.classroom",
+        "pk": 1,
+        "fields": {
+            "session": 1,
+            "name": "Eng All Class",
+            "faculty": 1,
+            "sec_faculty": null,
+            "subject": 1,
+            "working_days": "-MTWTF-",
+            "grade_system": 1,
+            "categories": [
+                1
+            ],
+            "exluded_from_class": [],
+            "exluded_from_test": []
+        }
+    },
+    {
+        "model": "api.classroom",
+        "pk": 2,
+        "fields": {
+            "session": 1,
+            "name": "Hindi Class for all",
+            "faculty": 2,
+            "sec_faculty": null,
+            "subject": 2,
+            "working_days": "-MTWTF-",
+            "grade_system": 1,
+            "categories": [
+                1,
+                2
+            ],
+            "exluded_from_class": [],
+            "exluded_from_test": []
+        }
+    },
+    {
+        "model": "api.classroom",
+        "pk": 3,
+        "fields": {
+            "session": 1,
+            "name": "Math for All",
+            "faculty": 1,
+            "sec_faculty": null,
+            "subject": 3,
+            "working_days": "-MTWTF-",
+            "grade_system": 1,
+            "categories": [
+                1,
+                2
+            ],
+            "exluded_from_class": [],
+            "exluded_from_test": []
+        }
+    }
+]

@@ -23,4 +23,6 @@ router.register(r"mark", views.MarkViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("classroom/<int:pk>/students", views.StudentsInClassView.as_view()),
+    path("auth/", views.AuthTokenView.as_view()),
 ]
