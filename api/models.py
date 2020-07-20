@@ -165,7 +165,7 @@ class Leave(models.Model):
     type = models.CharField(max_length=10, choices=LEAVE_TYPE_CHOICES, null=False)
 
     def __str__(self):
-        return f"{self.student.student_id}: {self.from_date}-{self.to_date}"
+        return f"{self.student.id}: {self.from_date}-{self.to_date}"
 
 
 class ClassAttendance(models.Model):
@@ -173,13 +173,15 @@ class ClassAttendance(models.Model):
     # faculty who actually took the attendance
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
     start_time = models.DateTimeField(auto_now=False, auto_now_add=False)
-    end_time = models.DateTimeField(auto_now=False, auto_now_add=False)
+    end_time = models.DateTimeField(
+        auto_now=False, auto_now_add=False, null=True, blank=True
+    )
 
     class Meta:
         verbose_name_plural = "Class Attendance"
 
     def __str__(self):
-        return f"{self.classroom.name}: {self.from_time}-{self.to_time}"
+        return f"{self.classroom.name}: {self.start_time}-{self.end_time}"
 
 
 class StudentAttendance(models.Model):
@@ -189,10 +191,11 @@ class StudentAttendance(models.Model):
     comment = models.CharField(max_length=15, null=True, blank=True)
 
     class Meta:
+        unique_together = [["class_attendance", "student"]]
         verbose_name_plural = "Student Attendance"
 
     def __str__(self):
-        return f"{self.class_attendance.classroom.name}: {self.student.student_id} - {self.attendance}"
+        return f"{self.class_attendance.classroom.name}: {self.student.id} - {self.attendance}"
 
 
 # examination related models

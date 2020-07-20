@@ -43,7 +43,15 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "profile_pic", "phone", "gender", "dob", "inactive_from")
+    list_display = (
+        "user",
+        "profile_id",
+        "profile_pic",
+        "phone",
+        "gender",
+        "dob",
+        "inactive_from",
+    )
 
 
 @admin.register(Faculty)
@@ -79,10 +87,10 @@ class ClassroomAdmin(admin.ModelAdmin):
         return f"{','.join([cat.name for cat in obj.categories.all()])}"
 
     def students_excluded_from_attendance(self, obj):
-        return f"{','.join([student.student_id for student in obj.exluded_from_class.all()])}"
+        return f"{','.join([student.id for student in obj.exluded_from_class.all()])}"
 
     def students_excluded_from_test(self, obj):
-        return f"{','.join([student.student_id for student in obj.exluded_from_test.all()])}"
+        return f"{','.join([student.id for student in obj.exluded_from_test.all()])}"
 
     list_filter = ("session__name",)
     list_display = (

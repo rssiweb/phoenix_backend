@@ -143,7 +143,8 @@
         "fields": {
             "profile": 2,
             "session": 1,
-            "category": 1
+            "category": 1,
+            "actual_class": ""
         }
     },
     {
@@ -152,7 +153,8 @@
         "fields": {
             "profile": 3,
             "session": 1,
-            "category": 1
+            "category": 1,
+            "actual_class": ""
         }
     },
     {
@@ -161,7 +163,8 @@
         "fields": {
             "profile": 4,
             "session": 1,
-            "category": 1
+            "category": 1,
+            "actual_class": ""
         }
     },
     {
@@ -226,6 +229,116 @@
             ],
             "exluded_from_class": [],
             "exluded_from_test": []
+        }
+    },
+    {
+        "model": "api.classattendance",
+        "pk": 4,
+        "fields": {
+            "classroom": 1,
+            "faculty": 1,
+            "start_time": "2020-07-18T02:11:00Z",
+            "end_time": "2020-07-18T03:11:00Z"
+        }
+    },
+    {
+        "model": "api.classattendance",
+        "pk": 6,
+        "fields": {
+            "classroom": 1,
+            "faculty": 1,
+            "start_time": "2020-07-20T02:14:00Z",
+            "end_time": null
+        }
+    },
+    {
+        "model": "api.classattendance",
+        "pk": 7,
+        "fields": {
+            "classroom": 1,
+            "faculty": 1,
+            "start_time": "2020-07-17T02:14:00Z",
+            "end_time": null
+        }
+    },
+    {
+        "model": "api.classattendance",
+        "pk": 8,
+        "fields": {
+            "classroom": 2,
+            "faculty": 1,
+            "start_time": "2020-07-20T02:08:00Z",
+            "end_time": null
+        }
+    },
+    {
+        "model": "api.classattendance",
+        "pk": 9,
+        "fields": {
+            "classroom": 3,
+            "faculty": 1,
+            "start_time": "2020-07-21T02:08:00Z",
+            "end_time": null
+        }
+    },
+    {
+        "model": "api.studentattendance",
+        "pk": 1,
+        "fields": {
+            "class_attendance": 7,
+            "student": 1,
+            "attendance": "P",
+            "comment": null
+        }
+    },
+    {
+        "model": "api.studentattendance",
+        "pk": 3,
+        "fields": {
+            "class_attendance": 7,
+            "student": 2,
+            "attendance": "P",
+            "comment": null
+        }
+    },
+    {
+        "model": "api.studentattendance",
+        "pk": 4,
+        "fields": {
+            "class_attendance": 7,
+            "student": 3,
+            "attendance": "P",
+            "comment": null
+        }
+    },
+    {
+        "model": "api.studentattendance",
+        "pk": 33,
+        "fields": {
+            "class_attendance": 6,
+            "student": 1,
+            "attendance": "P",
+            "comment": null
+        }
+    },
+    {
+        "model": "api.studentattendance",
+        "pk": 34,
+        "fields": {
+            "class_attendance": 6,
+            "student": 2,
+            "attendance": "P",
+            "comment": null
+        }
+    },
+    {
+        "model": "api.studentattendance",
+        "pk": 35,
+        "fields": {
+            "class_attendance": 6,
+            "student": 3,
+            "attendance": "P",
+            "comment": null
         }
     }
 ]

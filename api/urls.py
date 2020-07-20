@@ -7,7 +7,7 @@ router = DefaultRouter()
 
 router.register(r"branch", views.BranchViewSet)
 router.register(r"session", views.SessionViewSet)
-router.register(r"subjectL", views.SubjectViewSet)
+router.register(r"subject", views.SubjectViewSet)
 router.register(r"category", views.CategoryViewSet)
 router.register(r"faculty", views.FacultyViewSet)
 router.register(r"student", views.StudentViewSet)
@@ -20,9 +20,9 @@ router.register(r"student-attendance", views.StudentAttendanceViewSet)
 router.register(r"exam", views.ExamViewSet)
 router.register(r"test", views.TestViewSet)
 router.register(r"mark", views.MarkViewSet)
+router.register(r"classroom-students", views.StudentsInClassViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("classroom/<int:pk>/students", views.StudentsInClassView.as_view()),
     path("auth/", views.AuthTokenView.as_view()),
 ]
