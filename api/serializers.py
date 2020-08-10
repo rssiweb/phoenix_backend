@@ -128,7 +128,7 @@ class StudentMinimalAttendanceSerializer(serializers.ModelSerializer):
 
 class ClassAttendanceSerializer(serializers.ModelSerializer):
     entries = StudentMinimalAttendanceSerializer(
-        source="studentattendance_set", many=True
+        source="studentattendance_set", many=True, read_only=True
     )
 
     class Meta:

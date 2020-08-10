@@ -12,6 +12,7 @@ GENDER_CHOICES = (
 LEAVE_TYPE_CHOICES = (("full", "Full day leave"),)
 
 ATTENDANCE_TYPE_CHOICE = (
+    ("S", "Suspended"),
     ("P", "Present"),
     ("A", "Absent"),
     ("L", "Leave"),
