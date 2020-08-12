@@ -1,2 +1,1 @@
-web: flask db upgrade; gunicorn run:app
-worker: python worker.py
+web: gunicorn phoenix.wsgi
