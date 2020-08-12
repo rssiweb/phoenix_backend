@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") == "True"
 
-ALLOWED_HOSTS = ["*"] if DEBUG else ["attendence-brssi.herokuapp.com", "localhost"]
+ALLOWED_HOSTS = ["*"] if DEBUG else ["rssi-phoenix-api.herokuapp.com", "localhost"]
 
 
 # Application definition
@@ -127,3 +127,4 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:8080",
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
