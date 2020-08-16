@@ -1,4 +1,4 @@
-from flask import render_template, Blueprint
+from flask import render_template, Blueprint, redirect
 
 ui = Blueprint("ui", __name__, url_prefix="")
 
@@ -10,7 +10,8 @@ def login():
 
 @ui.route("/attendance")
 def attendance():
-    return render_template("attendance.html", page=1)
+    return redirect("/me")
+    # return render_template("attendance.html", page=1)
 
 
 @ui.route("/students")
