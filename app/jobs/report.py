@@ -77,8 +77,8 @@ def examToDict(exam_id):
             mark = Marks.query.filter(
                 Marks.test_id == test.id, Marks.student_id == std.id
             ).first()
-            maxMarks += test.max_marks
             if mark:
+                maxMarks += test.max_marks
                 if totalMarks == -1:
                     totalMarks = 0
                 sub = test.cat_sub_association.subject
@@ -128,7 +128,13 @@ def exam_report(meta, exam_id):
 
     filename = "%s All Category.csv" % exam.name
     filename = writeDictToCsv(
-        header, data, filename, "Percentage", reverse=True, sub_headers=sub_headers, default_sort_value=0
+        header,
+        data,
+        filename,
+        "Percentage",
+        reverse=True,
+        sub_headers=sub_headers,
+        default_sort_value=0,
     )
     csv_filenames.append(filename)
     logger.info("created report for all categories")
