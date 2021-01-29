@@ -69,7 +69,7 @@ def examToDict(exam_id):
         std_data["Name"] = std.name
         std_data["Student ID"] = std.student_id
         std_data["Category"] = std.category.name
-        std_data["Age"] = (date.today() - std.dob).days / 360
+        std_data["Age"] = "{:.1f}".format((date.today() - std.dob).days / 360)
 
         std_tests = [t for t in exam.tests if std in [a.student for a in t.students]]
         totalMarks, maxMarks = -1, 0

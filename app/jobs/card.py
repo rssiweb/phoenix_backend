@@ -12,7 +12,7 @@ import copy
 import itertools
 import os
 import time
-import io, urllib.request
+import urllib.request
 
 Person = namedtuple("Person", "name type contact image userid")
 
@@ -75,7 +75,7 @@ def generate_cards(persons):
         except Exception as e:
             print(e)
             dp_content = None
-        dp = Image.open(io.StringIO(dp_content)) if dp_content else None
+        dp = Image.open(dp_content) if dp_content else None
         tmp_img = copy.copy(img)
         draw = ImageDraw.Draw(tmp_img)
 
