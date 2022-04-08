@@ -232,7 +232,7 @@
         }
     },
     {
-        "model": "api.classattendance",
+        "model": "api.ClassOccurrance",
         "pk": 4,
         "fields": {
             "classroom": 1,
@@ -242,7 +242,7 @@
         }
     },
     {
-        "model": "api.classattendance",
+        "model": "api.ClassOccurrance",
         "pk": 6,
         "fields": {
             "classroom": 1,
@@ -252,7 +252,7 @@
         }
     },
     {
-        "model": "api.classattendance",
+        "model": "api.ClassOccurrance",
         "pk": 7,
         "fields": {
             "classroom": 1,
@@ -262,7 +262,7 @@
         }
     },
     {
-        "model": "api.classattendance",
+        "model": "api.ClassOccurrance",
         "pk": 8,
         "fields": {
             "classroom": 2,
@@ -272,7 +272,7 @@
         }
     },
     {
-        "model": "api.classattendance",
+        "model": "api.ClassOccurrance",
         "pk": 9,
         "fields": {
             "classroom": 3,

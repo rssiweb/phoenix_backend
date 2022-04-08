@@ -2,13 +2,13 @@ from django.db import models
 
 
 class Exam(models.Model):
-    session = models.ForeignKey("Session", on_delete=models.CASCADE)
+    bsa = models.ForeignKey("BranchSessionAssociation", on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     start_date = models.DateField(auto_now=False, auto_now_add=False)
     end_date = models.DateField(auto_now=False, auto_now_add=False)
 
     class Meta:
-        unique_together = [["name", "session"]]
+        unique_together = [["name", "bsa"]]
 
     def __str__(self):
         return f"({self.session.branch.name}, {self.session.name}): {self.name}"

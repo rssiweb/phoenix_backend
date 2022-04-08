@@ -3,7 +3,7 @@ from django.utils.encoding import force_str
 from rest_framework.compat import coreapi, coreschema
 from rest_framework import filters
 from django_filters import rest_framework as dfilters
-from api.models import Classroom, ClassAttendance, StudentAttendance
+from api.models import Classroom, ClassOccurrence, StudentAttendance
 
 
 class StudentInClassroomFilterBackend(filters.BaseFilterBackend):
@@ -53,14 +53,14 @@ class StudentInClassroomFilterBackend(filters.BaseFilterBackend):
         return queryset.filter(category=None)
 
 
-class ClassAttendanceFilterSet(dfilters.FilterSet):
+class ClassOccurrenceFilterSet(dfilters.FilterSet):
     start_time = dfilters.IsoDateTimeFromToRangeFilter(
         field_name="start_time", lookup_expr="gte"
     )
     not_ended = dfilters.BooleanFilter(field_name="end_time", lookup_expr="isnull")
 
     class Meta:
-        model = ClassAttendance
+        model = ClassOccurrence
         fields = ["classroom", "faculty", "start_time", "not_ended"]
 
 
@@ -71,4 +71,4 @@ class StudentAttendanceFilterSet(dfilters.FilterSet):
 
     class Meta:
         model = StudentAttendance
-        fields = ["class_attendance", "student__profile__profile_id"]
+        fields = ["class_attendance"]

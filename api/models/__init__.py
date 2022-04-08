@@ -5,3 +5,6 @@ from .grade import *
 from .grade import *
 from .leave import *
 from .user import *
+from .language import *
+from .badge import *
+from .position import *

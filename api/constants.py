@@ -1,0 +1,4 @@
+# user type options
+USER_TYPE_STUDENT = 1
+USER_TYPE_FACULTY = 2
+USER_TYPE_ADMIN = 3

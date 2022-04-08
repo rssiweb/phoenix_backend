@@ -2,7 +2,7 @@ from django.db import models
 
 
 class GradeSystem(models.Model):
-    session = models.ForeignKey("Session", on_delete=models.CASCADE)
+    bsa = models.ForeignKey("BranchSessionAssociation", on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
 
 

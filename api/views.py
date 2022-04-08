@@ -1,12 +1,15 @@
+from email.headerregistry import Group
+from functools import partial
 from rest_framework import viewsets, mixins
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.decorators import action
+from api.constants import USER_TYPE_ADMIN, USER_TYPE_FACULTY, USER_TYPE_STUDENT
 from api.filters import (
     StudentInClassroomFilterBackend,
-    ClassAttendanceFilterSet,
+    ClassOccurrenceFilterSet,
     StudentAttendanceFilterSet,
 )
 from api.models import (
@@ -20,14 +23,17 @@ from api.models import (
     Grade,
     Classroom,
     Leave,
-    ClassAttendance,
+    ClassOccurrence,
     StudentAttendance,
     Exam,
     Test,
     Mark,
+    User,
 )
+from api.models.core import BranchSessionAssociation
 from api.serializers import (
     BranchSerializer,
+    BranchSessionAssociationSerializer,
     SessionSerializer,
     SubjectSerializer,
     CategorySerializer,
@@ -37,11 +43,12 @@ from api.serializers import (
     GradeSerializer,
     ClassroomSerializer,
     LeaveSerializer,
-    ClassAttendanceSerializer,
+    ClassOccurranceSerializer,
     StudentAttendanceSerializer,
     ExamSerializer,
     TestSerializer,
     MarkSerializer,
+    UserSerializer,
 )
 
 
@@ -49,18 +56,45 @@ class AuthTokenView(ObtainAuthToken):
     "Auth view expects username and password as POST payload"
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
         serializer = self.serializer_class(
             data=request.data, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key, "user_id": user.pk, "email": user.email})
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response(
+            {
+                "token": token.key,
+                "user_id": user.pk,
+                "username": user.username,
+                "type": user.type,
+            }
+        )
 
 
 class AuthenticatedMixin:
     permission_classes = (IsAuthenticated,)
+
+
+class BSAViewSet(AuthenticatedMixin, viewsets.ReadOnlyModelViewSet):
+
+    queryset = BranchSessionAssociation.objects.all()
+    serializer_class = BranchSessionAssociationSerializer
+    filterset_fields = [
+        "branch",
+    ]
+
+    @action(detail=False)
+    def branches(self, request):
+        items = self.get_queryset()
+
+        page = self.paginate_queryset(items)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(items, many=True)
+        return Response(serializer.data)
 
 
 class BranchViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
@@ -107,14 +141,51 @@ class CategoryViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
     filterset_fields = ["name", "session__name"]
 
 
+class UserViewSet(AuthenticatedMixin, viewsets.ReadOnlyModelViewSet):
+    """
+    Faculty view
+    """
+
+    lookup_field = "username"
+    queryset = User.objects.all()
+
+    @action(detail=False, methods=["get"])
+    def me(self, request):
+        user = request.user
+        serializer_class, attr = {
+            USER_TYPE_FACULTY: (FacultySerializer, "faculty"),
+            USER_TYPE_STUDENT: (StudentSerializer, "student"),
+            USER_TYPE_ADMIN: (UserSerializer, None),
+        }[user.type]
+        serializer = serializer_class(getattr(user, attr) if attr else user)
+        return Response(serializer.data)
+
+    def get_object(self):
+        user = super().get_object()
+        if user.type == USER_TYPE_FACULTY:
+            return user.faculty
+        elif user.type == USER_TYPE_STUDENT:
+            return user.student
+        return user
+
+    def get_serializer_class(self):
+        if self.request.user.type == USER_TYPE_FACULTY:
+            return FacultySerializer
+        elif self.request.user.type == USER_TYPE_STUDENT:
+            return StudentSerializer
+        else:
+            return UserSerializer
+
+
 class FacultyViewSet(AuthenticatedMixin, viewsets.ReadOnlyModelViewSet):
     """
     Faculty view
     """
 
+    lookup_field = "profile__user__username"
     queryset = Faculty.objects
     serializer_class = FacultySerializer
-    filterset_fields = ["profile__profile_id", "branch__name", "profile__gender"]
+    filterset_fields = ["branch__name", "profile__gender"]
 
 
 class StudentViewSet(AuthenticatedMixin, viewsets.ReadOnlyModelViewSet):
@@ -122,9 +193,9 @@ class StudentViewSet(AuthenticatedMixin, viewsets.ReadOnlyModelViewSet):
     Student view
     """
 
+    lookup_field = "profile__user__username"
     queryset = Student.objects
     serializer_class = StudentSerializer
-    filterset_fields = ["profile__profile_id", "session__name", "category__name"]
 
 
 class StudentsInClassViewSet(
@@ -165,14 +236,16 @@ class ClassroomViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
     Classroom view
     """
 
-    queryset = Classroom.objects
+    queryset = Classroom.objects.all()
     serializer_class = ClassroomSerializer
-    filterset_fields = [
-        "session__name",
-        "categories",
-        "faculty__profile__profile_id",
-        "subject__name",
-    ]
+    filterset_fields = ["subject", "faculty__user", "bsa__branch", "bsa__session"]
+
+    @action(detail=True, methods=["get"])
+    def students(self, request, pk):
+        classroom = self.get_object()
+        students = classroom.students.all()
+        serializer = StudentSerializer(students, many=True)
+        return Response(serializer.data)
 
 
 class LeaveViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
@@ -185,14 +258,14 @@ class LeaveViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
     filterset_fields = ["student__profile__profile_id", "from_date", "to_date"]
 
 
-class ClassAttendanceViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
+class ClassOccurranceViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
     """
-    ClassAttendance view
+    ClassOccurrance view
     """
 
-    queryset = ClassAttendance.objects
-    serializer_class = ClassAttendanceSerializer
-    filterset_class = ClassAttendanceFilterSet
+    queryset = ClassOccurrence.objects
+    serializer_class = ClassOccurranceSerializer
+    filterset_class = ClassOccurrenceFilterSet
 
 
 class StudentAttendanceViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
@@ -233,4 +306,5 @@ class MarkViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
 
     queryset = Mark.objects
     serializer_class = MarkSerializer
-    filterset_fields = ["test", "student__profile__profile_id"]
+    filterset_fields = ["test"]
+
