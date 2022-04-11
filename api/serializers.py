@@ -1,4 +1,3 @@
-from attr import fields
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
 from api.models import (
