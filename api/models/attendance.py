@@ -30,7 +30,7 @@ class StudentAttendance(models.Model):
     student = models.ForeignKey("Student", on_delete=models.CASCADE)
     # faculty who took the attendance
     faculty = models.ForeignKey("Faculty", on_delete=models.CASCADE)
-    attendance = models.CharField(choices=ATTENDANCE_TYPE_CHOICE, max_length=10)
+    attendance = models.CharField(choices=ATTENDANCE_TYPE_CHOICE, max_length=1)
     comment = models.CharField(max_length=15, null=True, blank=True)
     entry_on = models.DateTimeField(default=timezone.now)
 
@@ -39,4 +39,4 @@ class StudentAttendance(models.Model):
         verbose_name_plural = "Student Attendance"
 
     def __str__(self):
-        return f"{self.class_attendance.classroom.name}: {self.student.id} - {self.attendance}"
+        return f"{self.class_occurrance.classroom.name}: {self.student.id} - {self.attendance}"

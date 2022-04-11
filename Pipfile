@@ -10,7 +10,7 @@ black = "*"
 pylint = "*"
 
 [packages]
-django = "*"
+django = "==3.2"
 psycopg2-binary = "*"
 djangorestframework = "*"
 django-filter = "*"

@@ -132,6 +132,41 @@ class StudentAttendanceSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CreateStudentAttendanceSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    faculty = serializers.CharField()
+    student = serializers.CharField()
+
+    class Meta:
+        model = StudentAttendance
+        fields = [
+            "faculty",
+            "student",
+            "class_occurrance",
+            "comment",
+            "attendance",
+            "id",
+        ]
+
+    def validate_faculty(self, username):
+        try:
+            return Faculty.objects.get(user__username=username)
+        except Faculty.DoesNotExist:
+            raise serializers.ValidationError("Invalid faculty value")
+
+    def validate_student(self, username):
+        try:
+            return Student.objects.get(user__username=username)
+        except Faculty.DoesNotExist:
+            raise serializers.ValidationError("Invalid value")
+
+
+class UpdateStudentAttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentAttendance
+        fields = ["comment", "attendance", "id"]
+
+
 class StudentMinimalAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentAttendance
@@ -173,4 +208,34 @@ class BranchSessionAssociationSerializer(serializers.ModelSerializer):
     class Meta:
         model = BranchSessionAssociation
         fields = "__all__"
+
+
+from django.utils import timezone
+
+
+class StudentAttendance1Serializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(source="class_occurrance.start_time")
+
+    class Meta:
+        model = StudentAttendance
+        fields = ["attendance", "date", "id"]
+
+
+class AttendanceStudentSerializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
+
+    attendance = StudentAttendance1Serializer(
+        source="studentattendance_set", many=True, read_only=True
+    )
+
+    class Meta:
+        model = Student
+        fields = ["category", "attendance", "id", "name"]
+
+    def get_name(self, model):
+        return model.user.get_full_name()
+
+    def get_id(self, model):
+        return model.user.username
 

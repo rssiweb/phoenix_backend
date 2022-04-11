@@ -15,45 +15,22 @@ from api.models.position import Position, UserPosition
 from .models import User
 
 
-from api.models.core import BranchSessionAssociation, Category, CategorySessionAssociation, CategoryStudentAssociation, CategorySubjectAssociation, Classroom, Quarter, Session, StudentClassroomAssociation, Subject
+from api.models.core import (
+    BranchSessionAssociation,
+    Category,
+    CategorySessionAssociation,
+    CategoryStudentAssociation,
+    CategorySubjectAssociation,
+    Classroom,
+    Quarter,
+    Session,
+    StudentClassroomAssociation,
+    Subject,
+)
 from api.models.grade import Grade, GradeSystem
 from api.models.user import Faculty, Student
 
 models = apps.get_models("api")
-
-# model_names_to_register = [
-#     "Branch",
-#     "Session",
-#     "Quarter",
-#     "Subject",
-#     "Category",
-#     "StudentClassroomAssociation",
-#     "SessionQuarterAssociation",
-#     "BranchSessionAssociation",
-#     "CategoryBranchAssociation",
-#     "CategorySubjectAssociation",
-#     "CategoryStudentAssociation",
-#     "Classroom_cbas",
-#     "Classroom_exclude_from_class",
-#     "Classroom_exclude_from_test",
-#     "Classroom",
-#     "ClassOccurrance",
-#     "StudentAttendance",
-#     "Exam",
-#     "Test",
-#     "Mark",
-#     "GradeSystem",
-#     "Grade",
-#     "Leave",
-#     "Faculty",
-#     "Student",
-# ]
-
-# models = [model for model in models if model.__name__ in model_names_to_register]
-
-# for model in models:
-#     admin.site.register(model)
-
 
 
 @admin.register(User)
@@ -106,14 +83,14 @@ class BranchAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
 
-
 @admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
+
 @admin.register(Quarter)
 class QuaterAdmin(admin.ModelAdmin):
-    list_display = ("name","start","end","session")
+    list_display = ("name", "start", "end", "session")
 
 
 @admin.register(Subject)
@@ -127,43 +104,58 @@ class CategoryAdmin(admin.ModelAdmin):
     # list_filter = ("session__name",)
     list_display = ("name",)
 
+
 @admin.register(BranchSessionAssociation)
 class BranchSessionAssociationAdmin(admin.ModelAdmin):
     # list_filter = ("session__name",)
-    list_display = ("branch","session","is_active")
+    list_display = ("branch", "session", "is_active")
 
 
 @admin.register(CategorySubjectAssociation)
 class CategorySubjectAssociationAdmin(admin.ModelAdmin):
-    list_display = ("cba","subject",)
+    list_display = (
+        "cba",
+        "subject",
+    )
+
 
 @admin.register(CategoryStudentAssociation)
 class CategoryStudentAssociationnAdmin(admin.ModelAdmin):
-    list_display = ("cba","student",)
+    list_display = (
+        "cba",
+        "student",
+    )
 
-@admin.register(CategorySessionAssociation)                            
+
+@admin.register(CategorySessionAssociation)
 class CategorySessionAssociationAdmin(admin.ModelAdmin):
-    list_display = ("category","session",)      
+    list_display = (
+        "category",
+        "session",
+    )
+
 
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
+
 @admin.register(LanguageProficiency)
 class LanguageProficiencyAdmin(admin.ModelAdmin):
-    list_display = ("lang","faculty","read","write","speak")   
+    list_display = ("lang", "faculty", "read", "write", "speak")
+
 
 @admin.register(Faculty)
-class FacultyAdmin(admin.ModelAdmin):  
-    list_filter = ("base_branch",   
-                )
-    list_display = ("user",
-                "title",
-                "permanent_address",
-                "current_address",
-                "base_branch",
-                "work_experience"
-            )
+class FacultyAdmin(admin.ModelAdmin):
+    list_filter = ("base_branch",)
+    list_display = (
+        "user",
+        "title",
+        "permanent_address",
+        "current_address",
+        "base_branch",
+        "work_experience",
+    )
 
 
 @admin.register(Student)
@@ -209,9 +201,11 @@ class ClassroomAdmin(admin.ModelAdmin):
         "grade_system",
     )
 
+
 # @admin.register(StudentClassroomAssociation)
 # class StudentClassroomAssociationAdmin(admin.ModelAdmin):
 #     list_display = ("classroom", "student")
+
 
 @admin.register(Leave)
 class LeaveAdmin(admin.ModelAdmin):
@@ -226,7 +220,14 @@ class ClassOccurranceAdmin(admin.ModelAdmin):
 @admin.register(StudentAttendance)
 class StudentAttendanceAdmin(admin.ModelAdmin):
     list_filter = ("attendance",)
-    list_display = ("class_occurrance", "student","faculty", "attendance", "comment", "entry_on")
+    list_display = (
+        "class_occurrance",
+        "student",
+        "faculty",
+        "attendance",
+        "comment",
+        "entry_on",
+    )
 
 
 @admin.register(Exam)
@@ -249,15 +250,22 @@ class MarkAdmin(admin.ModelAdmin):
 
 @admin.register(Badge)
 class BadgeAdmin(admin.ModelAdmin):
-    list_display = ("name","icon")
+    list_display = ("name", "icon")
+
 
 @admin.register(UserBadges)
 class UserBadgesAdmin(admin.ModelAdmin):
-    list_display = ("user","badge","assigned_on","assigned_for")
+    list_display = ("user", "badge", "assigned_on", "assigned_for")
+
 
 @admin.register(UserPosition)
 class UserPositionAdmin(admin.ModelAdmin):
-    list_display = ("user","position","approved_by",)
+    list_display = (
+        "user",
+        "position",
+        "approved_by",
+    )
+
 
 @admin.register(Position)
 class PositionAdmin(admin.ModelAdmin):

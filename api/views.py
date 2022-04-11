@@ -32,8 +32,10 @@ from api.models import (
 )
 from api.models.core import BranchSessionAssociation
 from api.serializers import (
+    AttendanceStudentSerializer,
     BranchSerializer,
     BranchSessionAssociationSerializer,
+    CreateStudentAttendanceSerializer,
     SessionSerializer,
     SubjectSerializer,
     CategorySerializer,
@@ -48,6 +50,7 @@ from api.serializers import (
     ExamSerializer,
     TestSerializer,
     MarkSerializer,
+    UpdateStudentAttendanceSerializer,
     UserSerializer,
 )
 
@@ -247,6 +250,21 @@ class ClassroomViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
         serializer = StudentSerializer(students, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=["get"])
+    def attendance(self, request, pk):
+        classroom = self.get_object()
+        occurrences = classroom.classoccurrence_set.all()
+        serializer = ClassOccurranceSerializer(occurrences, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def attendance_by_student(self, request, pk):
+        classroom = self.get_object()
+        students = classroom.students.all()
+        # multiple class occurrences for all students
+        serializer = AttendanceStudentSerializer(students, many=True)
+        return Response(serializer.data)
+
 
 class LeaveViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
     """
@@ -276,7 +294,16 @@ class StudentAttendanceViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
     queryset = StudentAttendance.objects
     serializer_class = StudentAttendanceSerializer
     filterset_class = StudentAttendanceFilterSet
+    # should be faculty in class or part of admin group
+
     # filterset_fields = ["class_attendance", "student__profile__profile_id"]
+
+    def get_serializer_class(self):
+        if self.action in ("create",):
+            return CreateStudentAttendanceSerializer
+        elif self.action in ("partial_update",):
+            return UpdateStudentAttendanceSerializer
+        return StudentAttendanceSerializer
 
 
 class ExamViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
