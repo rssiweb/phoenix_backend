@@ -162,22 +162,14 @@ class CreateStudentAttendanceSerializer(serializers.ModelSerializer):
 
 
 class UpdateStudentAttendanceSerializer(serializers.ModelSerializer):
+    date = serializers.ReadOnlyField(source="class_occurrance.start_time")
+
     class Meta:
         model = StudentAttendance
-        fields = ["comment", "attendance", "id"]
-
-
-class StudentMinimalAttendanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = StudentAttendance
-        fields = ["id", "attendance", "comment", "student"]
+        fields = ["comment", "attendance", "id", "date"]
 
 
 class ClassOccurranceSerializer(serializers.ModelSerializer):
-    entries = StudentMinimalAttendanceSerializer(
-        source="studentattendance_set", many=True, read_only=True
-    )
-
     class Meta:
         model = ClassOccurrence
         fields = "__all__"
@@ -210,22 +202,10 @@ class BranchSessionAssociationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-from django.utils import timezone
-
-
-class StudentAttendance1Serializer(serializers.ModelSerializer):
-    date = serializers.DateTimeField(source="class_occurrance.start_time")
-
-    class Meta:
-        model = StudentAttendance
-        fields = ["attendance", "date", "id"]
-
-
 class AttendanceStudentSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
-
-    attendance = StudentAttendance1Serializer(
+    attendance = UpdateStudentAttendanceSerializer(
         source="studentattendance_set", many=True, read_only=True
     )
 
@@ -238,4 +218,9 @@ class AttendanceStudentSerializer(serializers.ModelSerializer):
 
     def get_id(self, model):
         return model.user.username
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["attendance"] = sorted(data.pop("attendance", []), key=lambda x: x["date"])
+        return data
 
