@@ -19,7 +19,7 @@ class AccountTests(APITestCase):
         super().setUp()
         self.client.login(username="admin", password="zkhan1993")
 
-    def test_create_account(self):
+    def test_read_classoccurrence(self):
         """
         Ensure we can create a new account object.
         """
