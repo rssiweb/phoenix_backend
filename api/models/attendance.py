@@ -1,6 +1,8 @@
 from django.utils import timezone
 from django.db import models
 
+from api.utils import safe_date_format
+
 ATTENDANCE_TYPE_CHOICE = (
     ("S", "Suspended"),
     ("P", "Present"),
@@ -22,7 +24,9 @@ class ClassOccurrence(models.Model):
         verbose_name_plural = "Class Occurrence"
 
     def __str__(self):
-        return f"{self.classroom.name}: {self.start_time} - {self.end_time}"
+        start = safe_date_format(self.start_time, "%Y-%m-%d %H:%M")
+        end = safe_date_format(self.end_time, "%Y-%m-%d %H:%M")
+        return f"{self.classroom.name}: {start} - {end}"
 
 
 class StudentAttendance(models.Model):

@@ -1,8 +1,10 @@
+import unittest
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from api.models import Classroom
 from api.models.attendance import StudentAttendance
+from api.models.core import ClassroomManager
 
 from api.urls import router
 from pprint import pprint
@@ -69,4 +71,3 @@ class AccountTests(APITestCase):
         self.assertEqual(
             StudentAttendance.objects.get(pk=attendance_id).attendance, "A"
         )
-

@@ -121,4 +121,11 @@ class Classroom(models.Model):
 class StudentClassroomAssociation(models.Model):
     classroom = models.ForeignKey("Classroom", on_delete=models.CASCADE)
     student = models.ForeignKey("Student", on_delete=models.CASCADE)
+    attendance = models.BooleanField(
+        default=True,
+        help_text="Should this student be considers while taking attendance ?",
+    )
+    test = models.BooleanField(
+        default=True, help_text="Should this student be considers while taking tests?"
+    )
 

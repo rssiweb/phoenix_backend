@@ -54,9 +54,8 @@ class StudentInClassroomFilterBackend(filters.BaseFilterBackend):
 
 
 class ClassOccurrenceFilterSet(dfilters.FilterSet):
-    start_time = dfilters.IsoDateTimeFromToRangeFilter(
-        field_name="start_time", lookup_expr="gte"
-    )
+    faculty = dfilters.CharFilter(field_name="faculty__user__username")
+    start_time = dfilters.IsoDateTimeFromToRangeFilter(field_name="start_time")
     not_ended = dfilters.BooleanFilter(field_name="end_time", lookup_expr="isnull")
 
     class Meta:

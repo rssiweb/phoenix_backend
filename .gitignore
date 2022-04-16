@@ -13,3 +13,4 @@ specs/
 .coverage
 .pytest_cache/
 cov.xml
+*.db

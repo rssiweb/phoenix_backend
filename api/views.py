@@ -35,6 +35,7 @@ from api.serializers import (
     AttendanceStudentSerializer,
     BranchSerializer,
     BranchSessionAssociationSerializer,
+    CreateClassOccurranceSerializer,
     CreateStudentAttendanceSerializer,
     SessionSerializer,
     SubjectSerializer,
@@ -172,11 +173,13 @@ class UserViewSet(AuthenticatedMixin, viewsets.ReadOnlyModelViewSet):
         return user
 
     def get_serializer_class(self):
-        if self.request.user.type == USER_TYPE_FACULTY:
-            return FacultySerializer
-        elif self.request.user.type == USER_TYPE_STUDENT:
-            return StudentSerializer
+        if self.action in ("list",):
+            return UserSerializer
         else:
+            if self.request.user.type == USER_TYPE_FACULTY:
+                return FacultySerializer
+            elif self.request.user.type == USER_TYPE_STUDENT:
+                return StudentSerializer
             return UserSerializer
 
 
@@ -282,8 +285,12 @@ class ClassOccurranceViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
     """
 
     queryset = ClassOccurrence.objects
-    serializer_class = ClassOccurranceSerializer
     filterset_class = ClassOccurrenceFilterSet
+
+    def get_serializer_class(self):
+        if self.action in ("create",):
+            return CreateClassOccurranceSerializer
+        return ClassOccurranceSerializer
 
 
 class StudentAttendanceViewSet(AuthenticatedMixin, viewsets.ModelViewSet):

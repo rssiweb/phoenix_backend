@@ -70,7 +70,7 @@ class MyUserAdmin(UserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
-                    # "groups",
+                    "groups",
                     # "user_permissions",
                 ),
             },
@@ -160,11 +160,8 @@ class FacultyAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    # list_filter = ("session__name",)
-    list_display = (
-        "user",
-        # "category",
-    )
+    list_filter = ("category__name",)
+    list_display = ("user", "category")
 
 
 @admin.register(GradeSystem)
@@ -179,32 +176,31 @@ class GradeAdmin(admin.ModelAdmin):
     list_display = ("grade_system", "low", "high", "grade", "description")
 
 
+class StudentsInClassroom(admin.TabularInline):
+    model = Classroom.students.through
+
+
 @admin.register(Classroom)
 class ClassroomAdmin(admin.ModelAdmin):
-    def category_names(self, obj):
-        return f"{','.join([cat.name for cat in obj.categories.all()])}"
-
-    def students_excluded_from_attendance(self, obj):
-        return f"{','.join([student.id for student in obj.exluded_from_class.all()])}"
-
-    def students_excluded_from_test(self, obj):
-        return f"{','.join([student.id for student in obj.exluded_from_test.all()])}"
-
-    # list_filter = ("session__name",)
+    list_filter = ("bsa", "subject__name", "faculty")
+    filter_horizontal = ("students",)
     list_display = (
-        "bsa",
         "name",
+        "bsa",
         "faculty",
         "sec_faculty",
         "subject",
         "working_days",
         "grade_system",
     )
+    inlines = [
+        StudentsInClassroom,
+    ]
 
 
-# @admin.register(StudentClassroomAssociation)
-# class StudentClassroomAssociationAdmin(admin.ModelAdmin):
-#     list_display = ("classroom", "student")
+@admin.register(StudentClassroomAssociation)
+class StudentClassroomAssociationAdmin(admin.ModelAdmin):
+    list_display = ("classroom", "student", "attendance", "test")
 
 
 @admin.register(Leave)
@@ -219,7 +215,8 @@ class ClassOccurranceAdmin(admin.ModelAdmin):
 
 @admin.register(StudentAttendance)
 class StudentAttendanceAdmin(admin.ModelAdmin):
-    list_filter = ("attendance",)
+    list_filter = ("attendance", "class_occurrance__classroom")
+
     list_display = (
         "class_occurrance",
         "student",

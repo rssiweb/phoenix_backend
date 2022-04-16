@@ -20,6 +20,7 @@ from api.models import (
 )
 from api.models.core import BranchSessionAssociation
 from api.models.user import USER_TYPE_CHOICES
+from django.utils import timezone
 
 
 class BranchSerializer(serializers.ModelSerializer):
@@ -134,12 +135,16 @@ class StudentAttendanceSerializer(serializers.ModelSerializer):
 
 class CreateStudentAttendanceSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
+    date = serializers.DateTimeField(
+        source="class_occurrance.start_time", read_only=True
+    )
     faculty = serializers.CharField()
     student = serializers.CharField()
 
     class Meta:
         model = StudentAttendance
         fields = [
+            "date",
             "faculty",
             "student",
             "class_occurrance",
@@ -162,7 +167,7 @@ class CreateStudentAttendanceSerializer(serializers.ModelSerializer):
 
 
 class UpdateStudentAttendanceSerializer(serializers.ModelSerializer):
-    date = serializers.ReadOnlyField(source="class_occurrance.start_time")
+    date = serializers.DateTimeField(source="class_occurrance.start_time")
 
     class Meta:
         model = StudentAttendance
@@ -170,9 +175,29 @@ class UpdateStudentAttendanceSerializer(serializers.ModelSerializer):
 
 
 class ClassOccurranceSerializer(serializers.ModelSerializer):
+    faculty = serializers.CharField(source="faculty.user.username")
+
     class Meta:
         model = ClassOccurrence
         fields = "__all__"
+
+
+class CreateClassOccurranceSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    faculty = serializers.CharField()
+    start_time = serializers.DateTimeField(
+        default_timezone=timezone.get_current_timezone()
+    )
+
+    class Meta:
+        model = ClassOccurrence
+        fields = ["id", "start_time", "classroom", "faculty"]
+
+    def validate_faculty(self, username):
+        try:
+            return Faculty.objects.get(user__username=username)
+        except Faculty.DoesNotExist:
+            raise serializers.ValidationError("Invalid faculty value")
 
 
 class ExamSerializer(serializers.ModelSerializer):
