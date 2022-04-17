@@ -227,12 +227,10 @@ class BranchSessionAssociationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AttendanceStudentSerializer(serializers.ModelSerializer):
+class AttendanceByStudentSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
-    attendance = UpdateStudentAttendanceSerializer(
-        source="studentattendance_set", many=True, read_only=True
-    )
+    attendance = UpdateStudentAttendanceSerializer(many=True, read_only=True)
 
     class Meta:
         model = Student

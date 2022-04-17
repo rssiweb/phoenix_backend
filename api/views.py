@@ -32,7 +32,7 @@ from api.models import (
 )
 from api.models.core import BranchSessionAssociation
 from api.serializers import (
-    AttendanceStudentSerializer,
+    AttendanceByStudentSerializer,
     BranchSerializer,
     BranchSessionAssociationSerializer,
     CreateClassOccurranceSerializer,
@@ -264,8 +264,13 @@ class ClassroomViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
     def attendance_by_student(self, request, pk):
         classroom = self.get_object()
         students = classroom.students.all()
-        # multiple class occurrences for all students
-        serializer = AttendanceStudentSerializer(students, many=True)
+        for student in students:
+            student.attendance = StudentAttendance.objects.filter(
+                class_occurrance__classroom=classroom, student=student
+            ).all()
+        serializer = AttendanceByStudentSerializer(
+            students, many=True, context={"classroom": classroom}
+        )
         return Response(serializer.data)
 
 
