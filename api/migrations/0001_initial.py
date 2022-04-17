@@ -23,13 +23,21 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
-                ("password", models.CharField(max_length=128, verbose_name="password"),),
+                (
+                    "password",
+                    models.CharField(max_length=128, verbose_name="password"),
+                ),
                 (
                     "last_login",
-                    models.DateTimeField(blank=True, null=True, verbose_name="last login"),
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
                 ),
                 (
                     "is_superuser",
@@ -42,25 +50,35 @@ class Migration(migrations.Migration):
                 (
                     "username",
                     models.CharField(
-                        error_messages={"unique": "A user with that username already exists."},
+                        error_messages={
+                            "unique": "A user with that username already exists."
+                        },
                         help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
                         max_length=150,
                         unique=True,
-                        validators=[django.contrib.auth.validators.UnicodeUsernameValidator()],
+                        validators=[
+                            django.contrib.auth.validators.UnicodeUsernameValidator()
+                        ],
                         verbose_name="username",
                     ),
                 ),
                 (
                     "first_name",
-                    models.CharField(blank=True, max_length=150, verbose_name="first name"),
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="first name"
+                    ),
                 ),
                 (
                     "last_name",
-                    models.CharField(blank=True, max_length=150, verbose_name="last name"),
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="last name"
+                    ),
                 ),
                 (
                     "email",
-                    models.EmailField(blank=True, max_length=254, verbose_name="email address"),
+                    models.EmailField(
+                        blank=True, max_length=254, verbose_name="email address"
+                    ),
                 ),
                 (
                     "is_staff",
@@ -81,7 +99,8 @@ class Migration(migrations.Migration):
                 (
                     "date_joined",
                     models.DateTimeField(
-                        default=django.utils.timezone.now, verbose_name="date joined",
+                        default=django.utils.timezone.now,
+                        verbose_name="date joined",
                     ),
                 ),
                 (
@@ -96,17 +115,30 @@ class Migration(migrations.Migration):
                 (
                     "profile_pic",
                     models.CharField(
-                        blank=True, max_length=512, null=True, verbose_name="profile picture",
+                        blank=True,
+                        max_length=512,
+                        null=True,
+                        verbose_name="profile picture",
                     ),
                 ),
-                ("phone", models.CharField(blank=True, max_length=512, null=True),),
+                (
+                    "phone",
+                    models.CharField(blank=True, max_length=512, null=True),
+                ),
                 (
                     "gender",
                     models.PositiveSmallIntegerField(
-                        blank=True, choices=[(1, "Male"), (2, "Female"), (3, "Others")], null=True,
+                        blank=True,
+                        choices=[(1, "Male"), (2, "Female"), (3, "Others")],
+                        null=True,
                     ),
                 ),
-                ("dob", models.DateField(blank=True, null=True, verbose_name="date of birth"),),
+                (
+                    "dob",
+                    models.DateField(
+                        blank=True, null=True, verbose_name="date of birth"
+                    ),
+                ),
                 ("inactive_from", models.DateField(blank=True, null=True)),
                 (
                     "groups",
@@ -131,8 +163,14 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name": "user", "verbose_name_plural": "users", "abstract": False,},
-            managers=[("objects", django.contrib.auth.models.UserManager()),],
+            options={
+                "verbose_name": "user",
+                "verbose_name_plural": "users",
+                "abstract": False,
+            },
+            managers=[
+                ("objects", django.contrib.auth.models.UserManager()),
+            ],
         ),
         migrations.CreateModel(
             name="Badge",
@@ -140,11 +178,17 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=50, unique=True)),
-                ("icon", models.CharField(blank=True, max_length=512, null=True),),
+                (
+                    "icon",
+                    models.CharField(blank=True, max_length=512, null=True),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -153,12 +197,17 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=50, unique=True)),
             ],
-            options={"verbose_name_plural": "Branches",},
+            options={
+                "verbose_name_plural": "Branches",
+            },
         ),
         migrations.CreateModel(
             name="BranchSessionAssociation",
@@ -166,14 +215,21 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
-                ("is_active", models.BooleanField(default=False, verbose_name="active"),),
+                (
+                    "is_active",
+                    models.BooleanField(default=False, verbose_name="active"),
+                ),
                 (
                     "branch",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.branch",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.branch",
                     ),
                 ),
             ],
@@ -184,18 +240,25 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=10, unique=True)),
                 (
                     "branch",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.branch",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.branch",
                     ),
                 ),
             ],
-            options={"verbose_name_plural": "Categories", "unique_together": {("name", "branch")},},
+            options={
+                "verbose_name_plural": "Categories",
+                "unique_together": {("name", "branch")},
+            },
         ),
         migrations.CreateModel(
             name="CategorySessionAssociation",
@@ -203,17 +266,23 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
                     "category",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.category",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.category",
                     ),
                 ),
             ],
-            options={"verbose_name_plural": "Categories in Session",},
+            options={
+                "verbose_name_plural": "Categories in Session",
+            },
         ),
         migrations.CreateModel(
             name="Classroom",
@@ -221,7 +290,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=20)),
@@ -234,7 +306,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name_plural": "Classes",},
+            options={
+                "verbose_name_plural": "Classes",
+            },
         ),
         migrations.CreateModel(
             name="Exam",
@@ -242,7 +316,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=50)),
@@ -256,7 +333,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"unique_together": {("name", "bsa")},},
+            options={
+                "unique_together": {("name", "bsa")},
+            },
         ),
         migrations.CreateModel(
             name="Faculty",
@@ -264,7 +343,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
@@ -277,17 +359,26 @@ class Migration(migrations.Migration):
                         verbose_name="preferred title",
                     ),
                 ),
-                ("permanent_address", models.CharField(blank=True, max_length=200, null=True),),
-                ("current_address", models.CharField(blank=True, max_length=200, null=True),),
+                (
+                    "permanent_address",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                (
+                    "current_address",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
                 ("work_experience", models.TextField()),
                 (
                     "base_branch",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.branch",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.branch",
                     ),
                 ),
             ],
-            options={"verbose_name_plural": "Faculties",},
+            options={
+                "verbose_name_plural": "Faculties",
+            },
         ),
         migrations.CreateModel(
             name="Language",
@@ -295,7 +386,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=50, unique=True)),
@@ -307,7 +401,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=50, unique=True)),
@@ -319,12 +416,17 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=50, unique=True)),
             ],
-            options={"verbose_name_plural": "Sessions",},
+            options={
+                "verbose_name_plural": "Sessions",
+            },
         ),
         migrations.CreateModel(
             name="Student",
@@ -332,23 +434,30 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
                     "category",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.category",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.category",
                     ),
                 ),
                 (
                     "user",
                     models.OneToOneField(
-                        on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
             ],
-            options={"verbose_name_plural": "Students",},
+            options={
+                "verbose_name_plural": "Students",
+            },
         ),
         migrations.CreateModel(
             name="Subject",
@@ -356,12 +465,17 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=50, unique=True)),
             ],
-            options={"verbose_name_plural": "Subjects",},
+            options={
+                "verbose_name_plural": "Subjects",
+            },
         ),
         migrations.CreateModel(
             name="UserPosition",
@@ -369,7 +483,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
@@ -383,13 +500,15 @@ class Migration(migrations.Migration):
                 (
                     "position",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.position",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.position",
                     ),
                 ),
                 (
                     "user",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
             ],
@@ -400,24 +519,32 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
                     "assigned_on",
                     models.DateTimeField(
-                        default=django.utils.timezone.now, verbose_name="assigned on",
+                        default=django.utils.timezone.now,
+                        verbose_name="assigned on",
                     ),
                 ),
                 ("assigned_for", models.TextField(blank=True, null=True)),
                 (
                     "badge",
-                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="api.badge",),
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.badge",
+                    ),
                 ),
                 (
                     "user",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
             ],
@@ -428,7 +555,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=50)),
@@ -437,18 +567,23 @@ class Migration(migrations.Migration):
                 (
                     "classroom",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.classroom",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.classroom",
                     ),
                 ),
                 (
                     "evaluator",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.faculty",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.faculty",
                     ),
                 ),
                 (
                     "exam",
-                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="api.exam",),
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.exam",
+                    ),
                 ),
             ],
         ),
@@ -458,7 +593,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
@@ -478,13 +616,15 @@ class Migration(migrations.Migration):
                 (
                     "classroom",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.classroom",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.classroom",
                     ),
                 ),
                 (
                     "student",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.student",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.student",
                     ),
                 ),
             ],
@@ -495,20 +635,30 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("mark", models.FloatField()),
-                ("comment", models.TextField(blank=True, max_length=500, null=True),),
+                (
+                    "comment",
+                    models.TextField(blank=True, max_length=500, null=True),
+                ),
                 (
                     "student",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.student",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.student",
                     ),
                 ),
                 (
                     "test",
-                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="api.test",),
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.test",
+                    ),
                 ),
             ],
         ),
@@ -518,16 +668,25 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("from_date", models.DateTimeField()),
                 ("to_date", models.DateTimeField()),
-                ("type", models.CharField(choices=[("full", "Full day leave")], max_length=10),),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[("full", "Full day leave")], max_length=10
+                    ),
+                ),
                 (
                     "user",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
             ],
@@ -538,7 +697,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("read", models.BooleanField(default=False)),
@@ -547,13 +709,15 @@ class Migration(migrations.Migration):
                 (
                     "faculty",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.faculty",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.faculty",
                     ),
                 ),
                 (
                     "lang",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.language",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.language",
                     ),
                 ),
             ],
@@ -564,7 +728,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=20)),
@@ -583,17 +750,24 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("low", models.FloatField()),
                 ("high", models.FloatField()),
                 ("grade", models.CharField(max_length=5)),
-                ("description", models.CharField(blank=True, max_length=20, null=True),),
+                (
+                    "description",
+                    models.CharField(blank=True, max_length=20, null=True),
+                ),
                 (
                     "grade_system",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.gradesystem",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.gradesystem",
                     ),
                 ),
             ],
@@ -601,25 +775,31 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="faculty",
             name="languages",
-            field=models.ManyToManyField(through="api.LanguageProficiency", to="api.Language"),
+            field=models.ManyToManyField(
+                through="api.LanguageProficiency", to="api.Language"
+            ),
         ),
         migrations.AddField(
             model_name="faculty",
             name="user",
             field=models.OneToOneField(
-                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
             ),
         ),
         migrations.AddField(
             model_name="classroom",
             name="faculty",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="api.faculty"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="api.faculty"
+            ),
         ),
         migrations.AddField(
             model_name="classroom",
             name="grade_system",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="api.gradesystem",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="api.gradesystem",
             ),
         ),
         migrations.AddField(
@@ -643,7 +823,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="classroom",
             name="subject",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="api.subject"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="api.subject"
+            ),
         ),
         migrations.CreateModel(
             name="ClassOccurrence",
@@ -651,7 +833,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("start_time", models.DateTimeField()),
@@ -659,17 +844,21 @@ class Migration(migrations.Migration):
                 (
                     "classroom",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.classroom",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.classroom",
                     ),
                 ),
                 (
                     "faculty",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.faculty",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.faculty",
                     ),
                 ),
             ],
-            options={"verbose_name_plural": "Class Occurrence",},
+            options={
+                "verbose_name_plural": "Class Occurrence",
+            },
         ),
         migrations.CreateModel(
             name="CategorySubjectAssociation",
@@ -677,7 +866,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
@@ -690,7 +882,8 @@ class Migration(migrations.Migration):
                 (
                     "subject",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.subject",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.subject",
                     ),
                 ),
             ],
@@ -701,7 +894,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
@@ -714,7 +910,8 @@ class Migration(migrations.Migration):
                 (
                     "student",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.student",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.student",
                     ),
                 ),
             ],
@@ -722,7 +919,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="categorysessionassociation",
             name="session",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="api.session"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="api.session"
+            ),
         ),
         migrations.AddField(
             model_name="categorysessionassociation",
@@ -741,7 +940,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="branchsessionassociation",
             name="session",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="api.session"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="api.session"
+            ),
         ),
         migrations.CreateModel(
             name="StudentAttendance",
@@ -749,7 +950,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 (
@@ -764,24 +968,33 @@ class Migration(migrations.Migration):
                         max_length=1,
                     ),
                 ),
-                ("comment", models.CharField(blank=True, max_length=15, null=True),),
-                ("entry_on", models.DateTimeField(default=django.utils.timezone.now),),
+                (
+                    "comment",
+                    models.CharField(blank=True, max_length=15, null=True),
+                ),
+                (
+                    "entry_on",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
                 (
                     "class_occurrance",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.classoccurrence",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.classoccurrence",
                     ),
                 ),
                 (
                     "faculty",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.faculty",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.faculty",
                     ),
                 ),
                 (
                     "student",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.student",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.student",
                     ),
                 ),
             ],
@@ -796,7 +1009,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.AutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=50)),
@@ -805,16 +1021,21 @@ class Migration(migrations.Migration):
                 (
                     "session",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.session",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.session",
                     ),
                 ),
             ],
-            options={"unique_together": {("name", "session")},},
+            options={
+                "unique_together": {("name", "session")},
+            },
         ),
         migrations.AlterUniqueTogether(
-            name="categorysessionassociation", unique_together={("category", "session")},
+            name="categorysessionassociation",
+            unique_together={("category", "session")},
         ),
         migrations.AlterUniqueTogether(
-            name="branchsessionassociation", unique_together={("branch", "session")},
+            name="branchsessionassociation",
+            unique_together={("branch", "session")},
         ),
     ]

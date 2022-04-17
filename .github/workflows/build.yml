@@ -23,14 +23,15 @@ jobs:
           pipenv install --dev
       - name: Run Lint
         run: |
-          pipenv run black .
+          pipenv run black --check --diff .
       - name: Run Tests
         run: |
           pipenv run coverage run --source='.' manage.py test api.tests
           pipenv run coverage xml --omit=phoenix/*,manage.py
         env:
           SECRET_KEY: testingsecretkey
-          DEBUG: true
+          DEBUG: True
+          CORS_ORIGIN_WHITELIST: http://localhost:8000
           DATABASE_URL: sqlite:///db.sqlite3
       - name: Upload Unittest Coverage Report
         uses: codecov/codecov-action@v1

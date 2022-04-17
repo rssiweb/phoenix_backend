@@ -100,7 +100,11 @@ class Classroom(models.Model):
     name = models.CharField(max_length=20)
     faculty = models.ForeignKey("Faculty", on_delete=models.CASCADE)
     sec_faculty = models.ForeignKey(
-        "Faculty", on_delete=models.CASCADE, related_name="sec_classrooms", null=True, blank=True,
+        "Faculty",
+        on_delete=models.CASCADE,
+        related_name="sec_classrooms",
+        null=True,
+        blank=True,
     )
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     # classes may not be on all days
@@ -120,8 +124,10 @@ class StudentClassroomAssociation(models.Model):
     classroom = models.ForeignKey("Classroom", on_delete=models.CASCADE)
     student = models.ForeignKey("Student", on_delete=models.CASCADE)
     attendance = models.BooleanField(
-        default=True, help_text="Should this student be considers while taking attendance ?",
+        default=True,
+        help_text="Should this student be considers while taking attendance ?",
     )
     test = models.BooleanField(
-        default=True, help_text="Should this student be considers while taking tests?",
+        default=True,
+        help_text="Should this student be considers while taking tests?",
     )

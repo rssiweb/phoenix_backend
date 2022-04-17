@@ -59,7 +59,17 @@ class MyUserAdmin(UserAdmin):
                 )
             },
         ),
-        (_("Important dates"), {"fields": ("dob", "inactive_from", "last_login", "date_joined",)},),
+        (
+            _("Important dates"),
+            {
+                "fields": (
+                    "dob",
+                    "inactive_from",
+                    "last_login",
+                    "date_joined",
+                )
+            },
+        ),
         (
             _("Permissions"),
             {

@@ -16,7 +16,9 @@ class ClassOccurrence(models.Model):
     # faculty who actually took the class
     faculty = models.ForeignKey("Faculty", on_delete=models.CASCADE)
     start_time = models.DateTimeField(auto_now=False, auto_now_add=False)
-    end_time = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    end_time = models.DateTimeField(
+        auto_now=False, auto_now_add=False, null=True, blank=True
+    )
 
     class Meta:
         verbose_name_plural = "Class Occurrence"

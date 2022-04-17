@@ -21,13 +21,23 @@ class User(AbstractUser):
     type = models.PositiveSmallIntegerField(
         _("user type"), choices=USER_TYPE_CHOICES, null=True, blank=True
     )
-    profile_pic = models.CharField(_("profile picture"), max_length=512, null=True, blank=True)
-    phone = models.CharField(max_length=512, null=True, blank=True)
-    gender = models.PositiveSmallIntegerField(choices=GENDER_CHOICES, null=True, blank=True)
-    dob = models.DateField(
-        _("date of birth"), auto_now=False, auto_now_add=False, null=True, blank=True,
+    profile_pic = models.CharField(
+        _("profile picture"), max_length=512, null=True, blank=True
     )
-    inactive_from = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    phone = models.CharField(max_length=512, null=True, blank=True)
+    gender = models.PositiveSmallIntegerField(
+        choices=GENDER_CHOICES, null=True, blank=True
+    )
+    dob = models.DateField(
+        _("date of birth"),
+        auto_now=False,
+        auto_now_add=False,
+        null=True,
+        blank=True,
+    )
+    inactive_from = models.DateField(
+        auto_now=False, auto_now_add=False, null=True, blank=True
+    )
 
     def __str__(self):
         return f"{self.username}"

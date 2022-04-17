@@ -60,12 +60,19 @@ class AuthTokenView(ObtainAuthToken):
     "Auth view expects username and password as POST payload"
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={"request": request})
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, _ = Token.objects.get_or_create(user=user)
         return Response(
-            {"token": token.key, "user_id": user.pk, "username": user.username, "type": user.type,}
+            {
+                "token": token.key,
+                "user_id": user.pk,
+                "username": user.username,
+                "type": user.type,
+            }
         )
 
 
@@ -197,7 +204,9 @@ class StudentViewSet(AuthenticatedMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = StudentSerializer
 
 
-class StudentsInClassViewSet(AuthenticatedMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class StudentsInClassViewSet(
+    AuthenticatedMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
     """
     Students in Class view
     """

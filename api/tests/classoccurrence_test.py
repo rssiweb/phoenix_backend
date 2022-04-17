@@ -50,7 +50,11 @@ class ClassoccurrenceTest(APITestCase):
         response = self.client.post(
             url,
             dict(
-                faculty="admin", student="VLK0001", class_occurrance=1, attendance="P", comment="",
+                faculty="admin",
+                student="VLK0001",
+                class_occurrance=1,
+                attendance="P",
+                comment="",
             ),
             format="json",
         )
@@ -58,12 +62,18 @@ class ClassoccurrenceTest(APITestCase):
 
     def test_get_class_students(self):
         url = reverse("classroom-students", args=(1,))
-        response = self.client.get(url, format="json",)
+        response = self.client.get(
+            url,
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_attendancebystudent(self):
         url = reverse("classroom-attendance-by-student", args=(1,))
-        response = self.client.get(url, format="json",)
+        response = self.client.get(
+            url,
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_update_attendance(self):
@@ -71,15 +81,29 @@ class ClassoccurrenceTest(APITestCase):
         Ensure we can create a new attendance object.
         """
         data = dict(
-            faculty="admin", student="VLK0001", class_occurrance=1, attendance="P", comment="",
+            faculty="admin",
+            student="VLK0001",
+            class_occurrance=1,
+            attendance="P",
+            comment="",
         )
         url = reverse("studentattendance-list")
-        response = self.client.post(url, data, format="json",)
+        response = self.client.post(
+            url,
+            data,
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         url = reverse("studentattendance-detail", args=(2,))
         data["attendance"] = "A"
-        response = self.client.patch(url, data, format="json",)
+        response = self.client.patch(
+            url,
+            data,
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         attendance_id = response.data["id"]
-        self.assertEqual(StudentAttendance.objects.get(pk=attendance_id).attendance, "A")
+        self.assertEqual(
+            StudentAttendance.objects.get(pk=attendance_id).attendance, "A"
+        )

@@ -135,7 +135,9 @@ class StudentAttendanceSerializer(serializers.ModelSerializer):
 
 class CreateStudentAttendanceSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
-    date = serializers.DateTimeField(source="class_occurrance.start_time", read_only=True)
+    date = serializers.DateTimeField(
+        source="class_occurrance.start_time", read_only=True
+    )
     faculty = serializers.CharField()
     student = serializers.CharField()
 
@@ -183,7 +185,9 @@ class ClassOccurranceSerializer(serializers.ModelSerializer):
 class CreateClassOccurranceSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
     faculty = serializers.CharField()
-    start_time = serializers.DateTimeField(default_timezone=timezone.get_current_timezone())
+    start_time = serializers.DateTimeField(
+        default_timezone=timezone.get_current_timezone()
+    )
 
     class Meta:
         model = ClassOccurrence
