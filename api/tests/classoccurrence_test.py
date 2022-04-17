@@ -1,17 +1,11 @@
-import unittest
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from api.models import Classroom
 from api.models.attendance import StudentAttendance
 
-from api.urls import router
-from pprint import pprint
-
-# pprint(router.urls)
 
 
-class AccountTests(APITestCase):
+class ClassoccurrenceTest(APITestCase):
     fixtures = [
         "fixtures/test.json",
     ]
@@ -37,13 +31,14 @@ class AccountTests(APITestCase):
             url,
             dict(
                 classroom=1,
-                faculty=1,
+                faculty="VLK0002",
                 start_time="2022-05-10T20:41:00Z",
                 end_time="2022-05-10T22:41:00Z",
             ),
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
 
 
     def test_read_classdetails(self):
@@ -51,7 +46,6 @@ class AccountTests(APITestCase):
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 4)
-        print(response.data)
 
 
 
