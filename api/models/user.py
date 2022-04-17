@@ -18,22 +18,12 @@ USER_TYPE_CHOICES = (
 
 
 class User(AbstractUser):
-    type = models.PositiveSmallIntegerField(
-        _("user type"), choices=USER_TYPE_CHOICES, null=True, blank=True
-    )
-    profile_pic = models.CharField(
-        _("profile picture"), max_length=512, null=True, blank=True
-    )
+    type = models.PositiveSmallIntegerField(_("user type"), choices=USER_TYPE_CHOICES, null=True, blank=True)
+    profile_pic = models.CharField(_("profile picture"), max_length=512, null=True, blank=True)
     phone = models.CharField(max_length=512, null=True, blank=True)
-    gender = models.PositiveSmallIntegerField(
-        choices=GENDER_CHOICES, null=True, blank=True
-    )
-    dob = models.DateField(
-        _("date of birth"), auto_now=False, auto_now_add=False, null=True, blank=True
-    )
-    inactive_from = models.DateField(
-        auto_now=False, auto_now_add=False, null=True, blank=True
-    )
+    gender = models.PositiveSmallIntegerField(choices=GENDER_CHOICES, null=True, blank=True)
+    dob = models.DateField(_("date of birth"), auto_now=False, auto_now_add=False, null=True, blank=True,)
+    inactive_from = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
 
     def __str__(self):
         return f"{self.username}"
@@ -42,11 +32,7 @@ class User(AbstractUser):
 class Faculty(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     title = models.CharField(
-        _("preferred title"),
-        max_length=50,
-        null=True,
-        blank=True,
-        help_text=_("how would you like to be addressed"),
+        _("preferred title"), max_length=50, null=True, blank=True, help_text=_("how would you like to be addressed"),
     )
     permanent_address = models.CharField(max_length=200, null=True, blank=True)
     current_address = models.CharField(max_length=200, null=True, blank=True)

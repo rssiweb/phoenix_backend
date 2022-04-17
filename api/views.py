@@ -60,20 +60,11 @@ class AuthTokenView(ObtainAuthToken):
     "Auth view expects username and password as POST payload"
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(
-            data=request.data, context={"request": request}
-        )
+        serializer = self.serializer_class(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, _ = Token.objects.get_or_create(user=user)
-        return Response(
-            {
-                "token": token.key,
-                "user_id": user.pk,
-                "username": user.username,
-                "type": user.type,
-            }
-        )
+        return Response({"token": token.key, "user_id": user.pk, "username": user.username, "type": user.type,})
 
 
 class AuthenticatedMixin:
@@ -204,9 +195,7 @@ class StudentViewSet(AuthenticatedMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = StudentSerializer
 
 
-class StudentsInClassViewSet(
-    AuthenticatedMixin, mixins.ListModelMixin, viewsets.GenericViewSet
-):
+class StudentsInClassViewSet(AuthenticatedMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     Students in Class view
     """
@@ -244,7 +233,12 @@ class ClassroomViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
 
     queryset = Classroom.objects.all()
     serializer_class = ClassroomSerializer
-    filterset_fields = ["subject", "faculty__user", "bsa__branch", "bsa__session"]
+    filterset_fields = [
+        "subject",
+        "faculty__user",
+        "bsa__branch",
+        "bsa__session",
+    ]
 
     @action(detail=True, methods=["get"])
     def students(self, request, pk):
@@ -268,9 +262,7 @@ class ClassroomViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
             student.attendance = StudentAttendance.objects.filter(
                 class_occurrance__classroom=classroom, student=student
             ).all()
-        serializer = AttendanceByStudentSerializer(
-            students, many=True, context={"classroom": classroom}
-        )
+        serializer = AttendanceByStudentSerializer(students, many=True, context={"classroom": classroom})
         return Response(serializer.data)
 
 

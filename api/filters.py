@@ -16,20 +16,15 @@ class StudentInClassroomFilterBackend(filters.BaseFilterBackend):
     filter_description = "Classroom in which students you are looking for"
 
     def get_schema_fields(self, view):
-        assert (
-            coreapi is not None
-        ), "coreapi must be installed to use `get_schema_fields()`"
-        assert (
-            coreschema is not None
-        ), "coreschema must be installed to use `get_schema_fields()`"
+        assert coreapi is not None, "coreapi must be installed to use `get_schema_fields()`"
+        assert coreschema is not None, "coreschema must be installed to use `get_schema_fields()`"
         return [
             coreapi.Field(
                 name=self.filter_param,
                 required=False,
                 location="query",
                 schema=coreschema.String(
-                    title=force_str(self.filter_title),
-                    description=force_str(self.filter_description),
+                    title=force_str(self.filter_title), description=force_str(self.filter_description),
                 ),
             )
         ]
@@ -64,9 +59,7 @@ class ClassOccurrenceFilterSet(dfilters.FilterSet):
 
 
 class StudentAttendanceFilterSet(dfilters.FilterSet):
-    class_attendance = dfilters.BaseInFilter(
-        field_name="class_attendance", lookup_expr="in"
-    )
+    class_attendance = dfilters.BaseInFilter(field_name="class_attendance", lookup_expr="in")
 
     class Meta:
         model = StudentAttendance

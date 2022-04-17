@@ -26,12 +26,7 @@ class ClassoccurrenceTest(APITestCase):
         url = reverse("classoccurrence-list")
         response = self.client.post(
             url,
-            dict(
-                classroom=1,
-                faculty="VLK0002",
-                start_time="2022-05-10T20:41:00Z",
-                end_time="2022-05-10T22:41:00Z",
-            ),
+            dict(classroom=1, faculty="VLK0002", start_time="2022-05-10T20:41:00Z", end_time="2022-05-10T22:41:00Z",),
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -49,13 +44,7 @@ class ClassoccurrenceTest(APITestCase):
         url = reverse("studentattendance-list")
         response = self.client.post(
             url,
-            dict(
-                faculty="admin",
-                student="VLK0001",
-                class_occurrance=1,
-                attendance="P",
-                comment="",
-            ),
+            dict(faculty="admin", student="VLK0001", class_occurrance=1, attendance="P", comment="",),
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -74,13 +63,7 @@ class ClassoccurrenceTest(APITestCase):
         """
         Ensure we can create a new attendance object.
         """
-        data = dict(
-            faculty="admin",
-            student="VLK0001",
-            class_occurrance=1,
-            attendance="P",
-            comment="",
-        )
+        data = dict(faculty="admin", student="VLK0001", class_occurrance=1, attendance="P", comment="",)
         url = reverse("studentattendance-list")
         response = self.client.post(url, data, format="json",)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -90,6 +73,4 @@ class ClassoccurrenceTest(APITestCase):
         response = self.client.patch(url, data, format="json",)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         attendance_id = response.data["id"]
-        self.assertEqual(
-            StudentAttendance.objects.get(pk=attendance_id).attendance, "A"
-        )
+        self.assertEqual(StudentAttendance.objects.get(pk=attendance_id).attendance, "A")
