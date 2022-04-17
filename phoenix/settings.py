@@ -142,4 +142,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 AUTH_USER_MODEL = "api.User"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-

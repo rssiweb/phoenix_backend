@@ -4,7 +4,6 @@ from rest_framework.test import APITestCase
 from api.models.attendance import StudentAttendance
 
 
-
 class ClassoccurrenceTest(APITestCase):
     fixtures = [
         "fixtures/test.json",
@@ -23,8 +22,6 @@ class ClassoccurrenceTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 4)
 
-
-
     def test_create_classoccurrence(self):
         url = reverse("classoccurrence-list")
         response = self.client.post(
@@ -38,16 +35,12 @@ class ClassoccurrenceTest(APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
-
 
     def test_read_classdetails(self):
         url = reverse("classroom-list")
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 4)
-
-
 
     def test_create_attendance(self):
         """
@@ -76,8 +69,6 @@ class ClassoccurrenceTest(APITestCase):
         url = reverse("classroom-attendance-by-student", args=(1,))
         response = self.client.get(url, format="json",)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-
 
     def test_update_attendance(self):
         """

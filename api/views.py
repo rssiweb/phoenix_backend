@@ -346,4 +346,3 @@ class MarkViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
     queryset = Mark.objects
     serializer_class = MarkSerializer
     filterset_fields = ["test"]
-

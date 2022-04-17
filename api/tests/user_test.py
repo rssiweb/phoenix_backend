@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 
-
 class UserTest(APITestCase):
     fixtures = [
         "fixtures/test.json",
@@ -21,5 +20,3 @@ class UserTest(APITestCase):
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 4)
-      
-        

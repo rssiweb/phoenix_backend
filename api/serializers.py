@@ -246,4 +246,3 @@ class AttendanceByStudentSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data["attendance"] = sorted(data.pop("attendance", []), key=lambda x: x["date"])
         return data
-

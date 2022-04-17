@@ -130,4 +130,3 @@ class StudentClassroomAssociation(models.Model):
     test = models.BooleanField(
         default=True, help_text="Should this student be considers while taking tests?"
     )
-
