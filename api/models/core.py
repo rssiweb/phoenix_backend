@@ -122,4 +122,6 @@ class StudentClassroomAssociation(models.Model):
     attendance = models.BooleanField(
         default=True, help_text="Should this student be considers while taking attendance ?",
     )
-    test = models.BooleanField(default=True, help_text="Should this student be considers while taking tests?",)
+    test = models.BooleanField(
+        default=True, help_text="Should this student be considers while taking tests?",
+    )

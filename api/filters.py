@@ -24,7 +24,8 @@ class StudentInClassroomFilterBackend(filters.BaseFilterBackend):
                 required=False,
                 location="query",
                 schema=coreschema.String(
-                    title=force_str(self.filter_title), description=force_str(self.filter_description),
+                    title=force_str(self.filter_title),
+                    description=force_str(self.filter_description),
                 ),
             )
         ]

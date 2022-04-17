@@ -47,7 +47,17 @@ class MyUserAdmin(UserAdmin):
         (None, {"fields": ("username", "password")}),
         (
             _("Personal info"),
-            {"fields": ("first_name", "last_name", "email", "type", "profile_pic", "phone", "gender",)},
+            {
+                "fields": (
+                    "first_name",
+                    "last_name",
+                    "email",
+                    "type",
+                    "profile_pic",
+                    "phone",
+                    "gender",
+                )
+            },
         ),
         (_("Important dates"), {"fields": ("dob", "inactive_from", "last_login", "date_joined",)},),
         (

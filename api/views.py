@@ -64,7 +64,9 @@ class AuthTokenView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, _ = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key, "user_id": user.pk, "username": user.username, "type": user.type,})
+        return Response(
+            {"token": token.key, "user_id": user.pk, "username": user.username, "type": user.type,}
+        )
 
 
 class AuthenticatedMixin:
@@ -262,7 +264,9 @@ class ClassroomViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
             student.attendance = StudentAttendance.objects.filter(
                 class_occurrance__classroom=classroom, student=student
             ).all()
-        serializer = AttendanceByStudentSerializer(students, many=True, context={"classroom": classroom})
+        serializer = AttendanceByStudentSerializer(
+            students, many=True, context={"classroom": classroom}
+        )
         return Response(serializer.data)
 
 
