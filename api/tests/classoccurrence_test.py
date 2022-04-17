@@ -1,17 +1,11 @@
-import unittest
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from api.models import Classroom
 from api.models.attendance import StudentAttendance
 
-from api.urls import router
-from pprint import pprint
-
-pprint(router.urls)
 
 
-class AccountTests(APITestCase):
+class ClassoccurrenceTest(APITestCase):
     fixtures = [
         "fixtures/test.json",
     ]
@@ -28,6 +22,32 @@ class AccountTests(APITestCase):
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 4)
+
+
+
+    def test_create_classoccurrence(self):
+        url = reverse("classoccurrence-list")
+        response = self.client.post(
+            url,
+            dict(
+                classroom=1,
+                faculty="VLK0002",
+                start_time="2022-05-10T20:41:00Z",
+                end_time="2022-05-10T22:41:00Z",
+            ),
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+
+
+    def test_read_classdetails(self):
+        url = reverse("classroom-list")
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 4)
+
+
 
     def test_create_attendance(self):
         """
@@ -46,6 +66,18 @@ class AccountTests(APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_get_class_students(self):
+        url = reverse("classroom-students", args=(1,))
+        response = self.client.get(url, format="json",)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_attendancebystudent(self):
+        url = reverse("classroom-attendance-by-student", args=(1,))
+        response = self.client.get(url, format="json",)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
 
     def test_update_attendance(self):
         """
