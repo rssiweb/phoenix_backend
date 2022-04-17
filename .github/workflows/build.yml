@@ -13,7 +13,6 @@ jobs:
         python-version: [3.8]
     steps:
       - uses: actions/checkout@v2
-      - uses: psf/black@stable
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
@@ -22,10 +21,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip pipenv
           pipenv install --dev
+      - name: Run Lint
+        run: |
+          pipenv run black .
       - name: Run Tests
         run: |
           pipenv run coverage run --source='.' manage.py test api.tests
-          pipenv run coverage xml --omit=moviepedia/*,manage.py
+          pipenv run coverage xml --omit=phoenix/*,manage.py
         env:
           SECRET_KEY: testingsecretkey
           DEBUG: true
