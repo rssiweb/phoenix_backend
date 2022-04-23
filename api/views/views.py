@@ -1,8 +1,7 @@
-from email.headerregistry import Group
-from functools import partial
+from datetime import datetime
+from pprint import pprint
+from xml.dom import ValidationErr
 from rest_framework import viewsets, mixins
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
@@ -54,26 +53,7 @@ from api.serializers import (
     UpdateStudentAttendanceSerializer,
     UserSerializer,
 )
-
-
-class AuthTokenView(ObtainAuthToken):
-    "Auth view expects username and password as POST payload"
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(
-            data=request.data, context={"request": request}
-        )
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data["user"]
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response(
-            {
-                "token": token.key,
-                "user_id": user.pk,
-                "username": user.username,
-                "type": user.type,
-            }
-        )
+from api.serializers.serializers import TimesheetSerializer
 
 
 class AuthenticatedMixin:
@@ -321,6 +301,29 @@ class StudentAttendanceViewSet(AuthenticatedMixin, viewsets.ModelViewSet):
         elif self.action in ("partial_update",):
             return UpdateStudentAttendanceSerializer
         return StudentAttendanceSerializer
+
+    @action(detail=False, methods=["get"])
+    def timesheet(self, request):
+        """
+        return summary data of all faculty and classes taken/pending by each one of them
+        for more info check this sheet
+        https://docs.google.com/spreadsheets/d/1ufn8vcA5tcpoVvbTgGBO9NsXmiYgjmz54Qqg_L2GZxI/edit#gid=1909211630
+
+        input from query parameters the month
+        month: query params
+        session: query params
+        branch: optional query params, if not supplied return combined report of all branches
+        """
+
+        # month = request.query_params["month"]
+        # month = datetime.strptime(month, "%m-%Y").date()
+        items = [fac for fac in Faculty.objects.all_active()]
+        serializer = TimesheetSerializer(
+            items,
+            many=True,
+            context=request.query_params.copy(),
+        )
+        return Response(serializer.data)
 
 
 class ExamViewSet(AuthenticatedMixin, viewsets.ModelViewSet):

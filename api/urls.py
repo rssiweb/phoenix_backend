@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from api import views
-
+from api.views import auth as auth_views
 
 router = DefaultRouter()
 
@@ -29,5 +29,5 @@ router.register(r"classroom-students", views.StudentsInClassViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("auth/", views.AuthTokenView.as_view()),
+    path("auth/", auth_views.AuthTokenView.as_view()),
 ]

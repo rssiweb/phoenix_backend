@@ -43,6 +43,19 @@ class User(AbstractUser):
         return f"{self.username}"
 
 
+class IsActiveMixin:
+    def all_active(self):
+        return self.filter(user__is_active=True)
+
+
+class FacultyManager(models.Manager, IsActiveMixin):
+    pass
+
+
+class StudentManager(models.Manager, IsActiveMixin):
+    pass
+
+
 class Faculty(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     title = models.CharField(
@@ -57,6 +70,8 @@ class Faculty(models.Model):
     languages = models.ManyToManyField("Language", through="LanguageProficiency")
     base_branch = models.ForeignKey("Branch", on_delete=models.CASCADE)
     work_experience = models.TextField()
+
+    objects = FacultyManager()
 
     class Meta:
         verbose_name_plural = "Faculties"
@@ -86,6 +101,7 @@ class Student(models.Model):
     # session = models.ForeignKey("Session", on_delete=models.CASCADE)
 
     # actual_class = models.CharField(max_length=20)
+    objects = StudentManager()
 
     class Meta:
         verbose_name_plural = "Students"

@@ -1,3 +1,4 @@
+from datetime import date, datetime, timedelta
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
 from api.models import (
@@ -21,6 +22,7 @@ from api.models import (
 from api.models.core import BranchSessionAssociation
 from api.models.user import USER_TYPE_CHOICES
 from django.utils import timezone
+from rest_framework.exceptions import ParseError
 
 
 class BranchSerializer(serializers.ModelSerializer):
@@ -246,3 +248,71 @@ class AttendanceByStudentSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data["attendance"] = sorted(data.pop("attendance", []), key=lambda x: x["date"])
         return data
+
+
+class TimesheetSerializer(serializers.Serializer):
+    name = serializers.SerializerMethodField()
+    id = serializers.SerializerMethodField()
+    class_count = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        return obj.user.get_full_name()
+
+    def get_id(self, obj):
+        return obj.user.username
+
+    def _get_date_range(self):
+        """
+        for this to work view should dump all query parameters in serializer context
+        """
+        try:
+            month = self.context["month"]
+        except KeyError:
+            raise ParseError("month query parameter is required")
+        else:
+            month = datetime.strptime(month, "%m-%Y").date()
+            today = datetime.today().date()
+            if month > today:
+                raise ParseError("future month not supported")
+            start_date = month
+            next_month_index = month.month + 1 if month.month < 12 else 1
+            month_end = date(month.year, next_month_index, month.day) - timedelta(
+                days=1
+            )
+            end_date = month_end if month_end < today else today
+            return start_date, end_date
+
+    def _count_class(self, start: datetime.date, end: datetime.date, schedule: str):
+        """
+        start and end are datetime object
+        schedule  is a string of 7 characters representing class occurrence on each day of week (MTWTFSS)
+
+        """
+        weekly_count = sum([day == "1" for day in schedule])
+        days = (end - start).days + 1  # +1 makes it inclusive limits
+        first_week = [i >= start.weekday() for i in range(7)]
+        last_week = [i <= end.weekday() for i in range(7)]
+        mid_weeks = (days - sum(first_week) - sum(last_week)) // 7
+        first_week_class_count = sum(
+            [
+                (day_included and scheduled == "1")
+                for day_included, scheduled in zip(first_week, schedule)
+            ]
+        )
+        last_week_class_count = sum(
+            [
+                (day_included and scheduled == "1")
+                for day_included, scheduled in zip(last_week, schedule)
+            ]
+        )
+        return first_week_class_count + mid_weeks * weekly_count + last_week_class_count
+
+    def get_class_count(self, obj):
+        """count the number of classes according to the schedule of each classroom"""
+        start_date, end_date = self._get_date_range()
+        return sum(
+            [
+                self._count_class(start_date, end_date, classroom.working_days)
+                for classroom in obj.classroom_set.all()
+            ]
+        )

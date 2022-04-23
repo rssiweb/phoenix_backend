@@ -108,7 +108,7 @@ class Classroom(models.Model):
     )
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     # classes may not be on all days
-    # 0010101 - tuesday, thursday and Saturday (SMTWTFS)
+    # 0010101 - tuesday, thursday and Saturday (MTWTFSS)
     working_days = models.CharField(max_length=7)
     grade_system = models.ForeignKey("GradeSystem", on_delete=models.CASCADE)
     students = models.ManyToManyField("Student", through="StudentClassroomAssociation")
