@@ -3,11 +3,13 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from api.models.attendance import StudentAttendance
 
+from api.urls import router
+from pprint import pprint
+
+# pprint(router.urls)
 
 class ClassoccurrenceTest(APITestCase):
-    fixtures = [
-        "fixtures/test.json",
-    ]
+    fixtures = ["fixtures/core.json",]
 
     def setUp(self) -> None:
         super().setUp()
@@ -67,6 +69,25 @@ class ClassoccurrenceTest(APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = [
+            {
+                "id": 2,
+                "category": 1,
+                "groups": [],
+                "full_name": "Raju Sharma",
+                "type": "Student",
+                "last_login": None,
+                "username": "VLK0001",
+                "email": "",
+                "date_joined": "2022-04-08T00:13:41+05:30",
+                "profile_pic": None,
+                "phone": None,
+                "gender": None,
+                "dob": None,
+                "inactive_from": None,
+            }
+        ]
+        self.assertEqual(response.data, expected_data)
 
     def test_get_attendancebystudent(self):
         url = reverse("classroom-attendance-by-student", args=(1,))
