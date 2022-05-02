@@ -3,13 +3,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from api.models.attendance import StudentAttendance
 
-from api.urls import router
-from pprint import pprint
 
-# pprint(router.urls)
 
 class ClassoccurrenceTest(APITestCase):
-    fixtures = ["fixtures/core.json",]
+    fixtures = ["fixtures/core.json","fixtures/classoccurance.json","fixtures/user.json"]
 
     def setUp(self) -> None:
         super().setUp()

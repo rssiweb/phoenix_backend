@@ -1,330 +1,82 @@
 [
-    {
-        "model": "api.branch",
-        "pk": 1,
-        "fields": {
-            "name": "Branch 1"
-        }
-    },
-    {
-        "model": "api.branch",
-        "pk": 2,
-        "fields": {
-            "name": "Branch 3"
-        }
-    },
-    {
-        "model": "api.branch",
-        "pk": 3,
-        "fields": {
-            "name": "Branch 2"
-        }
-    },
-    {
-        "model": "api.session",
-        "pk": 1,
-        "fields": {
-            "name": "Session 1"
-        }
-    },
-    {
-        "model": "api.session",
-        "pk": 2,
-        "fields": {
-            "name": "Session 2"
-        }
-    },
-    {
-        "model": "api.session",
-        "pk": 3,
-        "fields": {
-            "name": "Session 3"
-        }
-    },
-    {
-        "model": "api.quarter",
-        "pk": 1,
-        "fields": {
-            "name": "Quater 1",
-            "start": "2022-01-01",
-            "end": "2022-03-31",
-            "session": 1
-        }
-    },
-    {
-        "model": "api.quarter",
-        "pk": 2,
-        "fields": {
-            "name": "Quater 2",
-            "start": "2022-04-01",
-            "end": "2022-06-30",
-            "session": 1
-        }
-    },
-    {
-        "model": "api.quarter",
-        "pk": 3,
-        "fields": {
-            "name": "Quater 3",
-            "start": "2022-07-01",
-            "end": "2022-08-31",
-            "session": 2
-        }
-    },
-    {
-        "model": "api.quarter",
-        "pk": 4,
-        "fields": {
-            "name": "Quater 4",
-            "start": "2022-09-01",
-            "end": "2022-11-30",
-            "session": 2
-        }
-    },
-    {
-        "model": "api.subject",
-        "pk": 1,
-        "fields": {
-            "name": "math"
-        }
-    },
-    {
-        "model": "api.subject",
-        "pk": 2,
-        "fields": {
-            "name": "science"
-        }
-    },
-    {
-        "model": "api.subject",
-        "pk": 3,
-        "fields": {
-            "name": "history"
-        }
-    },
-    {
-        "model": "api.subject",
-        "pk": 4,
-        "fields": {
-            "name": "geography"
-        }
-    },
-    {
-        "model": "api.subject",
-        "pk": 5,
-        "fields": {
-            "name": "hindi"
-        }
-    },
-    {
-        "model": "api.subject",
-        "pk": 6,
-        "fields": {
-            "name": "bengali"
-        }
-    },
-    {
-        "model": "api.subject",
-        "pk": 7,
-        "fields": {
-            "name": "computer"
-        }
-    },
-    {
-        "model": "api.branchsessionassociation",
-        "pk": 1,
-        "fields": {
-            "branch": 1,
-            "session": 1,
-            "is_active": true
-        }
-    },
-    {
-        "model": "api.branchsessionassociation",
-        "pk": 2,
-        "fields": {
-            "branch": 3,
-            "session": 2,
-            "is_active": true
-        }
-    },
-    {
-        "model": "api.branchsessionassociation",
-        "pk": 3,
-        "fields": {
-            "branch": 2,
-            "session": 3,
-            "is_active": true
-        }
-    },
-    {
-        "model": "api.category",
-        "pk": 1,
-        "fields": {
-            "name": "Cat 1",
-            "branch": 1
-        }
-    },
-    {
-        "model": "api.category",
-        "pk": 2,
-        "fields": {
-            "name": "Cat 2",
-            "branch": 3
-        }
-    },
-    {
-        "model": "api.category",
-        "pk": 3,
-        "fields": {
-            "name": "Cat 3",
-            "branch": 2
-        }
-    },
-    {
-        "model": "api.classroom",
-        "pk": 1,
-        "fields": {
-            "bsa": 1,
-            "name": "classroom 1",
-            "faculty": 1,
-            "sec_faculty": null,
-            "subject": 1,
-            "working_days": "3",
-            "grade_system": 1
-        }
-    },
-    {
-        "model": "api.classroom",
-        "pk": 2,
-        "fields": {
-            "bsa": 2,
-            "name": "Classroom 2",
-            "faculty": 1,
-            "sec_faculty": null,
-            "subject": 2,
-            "working_days": "3",
-            "grade_system": 1
-        }
-    },
-    {
-        "model": "api.studentclassroomassociation",
-        "pk": 1,
-        "fields": {
-            "classroom": 1,
-            "student": 1,
-            "attendance": true,
-            "test": true
-        }
-    },
-    {
-        "model": "api.studentclassroomassociation",
-        "pk": 2,
-        "fields": {
-            "classroom": 1,
-            "student": 1,
-            "attendance": true,
-            "test": true
-        }
-    },
-    {
-        "model": "api.gradesystem",
-        "pk": 1,
-        "fields": {
-            "bsa": 1,
-            "name": "bsa1"
-        }
-    },
-    {
-        "model": "api.user",
-        "pk": 1,
-        "fields": {
-            "password": "pbkdf2_sha256$260000$TB6K5NKko0k2ipg8REUWws$3zZQd6+yDUmbg+ne5ghPX95Vu8ZBNAwvTOUIWwrsAYk=",
-            "last_login": "2022-04-21T16:08:05.821Z",
-            "is_superuser": true,
-            "username": "admin",
-            "first_name": "",
-            "last_name": "",
-            "email": "gg@gmail.com",
-            "is_staff": true,
-            "is_active": true,
-            "date_joined": "2022-04-17T07:55:22.931Z",
-            "type": null,
-            "profile_pic": null,
-            "phone": null,
-            "gender": null,
-            "dob": null,
-            "inactive_from": null,
-            "groups": [],
-            "user_permissions": []
-        }
-    },
-    {
-        "model": "api.user",
-        "pk": 2,
-        "fields": {
-            "password": "pbkdf2_sha256$260000$hS9LCT0pKqmf9k6LulBdF9$RDoDcLmmO5/wPAcukcsKRYFlzwE2CDmMHTx8Id6tBQE=",
-            "last_login": null,
-            "is_superuser": false,
-            "username": "user1",
-            "first_name": "",
-            "last_name": "",
-            "email": "",
-            "is_staff": false,
-            "is_active": true,
-            "date_joined": "2022-04-17T07:56:52.962Z",
-            "type": null,
-            "profile_pic": null,
-            "phone": null,
-            "gender": null,
-            "dob": null,
-            "inactive_from": null,
-            "groups": [],
-            "user_permissions": []
-        }
-    },
-    {
-        "model": "api.user",
-        "pk": 3,
-        "fields": {
-            "password": "pbkdf2_sha256$260000$3FWWQKkXAPY8BpP77r5aia$CXetrzYkKTb1dHgB5V84CuCzDohMvpHRqyFv+CLdY7o=",
-            "last_login": null,
-            "is_superuser": false,
-            "username": "subho14",
-            "first_name": "Subho",
-            "last_name": "Das",
-            "email": "subho@gmail.com",
-            "is_staff": false,
-            "is_active": true,
-            "date_joined": "2022-04-21T07:14:19Z",
-            "type": 1,
-            "profile_pic": null,
-            "phone": null,
-            "gender": 1,
-            "dob": null,
-            "inactive_from": null,
-            "groups": [],
-            "user_permissions": []
-        }
-    },
-    {
-        "model": "api.faculty",
-        "pk": 1,
-        "fields": {
-            "user": 2,
-            "title": "don",
-            "permanent_address": "howrah",
-            "current_address": "howrah",
-            "base_branch": 1,
-            "work_experience": "dsada"
-        }
-    },
-    {
-        "model": "api.student",
-        "pk": 1,
-        "fields": {
-            "user": 2,
-            "category": 1
-        }
+  {
+    "model": "api.branch",
+    "pk": 1,
+    "fields": {
+        "name": "Branch 1"
     }
+  },
+  {
+      "model": "api.session",
+      "pk": 1,
+      "fields": {
+          "name": "Session 1"
+      }
+  },
+  {
+      "model": "api.quarter",
+      "pk": 1,
+      "fields": {
+          "name": "Quater 1",
+          "start": "2022-01-01",
+          "end": "2022-03-31",
+          "session": 1
+      }
+  },
+  {
+    "model": "api.branchsessionassociation",
+    "pk": 1,
+    "fields": {
+        "branch": 1,
+        "session": 1,
+        "is_active": true
+    }
+  },
+  {
+    "model": "api.category",
+    "pk": 1,
+    "fields": {
+        "name": "Cat 1",
+        "branch": 1
+    }
+  },
+  {
+      "model": "api.categorysessionassociation",
+      "pk": 1,
+      "fields": {
+          "category": 1,
+          "session": 1
+      }
+  },
+  {
+      "model": "api.categorysubjectassociation",
+      "pk": 1,
+      "fields": {
+          "cba": 1,
+          "subject": 1
+      }
+  },
+  {
+    "model": "api.subject",
+    "pk": 1,
+    "fields": {
+        "name": "computer"
+    }
+   },
+  {
+      "model": "api.categorystudentassociation",
+      "pk": 1,
+      "fields": {
+          "cba": 1,
+          "student": 1
+      }
+  },
+  {
+    "model": "api.student",
+    "pk": 1,
+    "fields": {
+        "user": 2,
+        "category": 1
+    }
+  }
 ]

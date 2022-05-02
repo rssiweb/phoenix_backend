@@ -11,7 +11,7 @@ class Exam(models.Model):
         unique_together = [["name", "bsa"]]
 
     def __str__(self):
-        return f"({self.session.branch.name}, {self.session.name}): {self.name}"
+        return f"{self.name}"
 
 
 class Test(models.Model):
