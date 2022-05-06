@@ -4,9 +4,12 @@ from rest_framework.test import APITestCase
 from api.models.attendance import StudentAttendance
 
 
-
 class ClassoccurrenceTest(APITestCase):
-    fixtures = ["fixtures/core.json","fixtures/classoccurance.json","fixtures/user.json"]
+    fixtures = [
+        "fixtures/core.json",
+        "fixtures/classoccurance.json",
+        "fixtures/user.json",
+    ]
 
     def setUp(self) -> None:
         super().setUp()

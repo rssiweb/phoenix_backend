@@ -8,6 +8,7 @@ class GradeSystem(models.Model):
     def __str__(self):
         return f"({self.name})"
 
+
 class Grade(models.Model):
     grade_system = models.ForeignKey(GradeSystem, on_delete=models.CASCADE)
     low = models.FloatField()
