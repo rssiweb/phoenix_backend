@@ -286,7 +286,7 @@ class TimesheetSerializer(serializers.Serializer):
         """
         start and end are datetime object
         schedule  is a string of 7 characters representing class occurrence on each day of week (MTWTFSS)
-
+        returns total number classes between given dates
         """
         weekly_count = sum([day == "1" for day in schedule])
         days = (end - start).days + 1  # +1 makes it inclusive limits
@@ -295,14 +295,14 @@ class TimesheetSerializer(serializers.Serializer):
         mid_weeks = (days - sum(first_week) - sum(last_week)) // 7
         first_week_class_count = sum(
             [
-                (day_included and scheduled == "1")
-                for day_included, scheduled in zip(first_week, schedule)
+                (day_in_range and scheduled == "1")
+                for day_in_range, scheduled in zip(first_week, schedule)
             ]
         )
         last_week_class_count = sum(
             [
-                (day_included and scheduled == "1")
-                for day_included, scheduled in zip(last_week, schedule)
+                (day_in_range and scheduled == "1")
+                for day_in_range, scheduled in zip(last_week, schedule)
             ]
         )
         return first_week_class_count + mid_weeks * weekly_count + last_week_class_count
