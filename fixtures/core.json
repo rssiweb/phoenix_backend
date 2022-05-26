@@ -1,0 +1,82 @@
+[
+  {
+    "model": "api.branch",
+    "pk": 1,
+    "fields": {
+        "name": "Branch 1"
+    }
+  },
+  {
+      "model": "api.session",
+      "pk": 1,
+      "fields": {
+          "name": "Session 1"
+      }
+  },
+  {
+      "model": "api.quarter",
+      "pk": 1,
+      "fields": {
+          "name": "Quater 1",
+          "start": "2022-01-01",
+          "end": "2022-03-31",
+          "session": 1
+      }
+  },
+  {
+    "model": "api.branchsessionassociation",
+    "pk": 1,
+    "fields": {
+        "branch": 1,
+        "session": 1,
+        "is_active": true
+    }
+  },
+  {
+    "model": "api.category",
+    "pk": 1,
+    "fields": {
+        "name": "Cat 1",
+        "branch": 1
+    }
+  },
+  {
+      "model": "api.categorysessionassociation",
+      "pk": 1,
+      "fields": {
+          "category": 1,
+          "session": 1
+      }
+  },
+  {
+      "model": "api.categorysubjectassociation",
+      "pk": 1,
+      "fields": {
+          "cba": 1,
+          "subject": 1
+      }
+  },
+  {
+    "model": "api.subject",
+    "pk": 1,
+    "fields": {
+        "name": "computer"
+    }
+   },
+  {
+      "model": "api.categorystudentassociation",
+      "pk": 1,
+      "fields": {
+          "cba": 1,
+          "student": 1
+      }
+  },
+  {
+    "model": "api.student",
+    "pk": 1,
+    "fields": {
+        "user": 2,
+        "category": 1
+    }
+  }
+]

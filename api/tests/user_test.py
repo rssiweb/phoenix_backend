@@ -1,11 +1,13 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from api.models import User
 
 
 class UserTest(APITestCase):
     fixtures = [
-        "fixtures/test.json",
+        "fixtures/core.json",
+        "fixtures/user.json",
     ]
 
     def setUp(self) -> None:

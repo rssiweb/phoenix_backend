@@ -4,9 +4,7 @@ from rest_framework.test import APITestCase
 
 
 class BsaTest(APITestCase):
-    fixtures = [
-        "fixtures/test.json",
-    ]
+    fixtures = ["fixtures/core.json", "fixtures/user.json"]
 
     def setUp(self) -> None:
         super().setUp()

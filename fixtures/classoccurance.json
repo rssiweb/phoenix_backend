@@ -1,0 +1,52 @@
+[
+    {
+        "model": "api.classoccurrence",
+        "pk": 1,
+        "fields": {
+          "classroom": 1,
+          "faculty": 1,
+          "start_time": "2022-04-10T20:41:00Z",
+          "end_time": null
+        }
+    },
+    {
+        "model": "api.classoccurrence",
+        "pk": 2,
+        "fields": {
+          "classroom": 1,
+          "faculty": 1,
+          "start_time": "2022-04-10T20:41:13Z",
+          "end_time": null
+        }
+    },
+    {
+      "model": "api.classroom",
+      "pk": 1,
+      "fields": {
+          "bsa": 1,
+          "name": "Class 1",
+          "faculty": 2,
+          "sec_faculty": 2,
+          "subject": 1,
+          "working_days": "5",
+          "grade_system": 1
+      }
+    },
+    {
+        "model": "api.studentattendance",
+        "pk": 1,
+        "fields": {
+          "class_occurrance": 2,
+          "student": 1,
+          "faculty": 1,
+          "attendance": "P",
+          "comment": "",
+          "entry_on": "2022-04-10T20:42:00Z"
+        }
+    },
+    {
+        "model": "api.gradesystem",
+        "pk": 1,
+        "fields": { "bsa": 1, "name": "Grade System1" }
+    }
+]

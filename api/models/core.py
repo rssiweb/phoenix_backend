@@ -82,7 +82,7 @@ class CategorySessionAssociation(models.Model):
         unique_together = [["category", "session"]]
 
     def __str__(self):
-        return f"{self.bsa} - {self.category}"
+        return f"{self.session} - {self.category}"
 
 
 class CategorySubjectAssociation(models.Model):

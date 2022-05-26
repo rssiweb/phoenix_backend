@@ -1,0 +1,98 @@
+[
+    {
+        "model": "api.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$216000$JSZgPJ11Z17E$o5d0tzEgyoi6enEG6CrJQ2YJBTYbu9JDBj/DgPqnXoU=",
+            "last_login": "2022-04-07T18:53:47Z",
+            "is_superuser": true,
+            "username": "admin",
+            "first_name": "",
+            "last_name": "",
+            "email": "zkhan1093@gmail.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2022-04-07T18:43:02Z",
+            "type": 2,
+            "profile_pic": null,
+            "phone": null,
+            "gender": null,
+            "dob": null,
+            "inactive_from": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "api.user",
+        "pk": 2,
+        "fields": {
+            "password": "pbkdf2_sha256$216000$wvbmckOQ9Np4$/SwUdNMulxUF1vw/ZO3OycpqCTlRCLjqIYeWpbSoKZE=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "VLK0001",
+            "first_name": "Raju",
+            "last_name": "Sharma",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-04-07T18:43:41Z",
+            "type": 1,
+            "profile_pic": null,
+            "phone": null,
+            "gender": null,
+            "dob": null,
+            "inactive_from": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "api.user",
+        "pk": 3,
+        "fields": {
+            "password": "pbkdf2_sha256$216000$ZS59DqPVrrvW$tkxw81EBVYzAJq/xOf6qQVPTzVIeXVJpCseyQMNjEiI=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "VLK0002",
+            "first_name": "Ram",
+            "last_name": "Kumar",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-04-07T20:05:16Z",
+            "type": 2,
+            "profile_pic": null,
+            "phone": null,
+            "gender": null,
+            "dob": null,
+            "inactive_from": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "api.faculty",
+        "pk": 1,
+        "fields": {
+            "user": 3,
+            "title": "Don",
+            "permanent_address": null,
+            "current_address": null,
+            "base_branch": 1,
+            "work_experience": "sdsad"
+        }
+    },
+    {
+        "model": "api.faculty",
+        "pk": 2,
+        "fields": {
+            "user": 1,
+            "title": "the choosen one",
+            "permanent_address": null,
+            "current_address": null,
+            "base_branch": 1,
+            "work_experience": "gg"
+        }
+    }
+]

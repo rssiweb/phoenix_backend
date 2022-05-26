@@ -17,6 +17,7 @@ django-filter = "*"
 dj-database-url = "*"
 django-cors-headers = "*"
 gunicorn = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.8"
